@@ -1,0 +1,227 @@
+﻿@using DKAC.Controllers
+@model DKAC.Models.InfoModel.PermissionActionInfo
+@{
+    var baseController = new BaseController();
+    ViewBag.Title = "Quản lý quyền truy cập";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <style>
+        #btnSearch {
+            padding: 7px 15px 7px 15px;
+        }
+
+        .lbl {
+            padding: 0px;
+            width: auto;
+            margin-top: 8px;
+            padding-left: 15px;
+        }
+
+        table {
+            border: 2px solid #e8e4e4;
+        }
+
+        .paging {
+            padding: 0px 15px 0px 15px;
+            text-align: right;
+        }
+
+        ul {
+            margin: 0px !important;
+        }
+
+        .w80 {
+            width: 80px !important;
+        }
+
+        table.table tr th:first-child {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h2>Quản lý <b>Quyền truy cập</b></h2>
+                    </div>
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-3">
+                        <select class="form-control" id="role" onchange="LoadPermissionByRole(this)">
+                            @foreach (var item in Model.ListRole)
+                            {
+                                <option value="@item.Id">@item.Description</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th class="text-center" colspan="2" rowspan="2">Trang</th>
+                        <th class="text-center" colspan="4">Quyền thao tác</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center w80">Xem</th>
+                        <th class="text-center w80">Thêm</th>
+                        <th class="text-center w80">Sửa</th>
+                        <th class="text-center w80">Xóa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ListModul)
+                    {
+                        var lstPage = Model.ListPage.Where(x => x.ModulId == item.id).ToList();
+                        <tr>
+                            <th colspan="6">@item.ModulName</th>
+                        </tr>
+                        foreach (var page in lstPage)
+                        {
+                            <tr id="page_@page.id" myid="@page.id" class="pageId">
+                                <td></td>
+                                <td>@(page.Description == "Admin" ? page.PageName + "(" + page.Description + ")" : page.PageName)</td>
+                                @foreach (var action in Model.ListAction)
+                                {
+                                    <td>
+                                        @if (ViewBag.hasUpdatePermission || ViewBag.hasDeletePermission)
+                                        {
+                                            <input type="checkbox" value="@action.Value" onclick="SavePermission(this)" class="form-control action_@action.Value" />
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+<script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript">
+    var model = @Html.Raw(Json.Encode(Model));
+    var lstPerAction = model.ListPermissionActions;
+    var lstPage = model.ListPage;
+    var role = $('#role option:selected').val() * 1;
+    for (var i = 0; i < lstPerAction.length; i++) {
+        if (lstPerAction[i].RoleId == role) {
+            var actionKey = lstPerAction[i].ActionKey * 1;
+            for (var j = 0; j < model.ListAction.length; j++) {
+                var actionValue = model.ListAction[j].Value * 1;
+                var and = actionKey & actionValue;
+                if (and == actionValue) {
+                    $(`#page_${lstPerAction[i].PageId}`).find(`.action_${actionValue}`).prop('checked', true);
+                }
+                else {
+                    $(`#page_${lstPerAction[i].PageId}`).find(`.action_${actionValue}`).prop('checked', false);
+                }
+            }
+        }
+    }
+
+    function LoadPermissionByRole(element) {
+        var roleId = $(element).val();
+        for (var i = 0; i < lstPage.length; i++) {
+            for (var j = 0; j < model.ListAction.length; j++) {
+                var actionValue = model.ListAction[j].Value * 1;
+                $(`#page_${lstPage[i].id}`).find(`.action_${actionValue}`).prop('checked', false);
+            }
+        }
+        for (var i = 0; i < lstPerAction.length; i++) {
+            if (lstPerAction[i].RoleId == roleId) {
+                var actionKey = lstPerAction[i].ActionKey * 1;
+                for (var j = 0; j < model.ListAction.length; j++) {
+                    var actionValue = model.ListAction[j].Value * 1;
+                    var and = actionKey & actionValue;
+                    if (and == actionValue) {
+                        $(`#page_${lstPerAction[i].PageId}`).find(`.action_${actionValue}`).prop('checked', true);
+                    }
+                    else {
+                        $(`#page_${lstPerAction[i].PageId}`).find(`.action_${actionValue}`).prop('checked', false);
+                    }
+                }
+            }
+        }
+    }
+
+    function SavePermission(element) {
+        var actionValue = $(element).val() * 1;
+        var parentElement = $(element).closest('.pageId');
+        if (actionValue > 1 && $(element).prop('checked') == true) {
+            $(parentElement).find('.action_1').prop('checked', true)
+        }
+        if (actionValue == 1 && $(element).prop('checked') == false) {
+            for (var i = 1; i < model.ListAction.length; i++) {
+                $(parentElement).find(`.action_${model.ListAction[i].Value}`).prop('checked', false);
+            }
+        }
+
+        var actionKey = 0
+        for (var i = 0; i < model.ListAction.length; i++) {
+            var actionVal = model.ListAction[i].Value;
+            if ($(parentElement).find(`.action_${actionVal}`).prop('checked') == true) {
+                actionKey += $(parentElement).find(`.action_${actionVal}`).val() * 1;
+            }
+        }
+
+        var url = '/Admin/SavePermission/';
+        var data = {
+            PageId: $(parentElement).attr('myid'),
+            RoleId: $('#role option:selected').val(),
+            ActionKey: actionKey,
+        }
+
+        $.post(url, data,
+            function (rs) {
+                if (rs.status > 0) {
+                    toastr.success(rs.message);
+                }
+                else {
+                    toastr.error(rs.message);
+                }
+            });
+    }
+
+    function Delete(id) {
+        var data = {
+            id: id,
+        };
+        var title = "Bạn có đồng ý xóa dữ liệu này không?";
+        var url = '/Supplier/Delete/';
+        swal({
+            title: title,
+            icon: "warning",
+            buttons: {
+                ok: "Xác nhận",
+                cancel: "Hủy",
+            }
+        }).then((isConfirm) => {
+            if (isConfirm != 'ok') {
+
+            } else {
+                $.post(url, data,
+                    function (rs) {
+                        if (rs.status > 0) {
+                            swal({
+                                title: "Xóa thành công!",
+                                text: "Dữ liệu của bạn đã được cập nhật!",
+                                icon: "success",
+                            }).then(function (isConfirm) {
+                                window.location.href = '/Supplier';
+                            });
+                        }
+                        else {
+                            toastr.error(rs.message);
+                        }
+                    });
+            }
+        });
+    }
+</script>
+

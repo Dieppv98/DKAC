@@ -1,0 +1,217 @@
+﻿@model DKAC.Models.InfoModel.SupplierInfo
+
+@{
+    ViewBag.Title = "Thêm mới nhà cung cấp";
+    if (Model.id > 0)
+    {
+        ViewBag.Title = "Chi tiết nhà cung cấp";
+    }
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    label {
+        margin-top: 8px;
+        color: #435d7d;
+        font-weight: 700;
+    }
+
+    .form-group {
+        border: 2px solid #afc9e4;
+        background: #eef6ff;
+        padding: 20px;
+    }
+
+        .form-group .row {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+</style>
+
+<div class="container">
+    <div class="table-wrapper">
+        <div class="table-title">
+            <div class="row">
+                <i class="fa fa-align-left" style="font-size: 25px; margin-top: 6px;"></i>
+                <div class="col-sm-6">
+                    @if (Model.id > 0)
+                    {
+                        <h2>Chi tiết nhà cung cấp</h2>
+                    }
+                    else
+                    {
+                        <h2>Thêm mới nhà cung cấp</h2>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <ol class="breadcrumb" style="margin-left: 15px;">
+                <li style="margin-right: 10px"><a href="/"> <i class="fa fa-home"></i>Home</a></li>
+                <li style="margin-right: 10px"><a href="/Supplier"><i class="fa fa-list"></i>Danh sách</a></li>
+                <li class="active">
+                    @if (Model.id > 0)
+                    {
+                        <span>Cập nhật</span>
+                    }
+                    else
+                    {
+                        <span>Thêm mới</span>
+                    }
+                </li>
+            </ol>
+        </div>
+
+        <form action="" method="post" id="edit">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="form-group">
+                @Html.HiddenFor(m => m.id, new { @class = "form-control", @id = "supId" })
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Mã nhà cung cấp: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.SupplierCode, new { @class = "form-control", @id = "supCode", @maxlength = "50" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.SupplierCode)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Tên nhà cung cấp: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.SupplierName, new { @class = "form-control", @id = "supName", @maxlength = "200" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.SupplierName)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Địa chỉ: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Address, new { @class = "form-control", @id = "supAddress", @maxlength = "500" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Address)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Số điện thoại: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Tel, new { @class = "form-control", @id = "supTel", @maxlength = "11" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Tel)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-md-12 col-md-offset-2 text-right">
+                <button onclick="AddOrUpdate()" class="btn btn-primary" id="btnLuu" style="width: 10%">Lưu</button>
+                <a type="button" class="btn btn-success" href="/supplier" style="width: 10%">Hủy</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Js file-->
+<script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#edit").submit(function () {
+            return false;
+        });
+    });
+
+    $("#supCode").on({
+        keyup: function () {
+            this.value = this.value.toUpperCase();
+        },
+        keydown: function (e) {
+            if (e.which === 32)
+                return false;
+        },
+        change: function () {
+            this.value = this.value.replace(/\s/g, "");
+        }
+    });
+
+    function AddOrUpdate() {
+        var data = {
+            id: $('#supId').val() * 1,
+            SupplierCode: $('#supCode').val(),
+            SupplierName: $('#supName').val(),
+            Address: $('#supAddress').val(),
+            Tel: $('#supTel').val(),
+        };
+
+        var title2 = "Bạn có đồng ý thêm mới không?";
+        var url = '/Supplier/Add';
+        if (data.id * 1 > 0) {
+            title2 = "Bạn có đồng ý cập nhật không?";
+            url = '/Supplier/Update';
+        }
+
+        if ($("form#edit").valid()) {
+            swal({
+                title: title2,
+                icon: "warning",
+                buttons: {
+                    ok: "Xác nhận",
+                    cancel: "Hủy",
+                }
+            }).then((isConfirm) => {
+                if (isConfirm != 'ok') {
+
+                } else {
+                    $("#btnLuu").attr("disabled", true);
+                    $.post(url, data,
+                        function (rs) {
+                            if (rs.status > 0) {
+                                swal({
+                                    title: "Cập nhật thành công!",
+                                    text: "Dữ liệu của bạn đã được cập nhật!",
+                                    icon: "success",
+                                }).then(function (isConfirm) {
+                                    if (data.id * 1 > 0) {
+                                        window.location.href = '/Supplier/Edit/' + data.id;
+                                    }
+                                    else {
+
+                                        window.location.href = '/Supplier';
+                                    }
+                                });
+                            }
+                            else {
+                                toastr.error(rs.message);
+                            }
+                        });
+                    $("#btnLuu").attr("disabled", false);
+                }
+            });
+        }
+    }
+
+
+</script>
+

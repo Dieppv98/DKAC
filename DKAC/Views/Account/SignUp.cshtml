@@ -1,0 +1,154 @@
+﻿@model DKAC.Models.InfoModel.EmployeeInfo
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Colorlib Templates">
+    <meta name="author" content="Colorlib">
+    <meta name="keywords" content="Colorlib Templates">
+    <!-- Title Page-->
+    <title>Au Register Forms by Colorlib</title>
+    <!-- Icons font CSS-->
+    <link href="~/assets/login/vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
+    <link href="~/assets/login/vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
+    <!-- Font special for pages-->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i" rel="stylesheet">
+    <!-- ~/assets/login/vendor CSS-->
+    <link href="~/assets/login/vendor/select2/select2.min.css" rel="stylesheet" media="all">
+    <link href="~/assets/login/vendor/datepicker/daterangepicker.css" rel="stylesheet" media="all">
+    <!-- Main CSS-->
+    <link href="~/assets/login/css/main.css" rel="stylesheet" media="all">
+</head>
+
+<body>
+
+    <div class="page-wrapper bg-red p-t-180 p-b-100 font-robo">
+        <div class="wrapper wrapper--w960">
+            <div class="card card-2">
+                <div class="card-heading"></div>
+                <div class="card-body">
+                    <h2 class="title">Đăng ký thành viên</h2>
+                    <form action="/Account/SignUp" method="post">
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger", @style = "color: red; font-style: italic; margin-bottom: 10px;" })
+
+                        <div class="input-group">
+                            <input class="input--style-2" type="text" placeholder="Họ tên" name="FullName">
+                        </div>
+                        <div style="margin-top: 10px; color: red; font-style: italic;">
+                            @Html.ValidationMessageFor(a => a.FullName)
+                        </div>
+
+                        <div class="input-group">
+                            <input class="input--style-2" type="text" placeholder="Tài khoản" name="UserName">
+                        </div>
+                        <div style="margin-top: 10px; color: red; font-style: italic;">
+                            @Html.ValidationMessageFor(a => a.UserName)
+                        </div>
+
+                        <div class="input-group">
+                            <input class="input--style-2" type="password" placeholder="Mật khẩu" name="PassWord">
+                        </div>
+                        <div style="margin-top: 10px; color: red; font-style: italic;">
+                            @Html.ValidationMessageFor(a => a.PassWord)
+                        </div>
+
+                        <div class="input-group">
+                            <input class="input--style-2" type="password" placeholder="Nhập lại mật khẩu" name="ConfirmPassWord">
+                        </div>
+                        <div style="margin-top: 10px; color: red; font-style: italic;">
+                            @Html.ValidationMessageFor(a => a.PassWord)
+                        </div>
+
+                        <div class="row row-space">
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input--style-2 js-datepicker" type="text" placeholder="Ngày sinh" name="BirthDay">
+                                    <i class="zmdi zmdi-calendar-note input-icon js-btn-calendar"></i>
+                                </div>
+                                <div style="margin-top: 10px; color: red; font-style: italic;">
+                                    @Html.ValidationMessageFor(a => a.Birthday)
+                                </div>
+                            </div>
+
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <div class="rs-select2 js-select-simple select--no-search">
+                                        <select name="Gender">
+                                            <option disabled="disabled" selected="selected">Giới tính</option>
+                                            <option value="1">Nam</option>
+                                            <option value="0">Nữ</option>
+                                            <option value="2">Khác</option>
+                                        </select>
+                                        <div class="select-dropdown"></div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px; color: red; font-style: italic;">
+                                    @Html.ValidationMessageFor(a => a.Gender)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <input class="input--style-2" type="text" placeholder="Email" name="Email">
+                        </div>
+                        <div style="margin-top: 10px; color: red; font-style: italic;">
+                            @Html.ValidationMessageFor(a => a.Email)
+                        </div>
+
+                        <div class="row row-space">
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <input class="input--style-2" type="text" placeholder="CMND" name="CMND">
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px; color: red; font-style: italic;">
+                                @Html.ValidationMessageFor(a => a.CMND)
+                            </div>
+
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <div class="rs-select2 js-select-simple select--no-search">
+                                        <select name="RoomId">
+                                            <option disabled="disabled" selected="selected">Phòng ban</option>
+                                            <option>Phòng 1</option>
+                                            <option>Phòng 2</option>
+                                            <option>Phòng 3</option>
+                                        </select>
+                                        <div class="select-dropdown"></div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px; color: red; font-style: italic;">
+                                    @Html.ValidationMessageFor(a => a.RoomID)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <input class="input--style-2" type="text" placeholder="Địa chỉ" name="Address">
+                        </div>
+                        <div style="margin-top: 10px; color: red; font-style: italic;">
+                            @Html.ValidationMessageFor(a => a.Address)
+                        </div>
+
+                        <div class="p-t-30 text-center">
+                            <button class="btn btn--radius btn--green" type="submit">Đăng ký</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Jquery JS-->
+    <script src="~/assets/login/vendor/jquery/jquery.min.js"></script>
+    <!-- ~/assets/login/vendor JS-->
+    <script src="~/assets/login/vendor/select2/select2.min.js"></script>
+    <script src="~/assets/login/vendor/datepicker/moment.min.js"></script>
+    <script src="~/assets/login/vendor/datepicker/daterangepicker.js"></script>
+    <!-- Main JS-->
+    <script src="~/assets/login/js/global.js"></script>
+</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>
+<!-- end document-->

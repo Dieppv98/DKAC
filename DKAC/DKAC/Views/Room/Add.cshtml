@@ -1,0 +1,187 @@
+﻿@model DKAC.Models.InfoModel.RoomInfo
+
+@{
+    ViewBag.Title = "Thêm mới phòng ban";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var Permission = (int)Session["Permission"];
+}
+
+<style>
+    label {
+        margin-top: 8px;
+        color: #435d7d;
+        font-weight: 700;
+    }
+
+    .form-group {
+        border: 2px solid #afc9e4;
+        background: #eef6ff;
+        padding: 20px;
+    }
+
+        .form-group .row {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+</style>
+
+<div class="container">
+    <div class="table-wrapper">
+        <div class="table-title">
+            <div class="row">
+                <i class="fa fa-align-left" style="font-size: 25px; margin-top: 6px;"></i>
+                <div class="col-sm-6">
+                    <h2>Thêm mới nhân viên</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <ol class="breadcrumb" style="margin-left: 15px;">
+                <li style="margin-right: 10px"><a href="/"> <i class="fa fa-home"></i>Home</a></li>
+                <li style="margin-right: 10px"><a href="/Room"><i class="fa fa-list"></i>Danh sách</a></li>
+                <li class="active">
+                    <span>Thêm mới</span>
+                </li>
+            </ol>
+        </div>
+
+        <form action="" method="post" id="edit">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.HiddenFor(m => m.Id, new { @class = "form-control", @id = "Id" })
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Tên phòng: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.RoomName, new { @class = "form-control", @id = "RoomName", @maxlength = "200" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.RoomName)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Mã phòng: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.RoomShortName, new { @class = "form-control", @id = "RoomShortName", @maxlength = "200" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.RoomShortName)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Trưởng phòng: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.DropDownListFor(a => a.Manager, (List<SelectListItem>)ViewBag.AllUserName, "---Chọn trưởng phòng---",
+                                                               new { @class = "form-control", @id = "Manager" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Manager)
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-md-12 col-md-offset-2 text-right">
+                <button onclick="AddOrUpdate()" class="btn btn-primary" id="btnLuu" style="width: 10%">Lưu</button>
+                <a type="button" class="btn btn-success" href="/Room" style="width: 10%">Hủy</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Js file-->
+<!-- ~/assets/login/vendor JS-->
+<script src="~/assets/login/vendor/select2/select2.min.js"></script>
+<script src="~/assets/login/vendor/datepicker/moment.min.js"></script>
+<script src="~/assets/login/vendor/datepicker/daterangepicker.js"></script>
+<script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
+<script src="~/assets/login/vendor/datepicker/moment.min.js"></script>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#edit").submit(function () {
+            return false;
+        });
+    });
+
+    $("#Members").on({
+        keydown: function (e) {
+            if (e.which === 32)
+                return false;
+        },
+        change: function () {
+            if(this.value <= 0) { this.value = 0;}
+            this.value = this.value.replace(/\s/g, "");
+        }
+
+    });
+
+    $("#RoomShortName").on({
+        keydown: function (e) {
+            if (e.which === 32)
+                return false;
+        },
+        change: function () {
+            this.value = this.value.replace(/\s/g, "");
+        }
+    });
+
+    function AddOrUpdate() {
+        var data = {
+            RoomName: $('#RoomName').val(),
+            RoomShortName: $('#RoomShortName').val(),
+            Manager: $('#Manager').val().trim(),
+        };
+
+        var title2 = "Bạn có đồng ý thêm mới không?";
+        var url = '/Room/Add';
+
+        if ($("form#edit").valid()) {
+            swal({
+                title: title2,
+                icon: "warning",
+                buttons: {
+                    ok: "Xác nhận",
+                    cancel: "Hủy",
+                }
+            }).then((isConfirm) => {
+                if (isConfirm != 'ok') {
+
+                } else {
+                    $("#btnLuu").attr("disabled", true);
+                    $.post(url, data,
+                        function (rs) {
+                            if (rs.status > 0) {
+                                swal({
+                                    title: "Cập nhật thành công!",
+                                    text: "Dữ liệu của bạn đã được cập nhật!",
+                                    icon: "success",
+                                }).then(function (isConfirm) {
+                                        window.location.href = '/Room';
+                                });
+                            }
+                            else {
+                                toastr.error(rs.message);
+                            }
+                        });
+                    $("#btnLuu").attr("disabled", false);
+                }
+            });
+        }
+    }
+
+
+</script>

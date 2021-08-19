@@ -1,0 +1,172 @@
+﻿@using DKAC.Controllers
+@model DKAC.Models.InfoModel.PermissionActionInfo
+@{
+    var baseController = new BaseController();
+    ViewBag.Title = "Quản lý vai trò";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <style>
+        #btnSearch {
+            padding: 7px 15px 7px 15px;
+        }
+
+        .lbl {
+            padding: 0px;
+            width: auto;
+            margin-top: 8px;
+            padding-left: 15px;
+        }
+
+        table {
+            border: 2px solid #e8e4e4;
+        }
+
+        .paging {
+            padding: 0px 15px 0px 15px;
+            text-align: right;
+        }
+
+        ul {
+            margin: 0px !important;
+        }
+
+        .w120 {
+            width: 120px !important;
+        }
+
+        table.table tr th:first-child {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h2>Quản lý <b>vai trò</b></h2>
+                    </div>
+                    <div class="col-sm-3">
+                        <a href="/Admin/EditRole/0" class="btn btn-success" style="padding: 10px 30px 10px 30px; border-radius: 5px"><i class="fa fa-plus"></i> Thêm mới Role</a>
+                    </div>
+                    <div class="col-sm-3">
+                        <select class="form-control" id="user" onchange="LoadRoleByUser(this)">
+                            @foreach (var item in Model.ListUser)
+                            {
+                                <option value="@item.id">@item.FullName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th class="text-center">Vai trò</th>
+                        <th class="text-center w120">Quyền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ListRole)
+                    {
+                        <tr>
+                            <td>@item.Description</td>
+                            <td>
+                                @if (ViewBag.hasUpdatePermission || ViewBag.hasDeletePermission)
+                                {
+                                    <input type="checkbox" value="@item.Id" onclick="SaveRole(this)" class="form-control role_@item.Id" />
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+<script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript">
+    var model = @Html.Raw(Json.Encode(Model));
+    var lstRole = model.ListRole;
+    var lstUserRole = model.ListUserRole;
+    var userElement = $('#user');
+    LoadRoleByUser(userElement);
+
+    function LoadRoleByUser(element) {
+        for (var j = 0; j < lstRole.length; j++) {
+            $(`.role_${lstRole[j].Id}`).prop('checked', false);
+        }
+        var userId = $(element).val();
+        for (var i = 0; i < lstUserRole.length; i++) {
+            for (var j = 0; j < lstRole.length; j++) {
+                if (lstUserRole[i].UserId == userId && lstUserRole[i].RoleId == lstRole[j].Id) {
+                    $(`.role_${lstRole[j].Id}`).prop('checked', true);
+                }
+            }
+        }
+    }
+
+    function SaveRole(element) {
+        var userId = $('#user').val();
+        var roleId = $(element).val();
+        var checked = $(element).prop('checked');
+
+        var url = '/Admin/SaveUserRole/';
+        var data = {
+            UserId: userId,
+            RoleId: roleId,
+            Check: checked,
+        }
+
+        $.post(url, data,
+            function (rs) {
+                if (rs.status > 0) {
+                    toastr.success(rs.message);
+                }
+                else {
+                    toastr.error(rs.message);
+                }
+            });
+    }
+
+    function Delete(id) {
+        var data = {
+            id: id,
+        };
+        var title = "Bạn có đồng ý xóa dữ liệu này không?";
+        var url = '/Supplier/Delete/';
+        swal({
+            title: title,
+            icon: "warning",
+            buttons: {
+                ok: "Xác nhận",
+                cancel: "Hủy",
+            }
+        }).then((isConfirm) => {
+            if (isConfirm != 'ok') {
+
+            } else {
+                $.post(url, data,
+                    function (rs) {
+                        if (rs.status > 0) {
+                            swal({
+                                title: "Xóa thành công!",
+                                text: "Dữ liệu của bạn đã được cập nhật!",
+                                icon: "success",
+                            }).then(function (isConfirm) {
+                                window.location.href = '/Supplier';
+                            });
+                        }
+                        else {
+                            toastr.error(rs.message);
+                        }
+                    });
+            }
+        });
+    }
+</script>
+

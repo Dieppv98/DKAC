@@ -1,0 +1,262 @@
+﻿@model DKAC.Models.InfoModel.EmployeeInfo
+@{
+    ViewBag.Title = "Chỉnh sửa tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    label {
+        margin-top: 8px;
+        color: #435d7d;
+        font-weight: 700;
+    }
+
+    .form-group {
+        border: 2px solid #afc9e4;
+        background: #eef6ff;
+        padding: 20px;
+    }
+
+        .form-group .row {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+</style>
+
+<div class="container">
+    <div class="table-wrapper">
+        <div class="table-title">
+            <div class="row">
+                <i class="fa fa-align-left" style="font-size: 25px; margin-top: 6px;"></i>
+                <div class="col-sm-6">
+                    <h2>Chỉnh sửa tài khoản của bạn</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <ol class="breadcrumb" style="margin-left: 15px;">
+                <li style="margin-right: 10px"><a href="/Account/Logout"> <i class="fa fa-sign-out-alt"></i> Đăng xuất</a></li>
+            </ol>
+        </div>
+
+        <form action="" method="post" id="edit">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="form-group">
+                @Html.HiddenFor(m => m.id, new { @class = "form-control", @id = "Id" })
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Họ tên nhân viên: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", @id = "FullName", @maxlength = "200" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.FullName)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Tài khoản (Mã nhân viên): </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @id = "UserName", @maxlength = "200" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.UserName)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Mật khẩu: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.PassWord, new { @class = "form-control", @id = "PassWord", @type = "password", @maxlength = "50" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.PassWord)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Giới tính: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.DropDownListFor(m=> m.Gender, new List<SelectListItem>
+                                              {
+                                                 new SelectListItem {Value = "1", Text = "Nam"},
+                                                 new SelectListItem {Value = "2", Text = "Nữ"},
+                                                 new SelectListItem {Value = "3", Text = "Khác"},
+                                              }, new { @class = "form-control", @id = "Gender" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Ngày sinh: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Birthday, new { @class = "form-control", @id = "BirthDay", @type="date", @placeholder = "yyyy/MM/dd", @Value = Model.Birthday.HasValue ? Model.Birthday.Value.ToString("yyyy-MM-dd") : "" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Birthday)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Số điện thoại: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Tel, new { @class = "form-control", @id = "Tel", @maxlength = "15" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Tel)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Email: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @id = "Email", @maxlength = "100", @type = "email" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Email)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>CMND: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.CMND, new { @class = "form-control", @id = "CMND", @maxlength = "15" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.CMND)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Địa chỉ: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Address, new { @class = "form-control", @id = "Address", @maxlength = "500" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Address)
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-md-12 col-md-offset-2 text-right">
+                <button onclick="AddOrUpdate()" class="btn btn-primary" id="btnLuu" style="width: 10%">Lưu</button>
+                <a type="button" class="btn btn-success" href="/Home/Index" style="width: 10%">Hủy</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Js file-->
+<!-- ~/assets/login/vendor JS-->
+<script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#edit").submit(function () {
+            return false;
+        });
+    });
+
+    $("#UserName").on({
+        keydown: function (e) {
+            if (e.which === 32)
+                return false;
+        },
+        change: function () {
+            this.value = this.value.replace(/\s/g, "");
+        }
+    });
+
+    function AddOrUpdate() {
+        var data = {
+            id: $('#Id').val() * 1,
+            FullName: $('#FullName').val(),
+            UserName: $('#UserName').val(),
+            PassWord: $('#PassWord').val(),
+            Gender: $('#Gender').val().trim(),
+            Birthday: $('#BirthDay').val(),
+            Tel: $('#Tel').val(),
+            Email: $('#Email').val(),
+            CMND: $('#CMND').val(),
+            Address: $('#Address').val(),
+        };
+
+        var title = "Bạn có đồng ý cập nhật không?";
+        var url = '/Employee/EditInfo';
+
+        if ($("form#edit").valid()) {
+            swal({
+                title: title,
+                icon: "warning",
+                buttons: {
+                    ok: "Xác nhận",
+                    cancel: "Hủy",
+                }
+            }).then((isConfirm) => {
+                if (isConfirm != 'ok') {
+
+                } else {
+                    $("#btnLuu").attr("disabled", true);
+                    $.post(url, data,
+                        function (rs) {
+                            if (rs.status > 0) {
+                                swal({
+                                    title: "Cập nhật thành công!",
+                                    text: "Dữ liệu của bạn đã được cập nhật!",
+                                    icon: "success",
+                                }).then(function (isConfirm) {
+                                    window.location.href = '/Employee/EditEmployeeInfo/' + data.id;
+                                });
+                            }
+                            else {
+                                toastr.error(rs.message);
+                            }
+                        });
+                    $("#btnLuu").attr("disabled", false);
+                }
+            });
+        }
+    }
+
+
+</script>
+
+@*<script>
+    $("#BirthDay")({ dateFormat: 'dd/MM/yyyy'});
+
+    $("#BirthDay").datepicker({ dateFormat: 'yyyy/MM/dd'});
+
+    $(function () {
+        $("#BirthDay").datepicker({
+                dateFormat: 'yyyy/MM/dd' })
+    });
+</script>*@

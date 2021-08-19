@@ -1,0 +1,87 @@
+﻿@model DKAC.Models.LoginModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Colorlib Templates">
+    <meta name="author" content="Colorlib">
+    <meta name="keywords" content="Colorlib Templates">
+    <!-- Title Page-->
+    <title>Au Register Forms by Colorlib</title>
+    <!-- Icons font CSS-->
+    <link href="~/assets/login/vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
+    <link href="~/assets/login/vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
+    <!-- Font special for pages-->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i" rel="stylesheet">
+    <!-- ~/assets/login/vendor CSS-->
+    <link href="~/assets/login/vendor/select2/select2.min.css" rel="stylesheet" media="all">
+    <link href="~/assets/login/vendor/datepicker/daterangepicker.css" rel="stylesheet" media="all">
+    <!-- Main CSS-->
+    <link href="~/assets/login/css/main.css" rel="stylesheet" media="all">
+</head>
+
+<body>
+
+    <style>
+        .input-group {
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+    </style>
+
+    <div class="page-wrapper bg-red p-t-180 p-b-100 font-robo">
+        <div class="wrapper wrapper--w960">
+            <div class="card card-2">
+                <div class="card-heading"></div>
+                <div class="card-body">
+                    <h2 class="title">Đăng nhập</h2>
+                    <form action="/Account/Login" method="post">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger", @style = "color: red; font-style: italic; margin-bottom: 10px;" })
+                        <fieldset>
+                            <div class="input-group">
+                                <input class="input--style-2" type="text" placeholder="Tài khoản" name="UserName">
+                            </div>
+                            <div style="margin-top: 10px; color: red; font-style: italic;">
+                                @Html.ValidationMessageFor(a => a.UserName)
+                            </div>
+                            <div class="input-group">
+                                <input class="input--style-2" type="password" placeholder="Mật khẩu" name="PassWord">
+                            </div>
+                            <div style="margin-top: 10px; color: red; font-style: italic;">
+                                @Html.ValidationMessageFor(a => a.Password)
+                            </div>
+                            <div class="row" style="padding-top:20px;">
+                                <div class="col-md-2">
+                                    <input type="checkbox" name="Remember" style=" width: 15px; height: 15px; margin-right:4px;">
+                                </div>
+                                <div class="col-md-2">
+                                    <label>Nhớ mật khẩu</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <a style="padding-left: 194px;text-align: right;">Bạn chưa có tài khoản?</a><a href="/Account/SignUp" style="padding-left: 5px;">Đăng ký</a>
+                                </div>
+                            </div>
+                            <div class="p-t-30 text-center">
+                                <button class="btn btn--radius btn--green" type="submit">Đăng nhập</button>
+                            </div>
+                        </fieldset>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Jquery JS-->
+    <script src="~/assets/login/vendor/jquery/jquery.min.js"></script>
+    <!-- ~/assets/login/vendor JS-->
+    <script src="~/assets/login/vendor/select2/select2.min.js"></script>
+    <script src="~/assets/login/vendor/datepicker/moment.min.js"></script>
+    <script src="~/assets/login/vendor/datepicker/daterangepicker.js"></script>
+    <!-- Main JS-->
+    <script src="~/assets/login/js/global.js"></script>
+</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>
+<!-- end document-->

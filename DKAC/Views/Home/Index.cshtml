@@ -1,0 +1,301 @@
+﻿@model DKAC.Models.RequestModel.HomeRequestModel
+
+@{
+    ViewBag.Title = "Trang chủ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .menu-product .cat {
+        background-color: #d74b33;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: bold;
+        padding: 15px 10px;
+        text-transform: uppercase;
+        margin: 0;
+        position: relative;
+    }
+
+    .sm-rating {
+        --star-size: 2;
+        padding: 0;
+        border: none;
+        unicode-bidi: bidi-override;
+        direction: rtl;
+        text-align: left;
+        user-select: none;
+        font-size: 2em;
+        font-size: calc(var(--star-size) * 1em);
+        cursor: pointer;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        -webkit-tap-highlight-color: transparent;
+        margin-bottom: 0;
+        height: calc(var(--star-size) / 2);
+        line-height: calc(var(--star-size) / 2);
+    }
+
+        .sm-rating > label {
+            display: inline-block;
+            position: relative;
+            width: 1.3em;
+            width: calc(var(--star-size) / 3 * 1.3em);
+            margin-bottom: 0;
+        }
+
+        .sm-rating > input {
+            position: relative;
+            transform: scale(3);
+            transform: scale(var(--star-size));
+            top: -.5em;
+            top: calc(var(--star-size) / 6 * -1em);
+            margin-left: -2.5em;
+            margin-left: calc(var(--star-size) / 6 * -5em);
+            z-index: 2;
+            opacity: 0;
+            font-size: initial;
+        }
+
+    .dish_descript {
+        border-bottom: 1px solid #dadada;
+    }
+
+        .dish_descript p {
+            font-size: 15px;
+            color: #1bbd36;
+        }
+
+    .dish_box {
+        border-bottom: 1px solid #dadada;
+        padding: 10px;
+    }
+
+        .dish_box p {
+            font-size: 14px;
+            color: #f15a23;
+            font-weight: bold;
+        }
+
+    .menu-product ul {
+        list-style: none;
+        display: block;
+        position: relative;
+        margin: 0px;
+        padding-top: 15px;
+    }
+
+    .menu-nn {
+        border-top: 2px solid #f5f5f5;
+        padding: 0;
+        margin: 0;
+        height: 50px;
+        background: white;
+    }
+</style>
+
+<!-- ======= Hero Section ======= -->
+<section id="hero">
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-ride="carousel">
+
+        <div class="carousel-inner" role="listbox">
+
+            <!-- Slide 1 -->
+            <div class="carousel-item active" style="background-image: url(/assets/img/slide/slide-1.jpg);">
+                <div class="carousel-container">
+                    <div class="carousel-content animated fadeInUp">
+                        <h2>Chào mừng đến với <span>DKAC.COM</span></h2>
+                        <p>Website đăng ký suất ăn công nghiệp online cho nhân viên theo từng ca thuộc công ty đầu tư và phát triển dịch vụ DKAC.</p>
+                        <div class="text-center"><a href="" class="btn-get-started">Chi tiêt</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="carousel-item" style="background-image: url(/assets/img/slide/slide-2.jpg);">
+                <div class="carousel-container">
+                    <div class="carousel-content animated fadeInUp">
+                        <h2>Số lượng</h2>
+                        <p>Hơn 100 loại thực đơn khác nhau, chia theo từng ca, thực đơn mỗi ca không giống nhau giúp cho công tác phục vụ, đáp ứng nhu cầu ăn uống của nhân viên một cách tốt nhất.</p>
+                        <div class="text-center"><a href="" class="btn-get-started">Chi tiêt</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="carousel-item" style="background-image: url(/assets/img/slide/slide-3.jpg);">
+                <div class="carousel-container">
+                    <div class="carousel-content animated fadeInUp">
+                        <h2>Chất lượng</h2>
+                        <p>Các món ăn, đồ uống được cung cấp từ các nhà cung cấp với mức tin cậy 100%, đảm bảo chất lượng suất ăn tốt nhất, đạt đủ tiêu chí về mặt vệ sinh an toàn thực phẩm.</p>
+                        <div class="text-center"><a href="" class="btn-get-started">Chi tiêt</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="carousel-item" style="background-image: url(/assets/img/slide/slide-4.jpg);">
+                <div class="carousel-container">
+                    <div class="carousel-content animated fadeInUp">
+                        <h2>Giá cả</h2>
+                        <p>Các suất ăn khác nhau với các mức giá khác nhau chủ yếu là thuộc mức bình dân nhưng vẫn cung cấp đầy đủ dinh dưỡng, năng lượng cần thiết cho nhân viên của công ty sau giờ làm việc căng thẳng, đảm bảo lợi ích cao nhất cho nhân viên.</p>
+                        <div class="text-center"><a href="" class="btn-get-started">Chi tiêt</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="carousel-item" style="background-image: url(/assets/img/slide/slide-5.jpg);">
+                <div class="carousel-container">
+                    <div class="carousel-content animated fadeInUp">
+                        <h2>Dịch vụ</h2>
+                        <p>Dịch vụ chuyển giao hàng nhanh chóng, tiện lợi, ứng dụng các công nghệ mới nhất.</p>
+                        <div class="text-center"><a href="" class="btn-get-started">Chi tiết</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6 -->
+            <div class="carousel-item" style="background-image: url(/assets/img/slide/slide-6.jpg);">
+                <div class="carousel-container">
+                    <div class="carousel-content animated fadeInUp">
+                        <h2></h2>
+                        <p></p>
+                        <div class="text-center"><a href="" class="btn-get-started">Read More</a></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <a class="carousel-control-prev" href="#heroCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon icofont-simple-left" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+
+        <a class="carousel-control-next" href="#heroCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon icofont-simple-right" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+
+        <ol class="carousel-indicators" id="hero-carousel-indicators"></ol>
+
+    </div>
+</section>
+<!-- End Hero -->
+<!-- ======= Body Section ======= -->
+<section class="div">
+    <div class="body-content div">
+        <div class="row" style="padding: 15px;">
+            <div class="form-group" style="width: 20%; float: left">
+                <div>
+                    <div>
+                        <div class="menu-product">
+                            <div class="cat">
+                                <div class="row">
+                                    <div class="col-md-8">Danh mục</div>
+                                    <div class="col-md-4 text-right"><a class="fa fa-list"></a></div>
+
+                                </div>
+                            </div>
+                            @foreach (var item in Model.lstDishType)
+                            {
+                                <div class="menu-nn">
+                                    <ul>
+                                        <li>
+                                            <a onclick="loadDish(@item.id)" style="cursor: pointer; color: limegreen" id="typeDish">@item.DishTypeName</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="width: 2%"></div>
+
+            <div class="form-group" style="width: 78%; background-color: white" id="listDish">
+                @foreach (var item in Model.lstDish)
+                {
+                    <div class="row" style="padding: 15px; margin-bottom: 20px;">
+                        <div class="col-md-12" style="margin: 20px 0px">
+                            <span style="font-size: 20px;">@item.DishName</span>
+                        </div>
+                        <div class="col-md-4 image">
+                            <img src="~/Content/image/Dish/@item.Image" style="width: 100%; height: 100%;" />
+                        </div>
+                        <div class="col-md-8">
+                            <div class="dish_descript">
+                                <p>@item.Description</p>
+                            </div>
+                            <div class="dish_box">
+                                <div class="row">
+                                    <div class="col-md-3"><p>Giá: </p></div>
+                                    <div class="col-md-9"><p>@String.Format("{0:N0} VNĐ", item.Cost)</p></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><p>Tên: </p></div>
+                                    <div class="col-md-9"><p>@item.DishName</p></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><p>Đánh giá: </p></div>
+                                    <div class="col-md-9">
+                                        <div class="sm-rating">
+                                            <input name="sm_rating" role="button" tabindex="5" type="radio" id="sm_rating5" value="5" on="tap:sm_rating.submit">
+                                            <label for="sm_rating5" title="5 stars">☆</label>
+                                            <input name="sm_rating" role="button" tabindex="4" type="radio" id="sm_rating4" value="4" on="tap:sm_rating.submit">
+                                            <label for="sm_rating4" title="4 stars">☆</label>
+                                            <input name="sm_rating" role="button" tabindex="3" type="radio" id="sm_rating3" value="3" on="tap:sm_rating.submit">
+                                            <label for="sm_rating3" title="3 stars">☆</label>
+                                            <input name="sm_rating" role="button" tabindex="2" type="radio" id="sm_rating2" value="2" on="tap:sm_rating.submit">
+                                            <label for="sm_rating2" title="2 stars">☆</label>
+                                            <input name="sm_rating" role="button" tabindex="1" type="radio" id="sm_rating1" value="1" on="tap:sm_rating.submit">
+                                            <label for="sm_rating1" title="1 stars">☆</label>
+                                            <input type="hidden" name="sm_rating_post_id" value="66449">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><p>Điểm: </p></div>
+                                    <div class="col-md-9">
+                                        @if (item.JugStatus == 1)
+                                        {
+                                            <p>
+                                                @item.JugmentPoint (@item.JugmentQty Đánh giá) - Đã đánh giá
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <p>
+                                                @item.JugmentPoint (@item.JugmentQty Đánh giá)
+                                            </p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dish_box">
+                                <a href="/Register/RegisterByPersonal?dishId=@item.id" class="btn btn-sm btn-success">Đăng ký</a>
+                                @if (item.JugStatus != 1)
+                                {
+                                    <a href="/Jugment?dishId=@item.id" class="btn btn-sm btn-danger">Đánh giá</a>
+                                }
+                                else
+                                {
+                                    <a href="/Jugment?dishId=@item.id" class="btn btn-sm btn-danger" onclick="return false" style="cursor: not-allowed">Đánh giá</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Body-->
+
+<script type="text/javascript">
+    function loadDish(typeId) {
+        $("#listDish").empty();
+        $("#listDish").load("/Home/ListDish?typeId=" + typeId);
+    }
+</script>

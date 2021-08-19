@@ -1,0 +1,538 @@
+﻿@model DKAC.Models.InfoModel.RegisterByPersonalInfo
+@{
+    ViewBag.Title = "Đăng ký ăn ca cá nhân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <style>
+        #btnSearch {
+            padding: 7px 15px 7px 15px;
+        }
+
+        .lbl {
+            padding: 0px;
+            width: auto;
+            margin-top: 8px;
+            padding-left: 15px;
+        }
+
+        table {
+            border: 2px solid #e8e4e4;
+        }
+
+        .paging {
+            padding: 0px 15px 0px 15px;
+            text-align: right;
+        }
+
+        ul {
+            margin: 0px !important;
+        }
+
+        .menu-product .cat {
+            background-color: #d74b33;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 15px 10px;
+            text-transform: uppercase;
+            margin: 0;
+            position: relative;
+        }
+
+        .sm-rating {
+            --star-size: 2;
+            padding: 0;
+            border: none;
+            unicode-bidi: bidi-override;
+            direction: rtl;
+            text-align: left;
+            user-select: none;
+            font-size: 2em;
+            font-size: calc(var(--star-size) * 1em);
+            cursor: pointer;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            -webkit-tap-highlight-color: transparent;
+            margin-bottom: 0;
+            height: calc(var(--star-size) / 2);
+            line-height: calc(var(--star-size) / 2);
+        }
+
+            .sm-rating > label {
+                display: inline-block;
+                position: relative;
+                width: 1.3em;
+                width: calc(var(--star-size) / 3 * 1.3em);
+                margin-bottom: 0;
+            }
+
+            .sm-rating > input {
+                position: relative;
+                transform: scale(3);
+                transform: scale(var(--star-size));
+                top: -.5em;
+                top: calc(var(--star-size) / 6 * -1em);
+                margin-left: -2.5em;
+                margin-left: calc(var(--star-size) / 6 * -5em);
+                z-index: 2;
+                opacity: 0;
+                font-size: initial;
+            }
+
+        .dish_descript {
+            border-bottom: 1px solid #dadada;
+        }
+
+            .dish_descript p {
+                font-size: 15px;
+                color: #1bbd36;
+                margin-top: 10px;
+            }
+
+        .dish_box {
+            border-bottom: 1px solid #dadada;
+            padding: 10px 0px;
+        }
+
+            .dish_box p {
+                font-size: 14px;
+                color: #f15a23;
+                font-weight: bold;
+                margin-top: 10px;
+            }
+
+        .menu-product ul {
+            list-style: none;
+            display: block;
+            position: relative;
+            margin: 0px;
+            padding-top: 15px;
+        }
+
+        .menu-nn {
+            border-top: 2px solid #f5f5f5;
+            padding: 0;
+            margin: 0;
+            height: 50px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h2>Chọn ngày đăng ký</h2>
+                    </div>
+                </div>
+            </div>
+            <form action="@Url.Action("RegisterByPersonal", "Register")" id="search-form" method="get">
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-4"></div>
+                    <label class="lbl">Ngày đăng ký: </label>
+                    <div class="col-md-3" style="margin-bottom: 10px;">
+                        <input class="form-control" name="RegisterDate" type="date" id="regDate" placeholder="yyyy/MM/dd" value="@DateTime.Now.ToString("yyyy-MM-dd")" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h2>Thông tin <b>Đăng ký</b></h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="padding: 15px; margin-bottom: 20px; border: 2px solid #dddddd">
+                <table class="table table-striped table-hover" id="lstReg">
+                    <thead>
+                        <tr>
+                            <th class="text-center">STT</th>
+                            <th class="text-center">Tên suất ăn</th>
+                            <th class="text-center">Ca</th>
+                            <th class="text-center">Số lượng</th>
+                            <th class="text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyLstReg">
+                        @{
+                            var count = 0;
+                            var day = DateTime.Now.Day;
+                            var hour = DateTime.Now.Hour;
+                        }
+                        @foreach (var item in ViewBag.listReg)
+                        {
+                            count++;
+                            <tr>
+                                <td class="text-center">@count</td>
+                                <td class="text-center">@item.Dish.DishName</td>
+                                <td class="text-center">@item.Ca</td>
+                                <td class="text-center">@item.Quantity</td>
+                                <td class="text-center">
+                                    @if (item.RegisterDate.Day == day)
+                                    {
+                                        if (hour < 9)
+                                        {
+                                            <a onclick="Delete(@item.id)" class="delete btn btn-sm btn-danger" style="cursor: pointer"><i class="fa fa-trash" style="color: white" title="Hủy đăng ký"></i></a>
+                                        }
+                                        else if (hour >= 9 && hour <= 15)
+                                        {
+                                            if (item.Ca > 1)
+                                            {
+                                                <a onclick="Delete(@item.id)" class="delete btn btn-sm btn-danger" style="cursor: pointer"><i class="fa fa-trash" style="color: white" title="Hủy đăng ký"></i></a>
+                                            }
+                                        }
+                                        else if (hour >= 15 && hour < 22)
+                                        {
+                                            if (item.Ca > 2)
+                                            {
+                                                <a onclick="Delete(@item.id)" class="delete btn btn-sm btn-danger" style="cursor: pointer"><i class="fa fa-trash" style="color: white" title="Hủy đăng ký"></i></a>
+                                            }
+                                        }
+                                        else { }
+                                    }
+                                    else
+                                    {
+                                        <a onclick="Delete(@item.id)" class="delete btn btn-sm btn-danger" style="cursor: pointer"><i class="fa fa-trash" style="color: white" title="Hủy đăng ký"></i></a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row" style="padding: 15px; margin-bottom: 20px; border: 2px solid #dddddd">
+                <div class="col-md-7">
+                    <div class="row">
+                        <div class="col-md-6 image">
+                            <img src="~/Content/image/Dish/@Model.Dish.Image" style="width: 100%; height: 100%;" />
+                        </div>
+                        <div class="col-md-6">
+                            <div class="dish_box" style="padding-top: 0">
+                                @Html.DropDownListFor(a => a.DishId, (List<SelectListItem>)ViewBag.listDish,
+                                                               new { @class = "form-control", @id = "dishId" })
+                            </div>
+                            <div class="dish_box" style="height: 210px">
+                                <div class="row">
+                                    <div class="col-md-4"><p>Giá: </p></div>
+                                    <input type="hidden" id="dCost" value="@Model.Dish.Cost" />
+                                    <div class="col-md-7"><p id="dishCost">@String.Format("{0:N0} VNĐ", Model.Dish.Cost)</p></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"><p>Tên: </p></div>
+                                    <div class="col-md-7"><p id="dishName">@Model.Dish.DishName</p></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"><p>Đánh giá: </p></div>
+                                    <div class="col-md-7">
+                                        <div class="sm-rating" style="margin-top: 5px">
+                                            <input name="sm_rating" role="button" tabindex="5" type="radio" id="sm_rating5" value="5" on="tap:sm_rating.submit">
+                                            <label for="sm_rating5" title="5 stars">☆</label>
+                                            <input name="sm_rating" role="button" tabindex="4" type="radio" id="sm_rating4" value="4" on="tap:sm_rating.submit">
+                                            <label for="sm_rating4" title="4 stars">☆</label>
+                                            <input name="sm_rating" role="button" tabindex="3" type="radio" id="sm_rating3" value="3" on="tap:sm_rating.submit">
+                                            <label for="sm_rating3" title="3 stars">☆</label>
+                                            <input name="sm_rating" role="button" tabindex="2" type="radio" id="sm_rating2" value="2" on="tap:sm_rating.submit">
+                                            <label for="sm_rating2" title="2 stars">☆</label>
+                                            <input name="sm_rating" role="button" tabindex="1" type="radio" id="sm_rating1" value="1" on="tap:sm_rating.submit">
+                                            <label for="sm_rating1" title="1 stars">☆</label>
+                                            <input type="hidden" name="sm_rating_post_id" value="66449">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"><p>Điểm: </p></div>
+                                    <div class="col-md-7">
+                                        <p id="jugment">@Model.Dish.JugmentPoint (@Model.Dish.JugmentQty đánh giá)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="dish_descript">
+                        <div class="row">
+                            <div class="col-md-3"><p>Họ tên: </p></div>
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(m => m.EmployeeName, new { @class = "form-control", @id = "emName", @disabled = true })
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3"><p>Phòng ban: </p></div>
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(m => m.RoomName, new { @class = "form-control", @id = "roomName", @disabled = true })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dish_box">
+                        <div class="row">
+                            <div class="col-md-3"><p>Ca: </p></div>
+                            <div class="col-md-5">
+                                <select class="form-control" id="ca">
+                                    <option value="0">---Chọn ca---</option>
+                                    <option id="ca1" value="1">Ca 1</option>
+                                    <option id="ca2" value="2">Ca 2</option>
+                                    <option id="ca3" value="3">Ca 3</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3"><p>Số lượng: </p></div>
+                            <div class="col-md-5">
+                                @Html.TextBoxFor(m => m.Quantity, new { @class = "form-control", @id = "quantity", @type = "number", @min = "1", @max = "100" })
+                            </div>
+                            <div class="col-md-1" style="padding-top: 10px;">
+                                Xuất
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3"><p>Thành tiền: </p></div>
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" disabled value="0" id="totalMoney" />
+                            </div>
+                            <div class="col-md-1" style="padding-top: 10px;">
+                                VNĐ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-right" style="margin-right: -15px">
+                <button onclick="RegisterByPersonal()" class="btn btn-primary" id="btnDangKy" style="width: 10%">Đăng ký</button>
+                <a type="button" class="btn btn-success" href="/" style="width: 10%">Hủy</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+    $('#quantity').val(1);
+    var cost = parseInt($('#dCost').val());
+    $('#totalMoney').val(cost);
+
+    var d = new Date();
+    var hour = d.getHours();
+    if (hour < 9) {
+        $('#ca1').prop("disabled", false);
+        $('#ca2').prop("disabled", false);
+        $('#ca3').prop("disabled", false);
+    }
+    else if (hour < 15 && hour >= 9) {
+        $('#ca1').prop("disabled", true);
+        $('#ca2').prop("disabled", false);
+        $('#ca3').prop("disabled", false);
+    }
+    else if (hour < 22 && hour >= 15) {
+        $('#ca1').prop("disabled", true);
+        $('#ca2').prop("disabled", true);
+        $('#ca3').prop("disabled", false);
+    }
+    else {
+        $('#ca1').prop("disabled", true);
+        $('#ca2').prop("disabled", true);
+        $('#ca3').prop("disabled", true);
+    }
+
+    //event
+    $('#quantity').on("input", function () {
+        if ($(this).val() < 1) {
+            $(this).val("1");
+        }
+        else if ($(this).val() > 100) {
+            $(this).val("100");
+        }
+
+        var qty = parseInt($(this).val());
+        var c = parseInt($('#dCost').val());
+        $('#totalMoney').val(c * qty);
+    });
+
+    $("#regDate").change(function () {
+        var currentDate = $(this).val();
+        $("#lstReg #tbodyLstReg").empty();
+        $("#lstReg").load("/Register/ListRegister?CurrentDate=" + currentDate);
+
+        var current_Date = d.getDate();
+        var select = new Date(currentDate);
+        var select_Date = select.getDate();
+        if (current_Date == select_Date) {
+            if (hour < 9) {
+                $('#ca1').prop("disabled", false);
+                $('#ca2').prop("disabled", false);
+                $('#ca3').prop("disabled", false);
+            }
+            else if (hour < 15 && hour >= 9) {
+                $('#ca1').prop("disabled", true);
+                $('#ca2').prop("disabled", false);
+                $('#ca3').prop("disabled", false);
+            }
+            else if (hour < 22 && hour >= 15) {
+                $('#ca1').prop("disabled", true);
+                $('#ca2').prop("disabled", true);
+                $('#ca3').prop("disabled", false);
+            }
+            else {
+                $('#ca1').prop("disabled", true);
+                $('#ca2').prop("disabled", true);
+                $('#ca3').prop("disabled", true);
+            }
+        }
+        else {
+            $('#ca1').prop("disabled", false);
+            $('#ca2').prop("disabled", false);
+            $('#ca3').prop("disabled", false);
+        }
+    });
+
+    $("#dishId").change(function () {
+        var dishId = $(this).val();
+        $.ajax({
+            url: "/Register/GetDish/" + dishId,
+            type: "GET",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "json",
+            success: function (result) {
+                console.log(result);
+                $('.image img').attr("src", "/Content/image/Dish/" + result.Image)
+                $('#dishCost').text(result.CostFormat);
+                $('#dCost').val(result.Cost);
+                $('#dishName').text(result.DishName);
+                $('#jugment').text(result.Jugment);
+                $('#totalMoney').val(result.Cost * $("#quantity").val());
+            },
+            error: function (ErrorMessage) {
+                alert(ErrorMessage.response);
+            }
+        });
+    });
+
+    //function
+    function RegisterByPersonal() {
+        var data = {
+            DishId: $("#dishId").val(),
+            Ca: $("#ca").val(),
+            Quantity: $("#quantity").val(),
+            RegisterDate: $("#regDate").val(),
+        };
+        var title = "Bạn có đồng ý đăng ký không?";
+        var url = '/Register/RegisterByPersonal/';
+        swal({
+            title: title,
+            icon: "warning",
+            buttons: {
+                ok: "Xác nhận",
+                cancel: "Hủy",
+            }
+        }).then((isConfirm) => {
+            if (isConfirm != 'ok') {
+
+            } else {
+                $.post(url, data,
+                    function (rs) {
+                        if (rs.status > 0) {
+                            swal({
+                                title: rs.message + "!",
+                                text: "Dữ liệu của bạn đã được cập nhật!",
+                                icon: "success",
+                            }).then(function (isConfirm) {
+                                window.location.href = '/Register/RegisterByPersonal?dishId=' + data.DishId;
+                            });
+                        }
+                        else {
+                            swal({
+                                title: rs.message + "!",
+                                text: "Có lỗi xảy ra!",
+                                icon: "error",
+                            })
+                        }
+                    });
+            }
+        });
+    };
+
+    function Delete(id) {
+        var dishId = $('#dishId').val();
+        var data = {
+            id: id,
+        };
+        var title = "Bạn có đồng ý hủy đăng ký không?";
+        var url = '/Register/Delete/';
+        swal({
+            title: title,
+            icon: "warning",
+            buttons: {
+                ok: "Xác nhận",
+                cancel: "Hủy",
+            }
+        }).then((isConfirm) => {
+            if (isConfirm != 'ok') {
+
+            } else {
+                $.post(url, data,
+                    function (rs) {
+                        if (rs.status > 0) {
+                            swal({
+                                title: rs.message + "!",
+                                text: "Dữ liệu của bạn đã được cập nhật!",
+                                icon: "success",
+                            }).then(function (isConfirm) {
+                                window.location.href = '/Register/RegisterByPersonal?dishId=' + dishId;
+                            });
+                        }
+                        else {
+                            toastr.error(rs.message);
+                        }
+                    });
+            }
+        });
+    }
+
+    //init
+    var dishId = $('#dishId').val();
+    var ca = $('#ca').val();
+    if (dishId >= 1 && ca > 0) {
+        $('#btnDangKy').prop("disabled", false);
+    }
+    else {
+        $('#btnDangKy').prop("disabled", true);
+    }
+
+    $('#dishId').change(function () {
+        dishId = $(this).val();
+        ca = $('#ca').val();
+        if (dishId >= 1 && ca > 0) {
+            $('#btnDangKy').prop("disabled", false);
+        }
+        else {
+            $('#btnDangKy').prop("disabled", true);
+        }
+    });
+
+    $('#ca').change(function () {
+        dishId = $('#dishId').val();
+        ca = $(this).val();
+        if (dishId >= 1 && ca > 0) {
+            $('#btnDangKy').prop("disabled", false);
+        }
+        else {
+            $('#btnDangKy').prop("disabled", true);
+        }
+    });
+
+</script>
+

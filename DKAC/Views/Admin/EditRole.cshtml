@@ -1,0 +1,170 @@
+﻿@model DKAC.Models.EntityModel.Role
+
+@{
+    ViewBag.Title = "Thêm mới vai trò";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    label {
+        margin-top: 8px;
+        color: #435d7d;
+        font-weight: 700;
+    }
+
+    .form-group {
+        border: 2px solid #afc9e4;
+        background: #eef6ff;
+        padding: 20px;
+    }
+
+        .form-group .row {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+</style>
+
+<div class="container">
+    <div class="table-wrapper">
+        <div class="table-title">
+            <div class="row">
+                <i class="fa fa-align-left" style="font-size: 25px; margin-top: 6px;"></i>
+                <div class="col-sm-6">
+                    <h2>Chi tiết vai trò</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <ol class="breadcrumb" style="margin-left: 15px;">
+                <li style="margin-right: 10px"><a href="/"> <i class="fa fa-home"></i>Home</a></li>
+                <li class="active">
+                    <span>Thêm mới</span>
+                </li>
+            </ol>
+        </div>
+
+        <form action="" method="post" id="edit">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="form-group">
+                @Html.HiddenFor(m => m.Id, new { @class = "form-control", @id = "supId" })
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Mã vai trò: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.RoleName, new { @class = "form-control", @id = "RoleName", @maxlength = "50" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.RoleName)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Mô tả: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Description, new { @class = "form-control", @id = "Description", @maxlength = "200" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Description)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-md-12 col-md-offset-2 text-right">
+                <button onclick="AddOrUpdate()" class="btn btn-primary" id="btnLuu" style="width: 10%">Lưu</button>
+                <a type="button" class="btn btn-success" href="/" style="width: 10%">Hủy</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Js file-->
+<script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#edit").submit(function () {
+            return false;
+        });
+    });
+
+    $("#supCode").on({
+        keyup: function () {
+            this.value = this.value.toUpperCase();
+        },
+        keydown: function (e) {
+            if (e.which === 32)
+                return false;
+        },
+        change: function () {
+            this.value = this.value.replace(/\s/g, "");
+        }
+    });
+
+    function AddOrUpdate() {
+        var data = {
+            id: $('#supId').val() * 1,
+            RoleName: $('#RoleName').val(),
+            Description: $('#Description').val(),
+        };
+
+        var title2 = "Bạn có đồng ý thêm mới không?";
+        var url = '/Admin/AddRole';
+        if (data.id * 1 > 0) {
+            title2 = "Bạn có đồng ý cập nhật không?";
+            url = '/Admin/AddRole';
+        }
+
+        if ($("form#edit").valid()) {
+            swal({
+                title: title2,
+                icon: "warning",
+                buttons: {
+                    ok: "Xác nhận",
+                    cancel: "Hủy",
+                }
+            }).then((isConfirm) => {
+                if (isConfirm != 'ok') {
+
+                } else {
+                    $("#btnLuu").attr("disabled", true);
+                    $.post(url, data,
+                        function (rs) {
+                            if (rs.status > 0) {
+                                swal({
+                                    title: "Cập nhật thành công!",
+                                    text: "Dữ liệu của bạn đã được cập nhật!",
+                                    icon: "success",
+                                }).then(function (isConfirm) {
+                                    if (data.id * 1 > 0) {
+                                        window.location.href = '/';
+                                    }
+                                    else {
+
+                                        window.location.href = '/';
+                                    }
+                                });
+                            }
+                            else {
+                                toastr.error(rs.message);
+                            }
+                        });
+                    $("#btnLuu").attr("disabled", false);
+                }
+            });
+        }
+    }
+
+</script>
+
+

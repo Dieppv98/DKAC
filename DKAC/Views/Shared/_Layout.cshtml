@@ -1,0 +1,833 @@
+﻿@using DKAC.Common
+@using DKAC.Models.EntityModel
+@using DKAC.Controllers
+@using DKAC.Models.InfoModel
+@using DKAC.Models.Enum
+@{
+    HomeController homeController = new HomeController();
+    var em = (Employee)Session[CommonConstants.EMPLOYEE_SESSION];
+    var user = (User)Session[CommonConstants.USER_SESSION];
+    var per = (AccountModulPageInfo)Session[CommonConstants.PAGE_MODUL_SESSION];
+    var userId = user.id;
+    var lstAllNoti = homeController.GetAllNotifyByUserId(userId);
+    var lstNotiNew = new List<Notify>();
+    var lstNotiOld = new List<Notify>();
+    foreach (var item in lstAllNoti)
+    {
+        var time = DateTime.Now.Subtract(item.CreatedDate.Value);
+        if (time.Days == 0 && time.Hours == 0)
+        {
+            lstNotiNew.Add(item);
+        }
+        else { lstNotiOld.Add(item); }
+    }
+}
+
+<!DOCTYPE html>
+
+<style>
+    .alert-minimalist {
+        background-color: rgb(241, 242, 240);
+        border-color: rgba(149, 149, 149, 0.3);
+        border-radius: 3px;
+        color: rgb(149, 149, 149);
+        padding: 10px;
+    }
+
+        .alert-minimalist > [data-notify="icon"] {
+            height: 100px;
+            margin-right: 12px;
+        }
+
+        .alert-minimalist > [data-notify="title"] {
+            color: rgb(51, 51, 51);
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .alert-minimalist > [data-notify="message"] {
+            font-size: 80%;
+        }
+
+    .notifyjs-bootstrap-base {
+        padding: 30px 150px 25px 110px !important;
+    }
+
+    .notifyjs-bootstrap-error {
+        background-color: #e8e8e8;
+        opacity: 0.8;
+        border: #bfbfbf solid 1px;
+    }
+
+    .nav-link {
+        padding: 0px !important;
+    }
+
+    .dropdown-toggle::after {
+        display: none !important;
+    }
+
+    .badge {
+        display: block !important;
+        line-height: 0.8 !important;
+    }
+
+    .dropdown-menu.show {
+        transform: translate3d(-298px, 30px, 21px) !important;
+        width: 350px !important;
+        border-radius: 10px !important;
+        background-color: #fffcfc !important;
+    }
+
+    .dropdown-header {
+        color: #000000 !important;
+    }
+
+    .dropdown-item {
+        font-size: 12px !important;
+    }
+
+    .toast toast-info {
+        background-color: #708f1c !important,
+    }
+</style>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Đăng ký ăn ca online</title>
+    <meta content="" name="descriptison">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="~/assets/img/favicon.png" rel="icon">
+    <link href="~/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Roboto:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="~/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/venobox/venobox.css" rel="stylesheet">
+    <link href="~/assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="~/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="~/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="~/assets/font/css/all.css" rel="stylesheet" />
+
+    <!-- Template Main CSS File -->
+    <link href="~/assets/css/style.css" rel="stylesheet">
+    <link href="~/Content/toastr.css" rel="stylesheet" />
+    <link href="~/Content/DKAC/index.min.css" rel="stylesheet" />
+
+
+    <!-- =======================================================
+    * Template Name: DBD - v2.0.1
+    * Template URL: https://bootstrapmade.com/company-free-html-bootstrap-template/
+    * Author: BootstrapMade.com
+    * License: https://bootstrapmade.com/license/
+    ======================================================== -->
+
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <header id="header" class="fixed-top">
+        <div class="container d-flex align-items-center">
+            <h1 class="logo mr-auto"><a href="index.html"><span>DKAC</span>.COM</a></h1>
+            <!-- Uncomment below if you prefer to use an image logo -->
+            <!-- <a href="index.html" class="logo mr-auto"><img src="~/assets/img/logo.png" alt="" class="img-fluid"></a>-->
+
+            <nav class="nav-menu d-none d-lg-block">
+                <ul>
+                    <li class="active"><a href="/">Trang chủ</a></li>
+
+                    @foreach (var item in per.ListModul)
+                    {
+                        <li class="drop-down">
+                            <a href="">@item.ModulName</a>
+                            <ul>
+                                @foreach (var page in per.ListPage)
+                                {
+                                    if (page.ModulId == item.id)
+                                    {
+                                        <li><a href="@page.Url">@page.PageName</a></li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    }
+
+                    <li class="drop-down">
+                        <a href="">Tài khoản</a>
+                        <ul>
+                            <li><a href="/Employee/EditEmployeeInfo">Thông tin cá nhân</a></li>
+                            <li><a href="/Account/Logout">Đăng xuất</a></li>
+                        </ul>
+                    </li>
+
+                    <li><a href="#">Giới thiệu</a></li>
+                    <li><a onclick="ToastNoTi()">Tin tức</a></li>
+
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" title="Thông báo" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div class="row">
+                                <div>
+                                    <i class="fas fa-bell fa-fw"></i>
+                                </div>
+                                <!-- Counter - Alerts -->
+                                <div>
+                                    <span class="badge badge-danger badge-counter"><span class="count">&nbsp;</span></span>
+                                </div>
+                            </div>
+                        </a>
+                        <!-- Dropdown - Alerts -->
+                        <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown" style="height: 655px;max-height: 655px;overflow:scroll;background-color: #f9f9f9 !important">
+                            <h6 class="dropdown-header" style="padding-bottom: 0px;">
+                                <b style="color: #dc3545">Thông báo <i class="fas fa-bell fa-fw" title="Thông báo"></i></b>
+                            </h6>
+                            @if (lstNotiNew != null && lstNotiNew.Count > 0)
+                            {
+                                <span style="font-size: 13px; padding-left: 25px;"><b>Mới</b></span>
+                                foreach (var item in lstNotiNew)
+                                {
+                                    <a class="dropdown-item d-flex align-items-center" style="cursor: pointer;text-transform: none;@(item.SeenStatus != (int)SeenStatus.Seen ? "background-color: #d7d9db;" : "")" @(item.TypeNoti == (int)TypeOfNoti.TypeDishNew ? "onclick=RedirectViewNewDish(" + item.Id + "," + item.DishId + ")" : "onclick=RedirectAllDishs(" + item.Id + ") href=#")>
+                                        <div class="mr-3">
+                                            <div class="">
+                                                <img src="/Content/image/Dish/@(item.TypeNoti == (int)TypeOfNoti.TypeDishNew ? item.Image : "favicon.png")" style="width: 35px; height: 35px;border-radius:25px;border:none;" />
+                                            </div>
+                                        </div>
+                                        <div class="text-wrap wrapper">
+                                            @if (item.ContentNoti != null)
+                                            {
+                                                <span>Bạn có thông báo mới: @(item.ContentNoti.Trim())</span>
+                                            }
+                                            <div class="small">
+                                                @{
+                                                    var now = DateTime.Now;
+                                                    var cre = item.CreatedDate.Value;
+                                                    TimeSpan time = now.Subtract(cre);
+
+                                                    if (time.Days > 0)
+                                                    {
+                                                        <span style="color: #138ce6;">@(time.Days) ngày trước</span>
+                                                    }
+                                                    if (time.Days == 0 && time.Hours > 0)
+                                                    {
+                                                        <span style="color: #138ce6;">Khoảng @(time.Hours) giờ trước</span>
+                                                    }
+                                                    if (time.Days == 0 && time.Hours == 0 && time.Minutes > 0)
+                                                    {
+                                                        <span style="color: #138ce6;">Khoảng @(time.Minutes) phút trước</span>
+                                                    }
+                                                    else if (time.Days == 0 && time.Hours == 0 && time.Minutes == 0 && time.Seconds > 0)
+                                                    {
+                                                        <span style="color: #138ce6;">Khoảng @(time.Seconds) giây trước</span>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        @if (item.SeenStatus != (int)SeenStatus.Seen)
+                                        {
+                                            <span class="dot" style="background-color:#0095ff; height: 12px; width: 20px;border-radius: 100%; display: inline-block;"></span>
+                                        }
+                                    </a>
+                                }
+                            }
+                            @if (lstNotiOld != null && lstNotiOld.Count > 0)
+                            {
+                                <span style="font-size: 13px; padding-left: 25px;"><b>Trước đó</b></span>
+                                foreach (var item in lstNotiOld)
+                                {
+                                    <a class="dropdown-item d-flex align-items-center" style="cursor: pointer;text-transform: none;@(item.SeenStatus != (int)SeenStatus.Seen ? "background-color: #d7d9db;" : "")" @(item.TypeNoti == (int)TypeOfNoti.TypeDishNew ? "onclick=RedirectViewNewDish(" + item.Id + "," + item.DishId + ")" : "onclick=RedirectAllDishs(" + item.Id + ") href=#")>
+                                        <div class="mr-3">
+                                            <div class="">
+                                                <img src="/Content/image/Dish/@(item.TypeNoti == (int)TypeOfNoti.TypeDishNew ? item.Image : "favicon.png")" style="width: 35px; height: 35px;border-radius:25px;border:none;" />
+                                            </div>
+                                        </div>
+                                        <div class="text-wrap wrapper">
+                                            @if (item.ContentNoti != null)
+                                            {
+                                                <span>Bạn có thông báo mới: @(item.ContentNoti.Trim())</span>
+                                            }
+                                            <div class="small">
+                                                @{
+                                                    var now = DateTime.Now;
+                                                    var cre = item.CreatedDate.Value;
+                                                    TimeSpan time = now.Subtract(cre);
+
+                                                    if (time.Days > 0)
+                                                    {
+                                                        <span style="color: #138ce6;">Khoảng @(time.Days) ngày trước</span>
+                                                    }
+                                                    if (time.Days == 0 && time.Hours > 0)
+                                                    {
+                                                        <span style="color: #138ce6;">Khoảng @(time.Hours) giờ trước</span>
+                                                    }
+                                                    if (time.Days == 0 && time.Hours == 0 && time.Minutes > 0)
+                                                    {
+                                                        <span style="color: #138ce6;">Khoảng @(time.Minutes) phút trước</span>
+                                                    }
+                                                    else if (time.Days == 0 && time.Hours == 0 && time.Minutes == 0 && time.Seconds > 0)
+                                                    {
+                                                        <span style="color: #138ce6;">Khoảng @(time.Seconds) giây trước</span>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        @if (item.SeenStatus != (int)SeenStatus.Seen)
+                                        {
+                                            <span class="dot" style="background-color:#0095ff; height: 12px; width: 20px;border-radius: 100%; display: inline-block;"></span>
+                                        }
+                                    </a>
+                                }
+                            }
+                            else if (lstAllNoti == null || lstAllNoti.Count == 0)
+                            {
+                                <a class="dropdown-item small text-gray-500">Không có thông báo nào cho bạn!</a>
+                            }
+                        </div>
+                    </li>
+                </ul>
+            </nav><!-- .nav-menu -->
+
+            <div class="header-social-links">
+                <a href="#" class="twitter"><i class="icofont-twitter"></i></a>
+                <a href="#" class="facebook"><i class="icofont-facebook"></i></a>
+                <a href="#" class="instagram"><i class="icofont-instagram"></i></a>
+                <a href="#" class="linkedin"><i class="icofont-linkedin"></i></a>
+            </div>
+
+        </div>
+    </header>
+    <!-- End Header -->
+
+    <main id="main">
+        <!--Body Section-->
+        <section id="body">
+            <div class="container" data-aos="fade-up">
+                @RenderBody()
+            </div>
+        </section>
+        <!--End Body Section-->
+    </main><!-- End #main -->
+    <!-- ======= Footer ======= -->
+    <footer id="footer">
+
+        <div class="footer-top">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-lg-3 col-md-6 footer-contact">
+                        <h3>Đăng Ký Ăn Ca</h3>
+                        <p>
+                            Số 1, Nguyễn Văn Huyên<br>
+                            Hà Nội, Việt Nam<br><br>
+                            <strong>Số điện thoại:</strong> +84 325 712 929<br>
+                            <strong>Email:</strong> phamvandiep353@gmail.com<br>
+                        </p>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6 footer-links">
+                        <h4>Liên kết</h4>
+                        <ul>
+                            <li><i class="bx bx-chevron-right"></i> <a href="">Trang chủ</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="">Giới thiệu</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="">Dịch vụ</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="">Sự kiên</a></li>
+                            <li><i class="bx bx-chevron-right"></i> <a href="">Bản quyền</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 footer-newsletter">
+                        <h4>Tham gia cùng chúng tôi</h4>
+                        <p>Lợi ích của bạn là nghĩa vụ của chúng tôi</p>
+                        <form action="" method="post">
+                            <input type="email" name="email"><input type="submit" value="Đăng ký">
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container d-md-flex py-4">
+
+            <div class="mr-md-auto text-center text-md-left">
+                <div class="copyright">
+                    &copy; Copyright <strong><span>DKAC</span></strong>. All Rights Reserved
+                </div>
+                <div class="credits">
+                    <!-- All the links in the footer should remain intact. -->
+                    <!-- You can delete the links only if you purchased the pro version. -->
+                    <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                    <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/company-free-html-bootstrap-template/ -->
+                    Thiết kế bởi <a href="https://bootstrapmade.com/">BootstrapMade</a>
+                </div>
+            </div>
+            <div class="social-links text-center text-md-right pt-3 pt-md-0">
+                <a href="" class="twitter"><i class="bx bxl-twitter"></i></a>
+                <a href="https://facebook.com/" class="facebook"><i class="bx bxl-facebook"></i></a>
+                <a href="" class="instagram"><i class="bx bxl-instagram"></i></a>
+                <a href="" class="google-plus"><i class="bx bxl-skype"></i></a>
+                <a href="" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+            </div>
+        </div>
+    </footer><!-- End Footer -->
+
+    <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+    <!-- Vendor JS Files -->
+    <script src="~/assets/vendor/jquery/jquery.min.js"></script>
+    <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+    <script src="~/assets/vendor/php-email-form/validate.js"></script>
+    <script src="~/assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script src="~/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="~/assets/vendor/venobox/venobox.min.js"></script>
+    <script src="~/assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+    <script src="~/assets/vendor/owl.carousel/owl.carousel.min.js"></script>
+    <script src="~/assets/vendor/aos/aos.js"></script>
+    <script src="~/assets/font/js/all.js"></script>
+    <script src="~/assets/vendor/jquery/sweetalert.min.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    <script src="~/Scripts/toastr.js"></script>
+    <script src="~/Scripts/notify.js"></script>
+    <script src="~/Scripts/notify.min.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="~/assets/js/main.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+
+</body>
+
+
+</html>
+
+@if (user != null || em != null)
+{
+    var shortName = "";
+    if (user != null)
+    {
+        var name = user.FullName;
+        if (name != null && name.Count() > 0)
+        {
+            for (int i = name.Length - 1; i >= 1; --i)
+            {
+                int vt = name.LastIndexOf(' ');
+                shortName = name.Substring(vt + 1);
+                break;
+            }
+        }
+    }
+    if (em != null)
+    {
+        var name = em.FullName;
+        if (name != null && name.Count() > 0)
+        {
+            for (int i = name.Length; i >= 0; i--)
+            {
+                int vt = name.LastIndexOf(' ');
+                shortName = name.Substring(vt + 1);
+                break;
+            }
+        }
+    }
+
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            /* Button used to open the chat form - fixed at the bottom of the page */
+            .open-button {
+                background-color: #555;
+                color: white;
+                padding: 16px 20px;
+                border: none;
+                cursor: pointer;
+                opacity: 0.8;
+                position: fixed;
+                bottom: 23px;
+                right: 28px;
+                width: 280px;
+            }
+
+            /* The popup chat - hidden by default */
+            .chat-popup {
+                display: none;
+                position: fixed;
+                bottom: 0;
+                right: 15px;
+                border: 3px solid #f1f1f1;
+                z-index: 9;
+            }
+
+            /* Add styles to the form container */
+            .form-container {
+                max-width: 300px;
+                padding: 10px;
+                background-color: white;
+            }
+
+                /* Full-width textarea */
+                .form-container textarea {
+                    width: 100%;
+                    padding: 15px;
+                    margin: 5px 0 22px 0;
+                    border: none;
+                    background: #f1f1f1;
+                    resize: none;
+                    min-height: 200px;
+                }
+
+                    /* When the textarea gets focus, do something */
+                    .form-container textarea:focus {
+                        background-color: #ddd;
+                        outline: none;
+                    }
+
+                /* Set a style for the submit/send button */
+                .form-container .btn {
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 6px 20px;
+                    border: none;
+                    cursor: pointer;
+                    width: 100%;
+                    margin-bottom: 5px;
+                    opacity: 0.8;
+                }
+
+                /* Add a red background color to the cancel button */
+                .form-container .cancel {
+                    background-color: red;
+                }
+
+                /* Add some hover effects to buttons */
+                .form-container .btn:hover, .open-button:hover {
+                    opacity: 1;
+                }
+        </style>
+    </head>
+    <body>
+
+        <button class="open-button" onclick="openForm()">Chat</button>
+
+        <div class="chat-popup" id="myForm">
+            <form action="" class="form-container" id="formChat">
+                <input type="hidden" id="displayname" />
+                <div>
+                    @if (user.UserName == "admin")
+                    {
+                        <label for="msg"><b>Phản hồi của người dùng</b></label>
+                    }
+                    else
+                    {<label for="msg"><b>Chat với quản trị viên</b></label>}
+                    <ul id="discussion" class="form-container" style="overflow: auto;overflow: auto; height: 230px; border: #dcdcdc solid 1px; background-color: #f1f1f1; margin-bottom: 5px; border-radius: 0.3rem;"></ul>
+                    <input style="width: 280px; height: 40px; margin-bottom: 5px;border-radius: 0.3rem;border: #5A5352 solid 1px;" placeholder="Nhập tin nhắn..." name="msg" id="message" required />
+                    @*<textarea placeholder="Nhập tin nhắn..." name="msg" id="message" required></textarea>*@
+                    <button type="submit" class="btn" id="sendmessage">Gửi</button>
+                    <button type="button" class="btn cancel" onclick="closeForm()">Đóng</button>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                $("form#formChat").submit(function () {
+                    return false;
+                });
+            });
+            function openForm() {
+                document.getElementById("myForm").style.display = "block";
+            }
+            function closeForm() {
+                document.getElementById("myForm").style.display = "none";
+            }
+
+            @*$(function () {
+                // Start the connection
+                $.connection.hub.logging = true;
+                $.connection.hub.start().done(init);
+
+                var chat = $.connection.hub;
+                //var chat = $.connection.brewBattleHub;
+
+                // Create a function that the hub can call back to display messages.
+                chat.client.addNewMessageToPage = function (name, message) {
+                    // Add the message to the page.
+                    $('#discussion').append('<li><strong>' + htmlEncode(name)
+                        + '</strong>: ' + htmlEncode(message) + '</li>');
+                };
+                $('#displayname').val('@shortName');
+                $('#message').focus();
+
+                //$.connection.hub.logging = true;
+                //var chat = $.connection.brewBattleHub;
+                //$.connection.chatHub.start(({ transport: ['webSockets', 'serverSentEvents', 'longPolling'] })).done(function () {
+                //    $("#sendmessage").click(function () {
+                //        // Call the chat method on the server
+                //        chat.server.roll($('#displayname').val(), $('#message').val());
+                //    });
+                //    chat.server.sendMessage($('#displayname').val(), $('#message').val());
+                //}).fail(function (reason) {
+                //    console.log("SignalR connection failed: " + reason);
+                //});
+
+                $('#sendmessage').click(function () {
+                    $.connection.hub.start().done(function () {
+                        // Call the Send method on the hub.
+                        chat.server.send($('#displayname').val(), $('#message').val());
+                        // Clear text box and reset focus for next comment.
+                        $('#message').val('').focus();
+                    });
+                });
+
+            });
+
+
+
+
+            // This optional function html-encodes messages for display in the page.
+            function htmlEncode(value) {
+
+                var encodedValue = $('<div />').text(value).html();
+                return encodedValue;
+            }*@
+        </script>
+
+
+    </body>
+</html>
+}
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/jquery.signalR-2.4.1.min.js"></script>
+<script src="~/Scripts/jquery.signalR-2.4.1.js"></script>
+<script src="~/signalr/hubs"></script>
+
+<script type="text/javascript">
+    var userId = @userId;
+    //var count = 0;
+    //var count1 = 1;
+    //if (count < count1) {
+    //    var t = 3;
+    //    $('span.count').html(t);
+    //}
+
+    $(function () {
+        // Lúc mới vào load thông báo
+        $.ajax({
+            type: 'GET',
+            url: '/Home/GetNotificationCoutByUserId/' + userId,
+            success: function (rs) {
+                var countNoti = rs.length;
+                $('span.count').html(countNoti);
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+
+        // Click on notification icon for show notification
+        $('span.noti').click(function (e) {
+            e.stopPropagation();
+            $('.noti-content').show();
+            var count = 0;
+            count = parseInt($('span.count').html()) || 0;
+            //only load notification if not already loaded
+            if (count > 0) {
+                updateNotification();
+            }
+            $('span.count', this).html('&nbsp;');
+        })
+        // hide notifications
+        $('html').click(function () {
+            $('.noti-content').hide();
+        })
+        // update notification
+        function updateNotification() {
+            $('#notiContent').empty();
+            $('#notiContent').append($('<li>Loading...</li>'));
+
+            $.ajax({
+                type: 'GET',
+                url: '/Home/GetNotificationContacts',
+                success: function (response) {
+                    $('#notiContent').empty();
+                    if (response.length == 0) {
+                        $('#notiContent').append($('<li>No data available</li>'));
+                    }
+                    $.each(response, function (index, value) {
+                        $('#notiContent').append($('<li>New contact : ' + value.ContactName + ' (' + value.ContactNo + ') added</li>'));
+                    });
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+        }
+
+        // Đếm và hiện số thống báo ở icon quả chuông
+        function updateNotificationCount() {
+            $.ajax({
+                type: 'GET',
+                url: '/Home/GetQuantityNoti',
+                success: function (rs) {
+                    var countNoti = rs.length;
+                    $('span.count').html(countNoti);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+        }
+
+        // kết nối với server
+        var connection = $.hubConnection("/signalr", { useDefaultPath: false });
+
+        $.connection.hub.start().done(function () { }).fail(function (e) {
+            console.log('Lỗi kết nối server');
+        });
+
+        connection.logging = true;
+        var hub = connection.createHubProxy("NotificationHub");
+        hub.on("conectionServer", function () {
+            alert("Xin chào");
+        });
+
+        connection.start();
+
+        var notificationHub = $.connection.notificationHub;
+
+        //signalr nhận message thông báo từ server nếu == "notify" thì chạy hàm đếm lại số thông báo để hiển thị ở icon quả chuông
+        notificationHub.client.notify = function (message) {
+            if (message && message.toLowerCase() == "notify") {
+                var idNoti = 0;
+                $.ajax({
+                    type: 'GET',
+                    url: '/Home/GetNotiNewFirst',
+                    success: function (rs) {
+                        idNoti = rs.Id;
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                })
+
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": false,
+                    "progressBar": false,
+                    "positionClass": "toast-bottom-left",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "500",
+                    "hideDuration": "1000",
+                    "timeOut": "10000",
+                    "extendedTimeOut": "10000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut",
+                };
+
+                toastr.info("Hãy vào đăng ký đi nào  <img src=\"/assets/img/notify.jpg\" style='width: 30px; height: 25px'/> </br><span style='color:#efff00'>Khoảng vài giây trước</span>", "Thông báo: Sắp đến giờ ăn!!!", { onclick: function () { RedirectAllDishs(idNoti) } });
+            }
+
+            if (message && message.toLowerCase() == "notifyaddnewdish") {
+                var idNotiAddNewDish = 0;
+                var idNewDish = 0;
+                var defautImage = '';
+                $.ajax({
+                    type: 'GET',
+                    url: '/Home/GetNotiNewFirst',
+                    success: function (rs) {
+                        var data = rs;
+                        idNotiAddNewDish = rs.Id;
+                        idNewDish = rs.DishId;
+                        defautImage = rs.Image;
+
+                        toastr.options = {
+                            "closeButton": true,
+                            "debug": false,
+                            "newestOnTop": false,
+                            "progressBar": false,
+                            "positionClass": "toast-bottom-left",
+                            "preventDuplicates": false,
+                            "onclick": null,
+                            "showDuration": "500",
+                            "hideDuration": "1000",
+                            "timeOut": "10000",
+                            "extendedTimeOut": "10000",
+                            "showEasing": "swing",
+                            "hideEasing": "linear",
+                            "showMethod": "fadeIn",
+                            "hideMethod": "fadeOut",
+                        };
+
+                        toastr.info("Vào khám phá món mới ngay nào!  <img src=\"/Content/image/Dish/" + defautImage + "\" style='width: 30px; height: 25px'/> </br><span style='color:#efff00'>Khoảng vài giây trước</span>", "Hot: Đã có món mới!!!", { onclick: function () { RedirectViewNewDish(idNotiAddNewDish, idNewDish) } });
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                })
+            }
+
+            updateNotificationCount();
+        }
+    })
+
+    function ToastNoTi() {
+        $.ajax({
+            type: 'GET',
+            url: '/Home/Test',
+            success: function (rs) {
+
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+    }
+
+    function RedirectAllDishs(idNoti) {
+        $.ajax({
+            type: 'GET',
+            url: '/Home/UpdateNotiSeenAfterClick/' + idNoti,
+            success: function (rs) {
+                updateNotificationCount();
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+        window.location.href = "/Home/ListAllDish";
+    }
+
+    function RedirectViewNewDish(idNotiAddNewDish, idNewDish) {
+        $.ajax({
+            type: 'GET',
+            url: '/Home/UpdateNotiSeenAfterClick/' + idNotiAddNewDish,
+            success: function (rs) {
+                updateNotificationCount();
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+        window.location.href = "/Register/RegisterByPersonal?dishId=" + idNewDish;
+    }
+</script>

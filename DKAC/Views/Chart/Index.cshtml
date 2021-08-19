@@ -1,0 +1,166 @@
+﻿@using DKAC.Common
+@using DKAC.Models.EntityModel
+@using DKAC.Controllers
+@using DKAC.Models.InfoModel
+@model DKAC.Models.RequestModel.DishRequestModel
+@{
+    ViewBag.Title = "Thống kê hệ thống";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = (User)Session[CommonConstants.USER_SESSION];
+}
+
+<head>
+    <style>
+        #btnSearch {
+            padding: 7px 15px 7px 15px;
+        }
+
+        .lbl {
+            padding: 0px;
+            width: auto;
+            margin-top: 8px;
+            padding-left: 15px;
+        }
+
+        table {
+            border: 2px solid #e8e4e4;
+        }
+
+        .paging {
+            padding: 0px 15px 0px 15px;
+            text-align: right;
+        }
+
+        ul {
+            margin: 0px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h2>Thống kê lượt sử dụng chức năng hệ thống</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-md-4"></div>
+
+                <div class="col-md-4 text-center">
+                    <button onclick="LoadChart()" id="btnSearch" class="btn btn-sm btn-primary filter-submit">
+                        <i class="fa fa-search"></i> Xem biểu đồ
+                    </button>
+                </div>
+
+                <div class="col-md-4"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<figure class="highcharts-figure">
+    <div id="container"></div>
+
+</figure>
+
+<script src="~/Scripts/chart.js/highcharts.js"></script>
+<script src="~/Scripts/chart.js/solid-gauge.js"></script>
+<script src="~/Scripts/chart.js/data.js"></script>
+<script src="~/Scripts/chart.js/export-data.js"></script>
+<script src="~/Scripts/chart.js/exporting2.js"></script>
+<script src="~/Scripts/chart.js/highslide-full.min.js"></script>
+<script src="~/Scripts/chart.js/highslide.config.js"></script>
+<script src="~/Scripts/chart.js/offline-exporting.js"></script>
+<script src="~/Scripts/chart.js/series-label.js"></script>
+<script src="~/Scripts/chart.js/solid-gauge.js"></script>
+
+
+<script type="text/javascript">
+
+    function LoadChart() {
+        $('#container').empty();
+
+        $.ajax({
+            url: "/Chart/LoadChart/",
+            type: "GET",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "json",
+            success: function (rs) {
+                console.log(rs);
+                var numberSup = 0;
+                var numberDish = 0;
+                var numberSum = 0;
+                var percentSup = 0;
+                var percentDish = 0;
+
+                if (rs != undefined) {
+                    numberSup = rs.NumberGetAllSupplier;
+                    numberDish = rs.NumberGetAllDish;
+                    numberSum = rs.NumberSum;
+                    percentSup = rs.PercentGetAllSupplier;
+                    percentDish = rs.PercentGetAllDish;
+                }
+                Highcharts.chart('container', {
+                    chart: {
+                        type: 'pie'
+                    },
+                    title: {
+                        text: 'Biểu đồ biểu diễn lượt sử dụng các chức năng hệ thống',
+                        fontFamily: 'sans-serif',
+                        fontSize: 20,
+                    },
+                    subtitle: {
+                        text: 'Đăng ký ăn ca',
+                        fontFamily: 'sans-serif',
+                        fontSize: 14,
+                    },
+                    accessibility: {
+                        announceNewData: {
+                            enabled: true
+                        },
+                        point: {
+                            valueSuffix: '%'
+                        }
+                    },
+                    plotOptions: {
+                        series: {
+                            dataLabels: {
+                                enabled: true,
+                                format: '{point.name}: {point.y:.2f}%',
+                                fontFamily: 'sans-serif',
+                            }
+                        }
+                    },
+                    tooltip: {
+                        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                        pointFormat: `<span style="color:#000000">{point.name}</span>: <b>{point.x}</b> trên tổng số ${numberSum} lượt <br/>`,
+                        fontFamily: 'sans-serif',
+                    },
+                    series: [{
+                        name: 'Tên chức năng',
+                        colorByPoint: true,
+                        data: [{
+                            name: 'Quản lý nhà cung cấp',
+                            color: '#1bbd36',
+                            y: percentSup,
+                            x: numberSup,
+                        }, {
+                            name: 'Quản lý suất ăn',
+                            color: '#d74b33',
+                            y: percentDish,
+                            x: numberDish,
+                        }]
+                    }],
+                });
+            },
+            error: function (err) {
+                toastr.error("Có lỗi xảy ra");
+            },
+        });
+    }
+</script>

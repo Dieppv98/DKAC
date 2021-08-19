@@ -1,0 +1,196 @@
+﻿@model DKAC.Models.InfoModel.EmployeeInfo
+
+@{
+    ViewBag.Title = "Xem chi tiết nhân viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    label {
+        margin-top: 8px;
+        color: #435d7d;
+        font-weight: 700;
+    }
+
+    .form-group {
+        border: 2px solid #afc9e4;
+        background: #eef6ff;
+        padding: 20px;
+    }
+
+        .form-group .row {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+</style>
+
+<div class="container">
+    <div class="table-wrapper">
+        <div class="table-title">
+            <div class="row">
+                <i class="fa fa-align-left" style="font-size: 25px; margin-top: 6px;"></i>
+                <div class="col-sm-6">
+                    <h2>Chi tiết nhân viên</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <ol class="breadcrumb" style="margin-left: 15px;">
+                <li style="margin-right: 10px"><a href="/"> <i class="fa fa-home"></i>Home</a></li>
+                <li style="margin-right: 10px"><a href="/Employee"><i class="fa fa-list"></i>Danh sách</a></li>
+                <li class="active">
+                    <span>Chi tết nhân viên: @Model.FullName</span>
+                </li>
+            </ol>
+        </div>
+
+        <form action="" method="post" id="edit">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="form-group">
+                @Html.HiddenFor(m => m.id, new { @class = "form-control", @id = "Id" })
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Họ tên nhân viên: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", @id = "FullName", @maxlength = "200", @disabled = "true" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Tài khoản (Mã nhân viên): </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @id = "UserName", @maxlength = "200", @disabled = "true" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Mật khẩu: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.PassWord, new { @class = "form-control", @id = "PassWord", @type = "password", @maxlength = "50", @disabled = "true" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Giới tính: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @if (Model.Gender == 1)
+                        {
+                            <input type="text" class="form-control" value="Nam" disabled />
+                        }
+                        else if (Model.Gender == 2)
+                        {
+                            <input type="text" class="form-control" value="Nữ" disabled />
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" value="Khác" disabled />
+                        }
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Ngày sinh: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Birthday, new { @class = "form-control", @id = "BirthDay", @placeholder = "yyyy/mm/dd", @Value = Model.Birthday.HasValue ? Model.Birthday.Value.ToString("dd/MM/yyyy") : "", @disabled = "true" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Phòng ban: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(a => a.RoomID, new { @class = "form-control", @id = "RoomId", @disabled = "true" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Vai trò: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @if (Model.Role == 1)
+                        {
+                            <input type="text" class="form-control" value="Nhân viên" disabled />
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" value="Trưởng phòng" disabled />
+                        }
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Số điện thoại: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Tel, new { @class = "form-control", @id = "Tel", @maxlength = "15", @disabled = "true" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Email: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @id = "Email", @maxlength = "100", @type = "email", @disabled = "true" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>CMND: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.CMND, new { @class = "form-control", @id = "CMND", @maxlength = "15", @disabled = "true" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Địa chỉ: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Address, new { @class = "form-control", @id = "Address", @maxlength = "500", @disabled = "true" })
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-md-12 col-md-offset-2 text-right">
+                <a type="button" class="btn btn-success" href="/Employee" style="width: 10%">Trở về</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Js file-->
+<!-- ~/assets/login/vendor JS-->
+<script src="~/assets/login/vendor/select2/select2.min.js"></script>
+<script src="~/assets/login/vendor/datepicker/moment.min.js"></script>
+<script src="~/assets/login/vendor/datepicker/daterangepicker.js"></script>
+<script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
+<script src="~/assets/login/vendor/datepicker/moment.min.js"></script>
+

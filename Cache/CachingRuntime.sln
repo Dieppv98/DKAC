@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CachingRuntime", "CachingRuntime\CachingRuntime.csproj", "{C5220EAF-9FD3-4E8A-BAD8-CD55692FFACF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C5220EAF-9FD3-4E8A-BAD8-CD55692FFACF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5220EAF-9FD3-4E8A-BAD8-CD55692FFACF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5220EAF-9FD3-4E8A-BAD8-CD55692FFACF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5220EAF-9FD3-4E8A-BAD8-CD55692FFACF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6188F9BD-39AC-4E03-9414-BBAC9ADC0727}
+	EndGlobalSection
+EndGlobal

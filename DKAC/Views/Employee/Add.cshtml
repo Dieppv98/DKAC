@@ -1,0 +1,309 @@
+﻿@model DKAC.Models.InfoModel.EmployeeInfo
+
+@{
+    /**/
+
+    ViewBag.Title = "Thêm mới nhân viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    label {
+        margin-top: 8px;
+        color: #435d7d;
+        font-weight: 700;
+    }
+
+    .form-group {
+        border: 2px solid #afc9e4;
+        background: #eef6ff;
+        padding: 20px;
+    }
+
+        .form-group .row {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+</style>
+
+<div class="container">
+    <div class="table-wrapper">
+        <div class="table-title">
+            <div class="row">
+                <i class="fa fa-align-left" style="font-size: 25px; margin-top: 6px;"></i>
+                <div class="col-sm-6">
+                    <h2>Thêm mới nhân viên</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <ol class="breadcrumb" style="margin-left: 15px;">
+                <li style="margin-right: 10px"><a href="/"> <i class="fa fa-home"></i>Home</a></li>
+                <li style="margin-right: 10px"><a href="/Employee"><i class="fa fa-list"></i>Danh sách</a></li>
+                <li class="active">
+                    <span>Thêm mới</span>
+                </li>
+            </ol>
+        </div>
+
+        <form action="" method="post" id="edit">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.HiddenFor(m => m.id, new { @class = "form-control", @id = "Id" })
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Họ tên nhân viên: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", @id = "FullName", @maxlength = "200" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.FullName)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Tài khoản (Mã nhân viên): </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @id = "UserName", @maxlength = "200" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.UserName)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Mật khẩu: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.PassWord, new { @class = "form-control", @id = "PassWord", @type = "password", @maxlength = "50" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.PassWord)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Giới tính: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.DropDownListFor(m=> m.Gender, new List<SelectListItem>
+                                              {
+                                                 new SelectListItem {Value = "1", Text = "Nam"},
+                                                 new SelectListItem {Value = "2", Text = "Nữ"},
+                                                 new SelectListItem {Value = "3", Text = "Khác"},
+                                              }, new { @class = "form-control", @id = "Gender" })
+
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Gender)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Ngày sinh: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Birthday, new { @class = "form-control", @id = "BirthDay", @placeholder = "yyyy/mm/dd", @type = "date" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Birthday)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Phòng ban: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.DropDownListFor(a => a.RoomID, (List<SelectListItem>)ViewBag.All, "---Chọn phòng---",
+                                                               new { @class = "form-control", @id = "RoomId" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.RoomID)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Vai trò: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.DropDownListFor(m=> m.Role, new List<SelectListItem>
+                                              {
+                                                 new SelectListItem {Value = "1", Text = "Nhân viên"},
+                                                 new SelectListItem {Value = "2", Text = "Trưởng phòng"},
+                                              }, new { @class = "form-control", @id = "Role" })
+
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Role)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Số điện thoại: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Tel, new { @class = "form-control", @id = "Tel", @maxlength = "15" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Tel)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Email: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @id = "Email", @maxlength = "200", @type = "email" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Email)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>CMND: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.CMND, new { @class = "form-control", @id = "CMND", @maxlength = "15" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.CMND)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Địa chỉ: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Address, new { @class = "form-control", @id = "Address", @maxlength = "500" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Address)
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-md-12 col-md-offset-2 text-right">
+                <button onclick="AddOrUpdate()" class="btn btn-primary" id="btnLuu" style="width: 10%">Lưu</button>
+                <a type="button" class="btn btn-success" href="/Employee" style="width: 10%">Hủy</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Js file-->
+<!-- ~/assets/login/vendor JS-->
+<script src="~/assets/login/vendor/select2/select2.min.js"></script>
+<script src="~/assets/login/vendor/datepicker/moment.min.js"></script>
+<script src="~/assets/login/vendor/datepicker/daterangepicker.js"></script>
+<script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
+<script src="~/assets/login/vendor/datepicker/moment.min.js"></script>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#edit").submit(function () {
+            return false;
+        });
+    });
+
+    $("#UserName").on({
+        keydown: function (e) {
+            if (e.which === 32)
+                return false;
+        },
+        change: function () {
+            this.value = this.value.replace(/\s/g, "");
+        }
+    });
+
+    function AddOrUpdate() {
+        var data = {
+            FullName: $('#FullName').val(),
+            UserName: $('#UserName').val(),
+            PassWord: $('#PassWord').val(),
+            Gender: $('#Gender').val().trim(),
+            BirthDay: $('#BirthDay').val(),
+            RoomId: $('#RoomId').val(),
+            Permission: $('#Permission').val(),
+            Role: $('#Role').val(),
+            Tel: $('#Tel').val(),
+            Email: $('#Email').val(),
+            CMND: $('#CMND').val(),
+            Address: $('#Address').val(),
+        };
+
+        var title2 = "Bạn có đồng ý thêm mới không?";
+        var url = '/Employee/Add';
+
+        if ($("form#edit").valid()) {
+            swal({
+                title: title2,
+                icon: "warning",
+                buttons: {
+                    ok: "Xác nhận",
+                    cancel: "Hủy",
+                }
+            }).then((isConfirm) => {
+                if (isConfirm != 'ok') {
+
+                } else {
+                    $("#btnLuu").attr("disabled", true);
+                    $.post(url, data,
+                        function (rs) {
+                            if (rs.status > 0) {
+                                swal({
+                                    title: "Cập nhật thành công!",
+                                    text: "Dữ liệu của bạn đã được cập nhật!",
+                                    icon: "success",
+                                }).then(function (isConfirm) {
+                                        window.location.href = '/Employee';
+                                });
+                            }
+                            else {
+                                toastr.error(rs.message);
+                            }
+                        });
+                    $("#btnLuu").attr("disabled", false);
+                }
+            });
+        }
+    }
+
+
+</script>
+<script>
+    $("#BirthDay").datepicker({ dateFormat: 'yyyy/MM/dd'});
+
+    $(function () {
+        $("#BirthDay").datepicker({
+                dateFormat: 'yyyy/MM/dd' })
+    });
+
+</script>

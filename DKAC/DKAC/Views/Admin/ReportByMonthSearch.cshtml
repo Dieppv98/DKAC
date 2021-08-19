@@ -1,0 +1,62 @@
+﻿@using DKAC.Repository
+@model List<DKAC.Models.InfoModel.RegisterByPersonalInfo>
+
+@{
+    EmployeeRepository _emRepo = new EmployeeRepository();
+}
+
+<table class="table table-striped table-hover" id="reportByMonth">
+    <thead>
+        <tr>
+            <th class="text-center" width="50">STT</th>
+            <th class="text-center">Nhân viên</th>
+            <th class="text-center" width="200">Số lượng đăng ký</th>
+            <th class="text-center" style="width: 300px;">Tổng tiền</th>
+        </tr>
+    </thead>
+    <tbody id="tbodyreportByMonth">
+        @{
+            var count = 0;
+            int? totalQty = 0;
+            int? totalMoney = 0;
+        }
+        @foreach (var item in Model)
+        {
+            totalQty += item.Quantity;
+            totalMoney += item.Dish.Cost * item.Quantity;
+        }
+        @foreach (var r in ViewBag.allRoom)
+        {
+            <tr>
+                <th colspan="4" class="text-center">@r.RoomName</th>
+            </tr>
+            var lstEm = _emRepo.GetEmployees(r.id);
+            foreach (var em in lstEm)
+            {
+                count++;
+                int? sl = 0;
+                int? m = 0;
+                foreach (var reg in Model)
+                {
+                    if (reg.EmployeeId == em.id)
+                    {
+                        sl += reg.Quantity;
+                        m += reg.Quantity * reg.Dish.Cost;
+                    }
+                }
+                <tr>
+                    <td class="text-center">@count</td>
+                    <td class="text-center">@em.FullName</td>
+                    <td class="text-center">@sl</td>
+                    <td class="text-center">@String.Format("{0:N0} VNĐ", m)</td>
+                </tr>
+            }
+        }
+        <tr>
+            <th colspan="2" class="text-center">Tổng</th>
+            <th class="text-center">@totalQty</th>
+            <th class="text-center">@String.Format("{0:N0} VNĐ", totalMoney)</th>
+        </tr>
+    </tbody>
+</table>
+

@@ -1,0 +1,27 @@
+﻿@model List<CachingRuntime.Models.Category>
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-bordered table-striped">
+
+                <tr>
+
+                    <th>Name</th>
+                </tr>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>@item.CategoryName</td>
+                    </tr>
+
+                }
+            </table>
+        </div>
+    </div>
+</div>

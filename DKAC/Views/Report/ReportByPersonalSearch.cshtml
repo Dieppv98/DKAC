@@ -1,0 +1,41 @@
+﻿@model List<DKAC.Models.InfoModel.RegisterByPersonalInfo>
+
+<table class="table table-striped table-hover" id="reportByPersonal">
+    <thead>
+        <tr>
+            <th class="text-center" width="50">STT</th>
+            <th class="text-center">Tên suất ăn</th>
+            <th class="text-center" width="50">Ca</th>
+            <th class="text-center" width="100">Số lượng</th>
+            <th class="text-center">Ngày đăng ký</th>
+            <th class="text-center" style="width: 200px;">Tổng tiền</th>
+        </tr>
+    </thead>
+    <tbody id="tbodyReportByPersonal">
+        @{
+            var count = 0;
+            int? totalQty = 0;
+            int? totalMoney = 0;
+        }
+        @foreach (var item in Model)
+        {
+            count++;
+            totalQty += item.Quantity;
+            totalMoney += item.Dish.Cost * item.Quantity;
+            <tr>
+                <td class="text-center">@count</td>
+                <td class="text-center">@item.Dish.DishName</td>
+                <td class="text-center">@item.Ca</td>
+                <td class="text-center">@item.Quantity</td>
+                <td class="text-center">@item.RegisterDate.ToString("dd/MM/yyyy")</td>
+                <td class="text-center">@String.Format("{0:N0} VNĐ", item.Dish.Cost * item.Quantity)</td>
+            </tr>
+        }
+        <tr>
+            <th colspan="3" class="text-center">Tổng</th>
+            <th class="text-center">@totalQty</th>
+            <th></th>
+            <th class="text-center">@String.Format("{0:N0} VNĐ", totalMoney)</th>
+        </tr>
+    </tbody>
+</table>

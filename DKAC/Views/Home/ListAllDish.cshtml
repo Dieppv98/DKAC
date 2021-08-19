@@ -1,0 +1,111 @@
+﻿@model DKAC.Models.RequestModel.HomeRequestModel
+@{
+    ViewBag.Title = "Tất cả món ăn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var count = 0;
+}
+
+
+
+<head>
+    <style>
+        #btnSearch {
+            padding: 7px 15px 7px 15px;
+        }
+
+        .lbl {
+            padding: 0px;
+            width: auto;
+            margin-top: 8px;
+            padding-left: 15px;
+        }
+
+        table {
+            border: 2px solid #e8e4e4;
+        }
+
+        .paging {
+            padding: 0px 15px 0px 15px;
+            text-align: right;
+        }
+
+        ul {
+            margin: 0px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h2>Tất cả các món ăn</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="table-wrapper" style=" background-color: #88a6cb; color: white; ">
+                
+            @foreach (var item in Model.lstAllDish)
+            {
+                { count++; }
+                <div class="row" style="padding: 15px; margin-bottom: 20px;">
+                    <div class="col-md-12" style="margin: 20px 0px">
+                        <span style="font-size: 20px;">@(count + ". ") @item.DishName</span>
+                    </div>
+                    <div class="col-md-4 image">
+                        <img src="~/Content/image/Dish/@item.Image" style="width: 100%; height: 100%;" />
+                    </div>
+                    <div class="col-md-8">
+                        <div class="dish_descript">
+                            <p>@item.Description</p>
+                        </div>
+                        <div class="dish_box">
+                            <div class="row">
+                                <div class="col-md-3"><p>Giá: </p></div>
+                                <div class="col-md-9"><p>@String.Format("{0:N0} VNĐ", item.Cost)</p></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3"><p>Tên: </p></div>
+                                <div class="col-md-9"><p>@item.DishName</p></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3"><p>Đánh giá: </p></div>
+                                <div class="col-md-9">
+                                    <div class="sm-rating">
+                                        <input name="sm_rating" role="button" tabindex="5" type="radio" id="sm_rating5" value="5" on="tap:sm_rating.submit">
+                                        <label for="sm_rating5" title="5 stars">☆</label>
+                                        <input name="sm_rating" role="button" tabindex="4" type="radio" id="sm_rating4" value="4" on="tap:sm_rating.submit">
+                                        <label for="sm_rating4" title="4 stars">☆</label>
+                                        <input name="sm_rating" role="button" tabindex="3" type="radio" id="sm_rating3" value="3" on="tap:sm_rating.submit">
+                                        <label for="sm_rating3" title="3 stars">☆</label>
+                                        <input name="sm_rating" role="button" tabindex="2" type="radio" id="sm_rating2" value="2" on="tap:sm_rating.submit">
+                                        <label for="sm_rating2" title="2 stars">☆</label>
+                                        <input name="sm_rating" role="button" tabindex="1" type="radio" id="sm_rating1" value="1" on="tap:sm_rating.submit">
+                                        <label for="sm_rating1" title="1 stars">☆</label>
+                                        <input type="hidden" name="sm_rating_post_id" value="66449">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3"><p>Điểm: </p></div>
+                                <div class="col-md-9">
+                                    <p>@item.JugmentPoint (@item.JugmentQty Đánh giá)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dish_box">
+                            <a href="/Register/RegisterByPersonal?dishId=@item.id" class="btn btn-sm btn-success">Đăng ký</a>
+                            <a href="/Jugment/Index?dishId=@item.id" class="btn btn-sm btn-danger">Đánh giá</a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</body>
