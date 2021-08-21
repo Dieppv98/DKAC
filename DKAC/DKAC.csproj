@@ -610,6 +610,8 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include=".gitattributes" />
+    <Content Include=".gitignore" />
     <Content Include="assets\css\style.css" />
     <Content Include="assets\font\css\all.css" />
     <Content Include="assets\font\css\all.min.css" />
