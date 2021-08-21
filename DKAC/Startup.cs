@@ -45,7 +45,7 @@ namespace DKAC
 
             RecurringJob.AddOrUpdate<LoginRepository>(
                 "Thông báo đăng ký",
-                x => x.PushNotifi(), "*/1 * * * *", TimeZoneInfo.Local);//"0 30 8 * * *" chạy lúc 8h30 hàng ngày //("*/5 * * * *")-5p chạy 1 lần
+                x => x.PushNotifi(), "*/5 * * * *", TimeZoneInfo.Local);//"0 30 8 * * *" chạy lúc 8h30 hàng ngày //("*/5 * * * *")-5p chạy 1 lần
 
             app.UseHangfireDashboard();
             app.UseHangfireServer();
