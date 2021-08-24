@@ -16,6 +16,7 @@ using Hangfire;
 using Hangfire.Dashboard;
 using DKAC.Common;
 using Microsoft.AspNet.SignalR;
+using DKAC.Controllers;
 
 [assembly: OwinStartup(typeof(DKAC.Startup))]
 
@@ -23,17 +24,10 @@ namespace DKAC
 {
     public class Startup
     {
-        //public Startup(IConfiguration configuration)
-        //{
-        //    Configuration1 = configuration;
-        //}
-
         public void Configuration(IAppBuilder app)
         {
             // Any connection or hub wire up and configuration should go here
             app.MapSignalR();
-            //app.RunSignalR();
-            
 
             GlobalConfiguration.Configuration
                 .UseSqlServerStorage("DKACDbContext");
@@ -43,9 +37,9 @@ namespace DKAC
                 Authorization = new[] { new HangFireAuthorizationFilter() }
             });
 
-            RecurringJob.AddOrUpdate<LoginRepository>(
+            RecurringJob.AddOrUpdate<HomeController>(
                 "Thông báo đăng ký",
-                x => x.PushNotifi(), "*/5 * * * *", TimeZoneInfo.Local);//"0 30 8 * * *" chạy lúc 8h30 hàng ngày //("*/5 * * * *")-5p chạy 1 lần
+                x => x.PushNotifi(), "*/1 * * * *", TimeZoneInfo.Local);//"0 30 8 * * *" chạy lúc 8h30 hàng ngày //("*/5 * * * *")-5p chạy 1 lần
 
             app.UseHangfireDashboard();
             app.UseHangfireServer();

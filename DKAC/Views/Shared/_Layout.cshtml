@@ -9,18 +9,6 @@
     var user = (User)Session[CommonConstants.USER_SESSION];
     var per = (AccountModulPageInfo)Session[CommonConstants.PAGE_MODUL_SESSION];
     var userId = user.id;
-    var lstAllNoti = homeController.GetAllNotifyByUserId(userId);
-    var lstNotiNew = new List<Notify>();
-    var lstNotiOld = new List<Notify>();
-    foreach (var item in lstAllNoti)
-    {
-        var time = DateTime.Now.Subtract(item.CreatedDate.Value);
-        if (time.Days == 0 && time.Hours == 0)
-        {
-            lstNotiNew.Add(item);
-        }
-        else { lstNotiOld.Add(item); }
-    }
 }
 
 <!DOCTYPE html>
@@ -188,113 +176,26 @@
                             </div>
                         </a>
                         <!-- Dropdown - Alerts -->
-                        <div id="scrollpagination" class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown" style="height: 655px;max-height: 655px;overflow:scroll;background-color: #f9f9f9 !important">
-                            <span class="dropdown-header" style="padding-bottom: 0px;">
-                                <b style="color: #dc3545">Thông báo <i class="fas fa-bell fa-fw" title="Thông báo"></i></b>
-                            </span>
-                            <div id="contentLoading">
-                                @*@if (lstNotiNew != null && lstNotiNew.Count > 0)
-                                {
-                                    <span style="font-size: 13px; padding-left: 25px;"><b>Mới</b></span>
-                                    foreach (var item in lstNotiNew)
-                                    {
-                                        <a class="dropdown-item d-flex align-items-center" style="cursor: pointer;text-transform: none;@(item.SeenStatus != (int)SeenStatus.Seen ? "background-color: #d7d9db;" : "")" @(item.TypeNoti == (int)TypeOfNoti.TypeDishNew ? "onclick=RedirectViewNewDish(" + item.Id + "," + item.DishId + ")" : "onclick=RedirectAllDishs(" + item.Id + ") href=#")>
-                                            <div class="mr-3">
-                                                <div class="">
-                                                    <img src="/Content/image/Dish/@(item.TypeNoti == (int)TypeOfNoti.TypeDishNew ? item.Image : "favicon.png")" style="width: 35px; height: 35px;border-radius:25px;border:none;" />
-                                                </div>
-                                            </div>
-                                            <div class="text-wrap wrapper">
-                                                @if (item.ContentNoti != null)
-                                                {
-                                                    <span>Bạn có thông báo mới: @(item.ContentNoti.Trim())</span>
-                                                }
-                                                <div class="small">
-                                                    @{
-                                                        var now = DateTime.Now;
-                                                        var cre = item.CreatedDate.Value;
-                                                        TimeSpan time = now.Subtract(cre);
-
-                                                        if (time.Days > 0)
-                                                        {
-                                                            <span style="color: #138ce6;">@(time.Days) ngày trước</span>
-                                                        }
-                                                        if (time.Days == 0 && time.Hours > 0)
-                                                        {
-                                                            <span style="color: #138ce6;">Khoảng @(time.Hours) giờ trước</span>
-                                                        }
-                                                        if (time.Days == 0 && time.Hours == 0 && time.Minutes > 0)
-                                                        {
-                                                            <span style="color: #138ce6;">Khoảng @(time.Minutes) phút trước</span>
-                                                        }
-                                                        else if (time.Days == 0 && time.Hours == 0 && time.Minutes == 0 && time.Seconds > 0)
-                                                        {
-                                                            <span style="color: #138ce6;">Khoảng @(time.Seconds) giây trước</span>
-                                                        }
-                                                    }
-                                                </div>
-                                            </div>
-                                            @if (item.SeenStatus != (int)SeenStatus.Seen)
-                                            {
-                                                <span class="dot" style="background-color:#0095ff; height: 12px; width: 20px;border-radius: 100%; display: inline-block;"></span>
-                                            }
+                        <div id="scrollpagination" class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown" style="height:655px;max-height:655px;background-color:#f9f9f9 !important;overflow-y:scroll;overflow-x:hidden;">
+                            <div class="row">
+                                <div class="col-5">
+                                    <span class="dropdown-header" style="padding-bottom: 0px;">
+                                        <b style="color: #dc3545">Thông báo <i class="fas fa-bell fa-fw" title="Thông báo"></i></b>
+                                    </span>
+                                </div>
+                                <div class="col-7" style="text-align:right;">
+                                    <span class="dropdown-header" style="padding-bottom: 0px;">
+                                        <a href="javascript:void(0)" onclick="TickALLReaded()" style="font-size:12px;cursor:pointer;color:#0095ff;padding-top:3px;text-transform:none;">
+                                            <u>Đánh dấu tất cả là đã đọc</u>
                                         </a>
-                                    }
-                                }
-                                @if (lstNotiOld != null && lstNotiOld.Count > 0)
-                                {
-                                    <span style="font-size: 13px; padding-left: 25px;"><b>Trước đó</b></span>
-                                    foreach (var item in lstNotiOld)
-                                    {
-                                        <a class="dropdown-item d-flex align-items-center" style="cursor: pointer;text-transform: none;@(item.SeenStatus != (int)SeenStatus.Seen ? "background-color: #d7d9db;" : "")" @(item.TypeNoti == (int)TypeOfNoti.TypeDishNew ? "onclick=RedirectViewNewDish(" + item.Id + "," + item.DishId + ")" : "onclick=RedirectAllDishs(" + item.Id + ") href=#")>
-                                            <div class="mr-3">
-                                                <div class="">
-                                                    <img src="/Content/image/Dish/@(item.TypeNoti == (int)TypeOfNoti.TypeDishNew ? item.Image : "favicon.png")" style="width: 35px; height: 35px;border-radius:25px;border:none;" />
-                                                </div>
-                                            </div>
-                                            <div class="text-wrap wrapper">
-                                                @if (item.ContentNoti != null)
-                                                {
-                                                    <span>Bạn có thông báo mới: @(item.ContentNoti.Trim())</span>
-                                                }
-                                                <div class="small">
-                                                    @{
-                                                        var now = DateTime.Now;
-                                                        var cre = item.CreatedDate.Value;
-                                                        TimeSpan time = now.Subtract(cre);
-
-                                                        if (time.Days > 0)
-                                                        {
-                                                            <span style="color: #138ce6;">Khoảng @(time.Days) ngày trước</span>
-                                                        }
-                                                        if (time.Days == 0 && time.Hours > 0)
-                                                        {
-                                                            <span style="color: #138ce6;">Khoảng @(time.Hours) giờ trước</span>
-                                                        }
-                                                        if (time.Days == 0 && time.Hours == 0 && time.Minutes > 0)
-                                                        {
-                                                            <span style="color: #138ce6;">Khoảng @(time.Minutes) phút trước</span>
-                                                        }
-                                                        else if (time.Days == 0 && time.Hours == 0 && time.Minutes == 0 && time.Seconds > 0)
-                                                        {
-                                                            <span style="color: #138ce6;">Khoảng @(time.Seconds) giây trước</span>
-                                                        }
-                                                    }
-                                                </div>
-                                            </div>
-                                            @if (item.SeenStatus != (int)SeenStatus.Seen)
-                                            {
-                                                <span class="dot" style="background-color:#0095ff; height: 12px; width: 20px;border-radius: 100%; display: inline-block;"></span>
-                                            }
-                                        </a>
-                                    }
-                                }
-                                else if (lstAllNoti == null || lstAllNoti.Count == 0)
-                                {
-                                    <a class="dropdown-item small text-gray-500">Không có thông báo nào cho bạn!</a>
-                                }*@
+                                    </span>
+                                </div>
                             </div>
-                            <div class="loading" id="loading" style="background-color:aliceblue"></div>
+
+                            <div id="contentLoading">
+
+                            </div>
+                            <div class="loading" id="loading" style="background-color:aliceblue;font-size:12px;"></div>
                         </div>
                     </li>
                 </ul>
@@ -630,10 +531,11 @@
 
 <script type="text/javascript">
     var userId = @userId;
+    var pageIndex = 2;
 
     $(function () {
-            // Lúc mới vào load thông báo
-            $.ajax({
+        // Lúc mới vào load thông báo
+        $.ajax({
                 type: 'GET',
                 url: '/Home/GetNotificationCoutByUserId/' + userId,
                 success: function (rs) {
@@ -645,8 +547,8 @@
                 }
             })
 
-            // Click on notification icon for show notification
-            $('span.noti').click(function (e) {
+        // Click on notification icon for show notification
+        $('span.noti').click(function (e) {
                 e.stopPropagation();
                 $('.noti-content').show();
                 var count = 0;
@@ -657,12 +559,12 @@
                 }
                 $('span.count', this).html('&nbsp;');
             })
-            // hide notifications
-            $('html').click(function () {
+        // hide notifications
+        $('html').click(function () {
                 $('.noti-content').hide();
             })
-            // update notification
-            function updateNotification() {
+        // update notification
+        function updateNotification() {
                 $('#notiContent').empty();
                 $('#notiContent').append($('<li>Loading...</li>'));
 
@@ -684,8 +586,8 @@
                 })
             }
 
-            // Đếm và hiện số thống báo ở icon quả chuông
-            function updateNotificationCount() {
+        // Đếm và hiện số thống báo ở icon quả chuông
+        function updateNotificationCount() {
                 $.ajax({
                     type: 'GET',
                     url: '/Home/GetQuantityNoti',
@@ -699,18 +601,18 @@
                 })
             }
 
-            // kết nối với server
-            var connection = $.hubConnection("/signalr", { useDefaultPath: false });
-            $.connection.hub.start().done(function () { }).fail(function (e) {
-                console.log('Lỗi kết nối server');
-            });
-            connection.logging = true;
-            connection.start();
+        // kết nối với server
+        var connection = $.hubConnection("/signalr", { useDefaultPath: false });
+        $.connection.hub.start().done(function () { }).fail(function (e) {
+            console.log('Lỗi kết nối server');
+        });
+        connection.logging = true;
+        connection.start();
 
-            var notificationHub = $.connection.notificationHub;
+        var notificationHub = $.connection.notificationHub;
 
-            //signalr nhận message thông báo từ server nếu == "notify" thì chạy hàm đếm lại số thông báo để hiển thị ở icon quả chuông
-            notificationHub.client.notify = function (message) {
+        //signalr nhận message thông báo từ server nếu == "notify" thì chạy hàm đếm lại số thông báo để hiển thị ở icon quả chuông
+        notificationHub.client.notify = function (message) {
                 if (message && message.toLowerCase() == "notify") {
                     var idNoti = 0;
                     $.ajax({
@@ -786,7 +688,7 @@
 
                 updateNotificationCount();
             }
-        })
+    })
 
     function RedirectAllDishs(idNoti) {
             $.ajax({
@@ -818,21 +720,124 @@
 
     $(function () {
         $('#scrollpagination').scrollPagination({
-            'url': 'democontent.json',
+            'url': '/Home/LoadNoti',
             'data': {
-                'page': 1,
+                'page': pageIndex,
                 'size': 15,
             },
         });
     });
 
     function LoadNoti() {
-        $('div #scrollpagination').block({
-            message: 'Loading...',
-            css: { border: '0.5px solid #000000', fontSize: '12px', margin: '90% 0% 0% 35%' }
-        });
+        var notifyLoaded = $('#notifyLoaded'); //kiểm tra xem thông báo đã load ra chưa
+        if (notifyLoaded.length <= 0 || notifyLoaded == undefined || notifyLoaded == null) {
+            $('div #scrollpagination').block({
+                message: 'Đang tải...',
+                css: { border: '0.5px solid #000000', fontSize: '12px', margin: '90% 0% 0% 35%' }
+            });
+            var data = {
+                page: 1,
+                size: 15,
+            };
+            $.ajax({
+                type: 'POST',
+                url: '/Home/LoadNoti',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                success: function (data) {
+                    var html = "<span id='notifyLoaded' style='display:none'></span>";
+                    //load những thông báo mới
+                    if (data.lstNotiNew != null && data.lstNotiNew.length > 0) {
+                        html += `<span id='notifyNew' style='font-size: 13px; padding-left: 25px;'><b>Mới</b></span>`;
+                        for (var i = 0; i < data.lstNotiNew.length; i++) {
+                            html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;${data.lstNotiNew[i].SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${data.lstNotiNew[i].TypeNoti == 2 ? "RedirectViewNewDish(" + data.lstNotiNew[i].Id + "," + data.lstNotiNew[i].DishId + ")" : "RedirectAllDishs(" + data.lstNotiNew[i].Id + ")"}' href='#'>
+                                     <div class='mr-3'>
+                                         <div>
+                                             <img src='/Content/image/Dish/${data.lstNotiNew[i].TypeNoti == 2 ? data.lstNotiNew[i].Image : "favicon.png"}' style='width:35px; height:35px;border-radius:25px;border:none;' />
+                                         </div>
+                                     </div>
+                                     <div class='text-wrap wrapper'>
+                                            <span>Bạn có thông báo mới: ${data.lstNotiNew[i].ContentNoti.trim()}</span>
+                                            <div class='small'>`
+                            if (data.lstNotiNew[i].Days > 0) {
+                                html += `<span style='color:#138ce6;'>${data.lstNotiNew[i].Days} ngày trước</span>`
+                            }
+                            if (data.lstNotiNew[i].Days == 0 && data.lstNotiNew[i].Hours > 0) {
+                                html += `<span style='color:#138ce6;'>Khoảng ${data.lstNotiNew[i].Hours} giờ trước</span>`
+                            }
+                            if (data.lstNotiNew[i].Days == 0 && data.lstNotiNew[i].Hours == 0 && data.lstNotiNew[i].Minutes > 0) {
+                                html += `<span style='color:#138ce6;'>Khoảng ${data.lstNotiNew[i].Minutes} phút trước</span>`
+                            }
+                            if (data.lstNotiNew[i].Days == 0 && data.lstNotiNew[i].Hours == 0 && data.lstNotiNew[i].Minutes == 0 && data.lstNotiNew[i].Seconds > 0) {
+                                html += `<span style='color:#138ce6;'>Khoảng ${data.lstNotiNew[i].Seconds} giây trước</span>`
+                            }
+                            html += `</div></div>`
+                            if (data.lstNotiNew[i].SeenStatus != 1) {
+                                html += `<span class='dot' style='background-color:#0095ff;height:12px;width:19px;border-radius:100%;display:inline-block;'><span>`
+                            }
+                            html += `</a>`;
+                        }
+                    }
+                    //Load những thông báo cũ
+                    if (data.lstNotiOld != null && data.lstNotiOld.length > 0) {
+                        var notifyNew = $('#notifyNew');
+                        if (notifyNew != null || notifyNew != undefined || notifyNew.length > 0) {
+                            html += `<span id='notifyOld' style='font-size: 13px; padding-left: 25px;'><b>Trước đó</b></span>`;
+                        }
+                        for (var i = 0; i < data.lstNotiOld.length; i++) {
+                            html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;${data.lstNotiOld[i].SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${data.lstNotiOld[i].TypeNoti == 2 ? "RedirectViewNewDish(" + data.lstNotiOld[i].Id + "," + data.lstNotiOld[i].DishId + ")" : "RedirectAllDishs(" + data.lstNotiOld[i].Id + ")"}' href='#'>
+                                     <div class='mr-3'>
+                                         <div>
+                                             <img src='/Content/image/Dish/${data.lstNotiOld[i].TypeNoti == 2 ? data.lstNotiOld[i].Image : "favicon.png"}' style='width:35px; height:35px;border-radius:25px;border:none;' />
+                                         </div>
+                                     </div>
+                                     <div class='text-wrap wrapper'>
+                                            <span>Bạn có thông báo mới: ${data.lstNotiOld[i].ContentNoti.trim()}</span>
+                                            <div class='small'>`
+                            if (data.lstNotiOld[i].Days > 0) {
+                                html += `<span style='color:#138ce6;'>${data.lstNotiOld[i].Days} ngày trước</span>`
+                            }
+                            if (data.lstNotiOld[i].Days == 0 && data.lstNotiOld[i].Hours > 0) {
+                                html += `<span style='color:#138ce6;'>Khoảng ${data.lstNotiOld[i].Hours} giờ trước</span>`
+                            }
+                            html += `</div></div>`
+                            if (data.lstNotiOld[i].SeenStatus != 1) {
+                                html += `<span class='dot' style='background-color:#0095ff;height:12px;width:19px;border-radius:100%;display:inline-block;'><span>`
+                            }
+                            html += `</a>`;
+                        }
+                    }
+                    if (data.lstNotiNew.length == 0 && data.lstNotiOld.length == 0) {
+                        html += `<a class='dropdown-item small text-gray-500'>Không có thông báo nào cho bạn!</a>`;
+                    }
+                    $('#contentLoading').html(html);
 
-        $('div #scrollpagination').unblock();
+                    $('div #scrollpagination').unblock();
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
+        }
+    }
 
+    function TickALLReaded() {
+        $.ajax({
+            type: 'GET',
+            url: '/Home/TickALLReaded/' + userId,
+            success: function (rs) {
+                if (rs > 0) {
+                    $('span.count').html(0);
+                    $('#contentLoading a').each(function (index, element) {
+                        $(element).attr('style', 'padding-bottom:5px;cursor: pointer;text-transform: none;')
+                        $(element).find('.dot').remove();
+                    })
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
     }
 </script>

@@ -398,5 +398,7 @@ __pycache__/
 .vs/DKAC/v15/Server/sqlite3/storage.ide-shm
 .vs/DKAC/v15/Server/sqlite3/storage.ide-wal
 **/.vs/DKAC/
+**/.vs/*
+**/*.vs/
 .suo
 *.suo

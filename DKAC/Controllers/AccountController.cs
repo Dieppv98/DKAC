@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
 
 namespace DKAC.Controllers
 {
@@ -41,6 +42,26 @@ namespace DKAC.Controllers
                         Session.Add(CommonConstants.USER_SESSION, user);
                         Session.Add(CommonConstants.PAGE_MODUL_SESSION, pagemodul);
 
+                        //add những user online vào cache
+                        string userCache = $"ID_{user.id}-{user.UserName}-{user.FullName}";
+                        FormsAuthentication.SetAuthCookie(login.UserName, login.RememberMe);
+                        if (HttpRuntime.Cache["LoggedInUsers"] != null)
+                        {
+                            List<string> loggedInUsers = (List<string>)HttpRuntime.Cache["LoggedInUsers"];
+                            var cache = loggedInUsers.Where(x => x.Contains(userCache)).FirstOrDefault();
+                            if (cache == null) //kiểm tra nếu trong cache chưa có thì mới add vào
+                            {
+                                loggedInUsers.Add(userCache);
+                                HttpRuntime.Cache["LoggedInUsers"] = loggedInUsers;
+                            }
+                        }
+                        else
+                        {
+                            List<string> loggedInUsers = new List<string>();
+                            loggedInUsers.Add(userCache);
+                            HttpRuntime.Cache["LoggedInUsers"] = loggedInUsers;
+                        }
+
                         return RedirectToAction("Index", "Home");
                     }
                 }
@@ -48,7 +69,7 @@ namespace DKAC.Controllers
             }
             return View("Login");
         }
-
+        
         [HttpGet]
         public ActionResult SignUp()
         {
@@ -71,6 +92,19 @@ namespace DKAC.Controllers
 
         public ActionResult Logout()
         {
+            User user = (User)Session[CommonConstants.USER_SESSION];
+            string userCache = $"ID_{user.id}-";
+            if (HttpRuntime.Cache["LoggedInUsers"] != null)
+            {
+                List<string> loggedInUsers = (List<string>)HttpRuntime.Cache["LoggedInUsers"];
+                var cache = loggedInUsers.Where(x => x.Contains(userCache)).FirstOrDefault();
+
+                if (cache != null)
+                {
+                    loggedInUsers.Remove(cache); //remove user khỏi list user đang online
+                }
+            }
+
             Session.Remove(CommonConstants.EMPLOYEE_SESSION);
             Session.Remove(CommonConstants.USER_SESSION);
             return RedirectToAction("Login", "Account");

@@ -580,7 +580,9 @@
     <Compile Include="Models\InfoModel\ChartInfo.cs" />
     <Compile Include="Models\InfoModel\DishInfo.cs" />
     <Compile Include="Models\InfoModel\EmployeeInfo.cs" />
+    <Compile Include="Models\InfoModel\LoadNotifyInfo.cs" />
     <Compile Include="Models\InfoModel\MenuInfo.cs" />
+    <Compile Include="Models\InfoModel\NotifyInfo.cs" />
     <Compile Include="Models\InfoModel\PermissionActionInfo.cs" />
     <Compile Include="Models\InfoModel\RegisterByPersonalInfo.cs" />
     <Compile Include="Models\InfoModel\RoomInfo.cs" />

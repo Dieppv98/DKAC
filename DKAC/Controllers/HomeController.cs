@@ -7,6 +7,7 @@ using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -84,14 +85,7 @@ namespace DKAC.Controllers
         {
             return View();
         }
-
-        [HttpGet]
-        public int Test()
-        {
-            _nc.NotifyRegister();
-            return 1;
-        }
-
+        
         [HttpGet]
         public JsonResult GetNotificationCoutByUserId(int id)
         {
@@ -119,6 +113,65 @@ namespace DKAC.Controllers
         {
             var rs = _nc.GetAllNotifyByUserId(id);
             return rs;
+        }
+
+        /// <summary>
+        /// Khi người dùng click vào quả chuông thông báo lần đầu tiên thì chạy
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult LoadNoti(int page, int size)
+        {
+            LoadNotifyInfo notifyInfo = new LoadNotifyInfo();
+            List<NotifyInfo> lstNotiNew = new List<NotifyInfo>();
+            List<NotifyInfo> lstNotiOld = new List<NotifyInfo>();
+            User user = (User)Session[CommonConstants.USER_SESSION];
+            List<NotifyInfo> rs = _nc.LoadNoti(page, size, user.id) ?? new List<NotifyInfo>();
+            foreach (var item in rs)
+            {
+                TimeSpan time = DateTime.Now.Subtract(item.CreatedDate.Value);
+                item.Days = time.Days;
+                item.Hours = time.Hours;
+                item.Minutes = time.Minutes;
+                item.Seconds = time.Seconds;
+                if (time.Days == 0 && time.Hours == 0)
+                {
+                    lstNotiNew.Add(item);
+                }
+                else { lstNotiOld.Add(item); }
+            }
+            notifyInfo.lstNotiNew = lstNotiNew.OrderByDescending(x => x.CreatedDate).ToList();
+            notifyInfo.lstNotiOld = lstNotiOld.OrderByDescending(x => x.CreatedDate).ToList();
+            return Json(notifyInfo, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult TickALLReaded(int id)
+        {
+            var rs = _nc.TickALLReaded(id);
+            return Json(rs, JsonRequestBehavior.AllowGet);
+        }
+        
+        public Task<int> PushNotifi()
+        {
+            List<int> lst = new List<int>();
+            List<string> loggedInUsers = (List<string>)HttpRuntime.Cache["LoggedInUsers"];
+            if(loggedInUsers != null && loggedInUsers.Count > 0)
+            {
+                var lstId = loggedInUsers.Select(x => x.Split('-').FirstOrDefault()?.Split('_').LastOrDefault()).ToList();
+
+                foreach (var item in lstId)
+                {
+                    int id = Int32.Parse(item);
+                    lst.Add(id);
+                }
+            }
+            if(lst.Count > 0)
+            {
+                _nc.NotifyRegister(lst);
+            }
+            int count = 1;
+            return Task.FromResult(count);
         }
     }
 }

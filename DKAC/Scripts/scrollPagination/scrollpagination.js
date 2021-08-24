@@ -11,22 +11,26 @@
         'autoload': true,
         'data': {
             'page': 1,
-            'size': 10,
+            'size': 15,
         }, 
         'before': function(){
             // Before load function, you can display a preloader div
-            $(this.loading).fadeIn();
+            setTimeout(function () {
+                $(this.loading).fadeIn();
+            }, 3000);
         },
         'after': function(elementsLoaded){
             // After loading content, you can use this function to animate your new elements
-            $(this.loading).fadeOut();
-            $(elementsLoaded).fadeInWithDelay();
+            setTimeout(function () {
+                $(this.loading).fadeOut();
+                $(elementsLoaded).fadeInWithDelay();
+            }, 3000);
         },
         'scroller': $('#scrollpagination'), // Who gonna scroll? default is the full window
         'heightOffset': 20, 
         'loading': '#loading',
-        'loadingText': 'Loading.......', 
-        'loadingNomoreText': 'No more.',
+        'loadingText': 'Đang tải...', 
+        'loadingNomoreText': 'Không còn thông báo nào!',
         'manuallyText': 'click me to loading',
     };
 
@@ -61,20 +65,79 @@
             url: opts.url,
             data: opts.data,
             dataType: 'json',
+            async: false,
+            cache: false,
             success: function(data){
                 var html = "";
-                if(data.content != null){
+                if (data.lstNotiNew.length > 0 || data.lstNotiOld.length > 0) {
                     $(opts.loading).text(opts.loadingText);
-                    $.each(data.content,function(index, value){
-                        html += "<li style='opacity:0;-moz-opacity: 0;filter: alpha(opacity=0);'><p>" + value + "</p></li>";
-                        dataCount = parseInt(index) + 1;
+
+                    $.each(data.lstNotiNew,function(index, value){
+                        html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;${value.SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${value.TypeNoti == 2 ? "RedirectViewNewDish(" + value.Id + "," + value.DishId + ")" : "RedirectAllDishs(" + value.Id + ")"}' href='#'>
+                                     <div class='mr-3'>
+                                         <div>
+                                             <img src='/Content/image/Dish/${value.TypeNoti == 2 ? value.Image : "favicon.png"}' style='width:35px; height:35px;border-radius:25px;border:none;' />
+                                         </div>
+                                     </div>
+                                     <div class='text-wrap wrapper'>
+                                            <span>Bạn có thông báo mới: ${value.ContentNoti.trim()}</span>
+                                            <div class='small'>`
+                        if (value.Days > 0) {
+                            html += `<span style='color:#138ce6;'>${value.Days} ngày trước</span>`
+                        }
+                        if (value.Days == 0 && value.Hours > 0) {
+                            html += `<span style='color:#138ce6;'>Khoảng ${value.Hours} giờ trước</span>`
+                        }
+                        if (value.Days == 0 && value.Hours == 0 && value.Minutes > 0) {
+                            html += `<span style='color:#138ce6;'>Khoảng ${value.Minutes} phút trước</span>`
+                        }
+                        if (value.Days == 0 && value.Hours == 0 && value.Minutes == 0 && value.Seconds > 0) {
+                            html += `<span style='color:#138ce6;'>Khoảng ${value.Seconds} giây trước</span>`
+                        }
+                        html += `</div></div>`
+                        if (value.SeenStatus != 1) {
+                            html += `<span class='dot' style='background-color:#0095ff;height:12px;width:19px;border-radius:100%;display:inline-block;'><span>`
+                        }
+                        html += `</a>`;
                     });
-                    $(obj).append(html);
-                    if(dataCount < opts.data.size){
-                        opts.data.page++;
-                    }else{
-                        $.fn.stopScrollPagination(obj, opts);
+
+                    var notifyNew = $('#notifyNew');
+                    if (notifyNew != null || notifyNew != undefined || notifyNew.length > 0) {
+                        var notifyOld = $('#notifyOld');
+                        if (notifyOld == null || notifyOld == undefined || notifyOld.length <= 0) {
+                            html += `<span style='font-size: 13px; padding-left: 25px;'><b>Trước đó</b></span>`;
+                        }
                     }
+                    
+                    $.each(data.lstNotiOld, function (index, value) {
+                        html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;${value.SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${value.TypeNoti == 2 ? "RedirectViewNewDish(" + value.Id + "," + value.DishId + ")" : "RedirectAllDishs(" + value.Id + ")"}' href='#'>
+                                     <div class='mr-3'>
+                                         <div>
+                                             <img src='/Content/image/Dish/${value.TypeNoti == 2 ? value.Image : "favicon.png"}' style='width:35px; height:35px;border-radius:25px;border:none;' />
+                                         </div>
+                                     </div>
+                                     <div class='text-wrap wrapper'>
+                                            <span>Bạn có thông báo mới: ${value.ContentNoti.trim()}</span>
+                                            <div class='small'>`
+                        if (value.Days > 0) {
+                            html += `<span style='color:#138ce6;'>${value.Days} ngày trước</span>`
+                        }
+                        if (value.Days == 0 && value.Hours > 0) {
+                            html += `<span style='color:#138ce6;'>Khoảng ${value.Hours} giờ trước</span>`
+                        }
+                        html += `</div></div>`
+                        if (value.SeenStatus != 1) {
+                            html += `<span class='dot' style='background-color:#0095ff;height:12px;width:19px;border-radius:100%;display:inline-block;'><span>`
+                        }
+                        html += `</a>`;
+                    });
+                    opts.data.page++; //tăng pageIndex lên 1 đơn vị
+
+                    $('#contentLoading').append(html);
+                }
+                if (data.lstNotiNew.length == 0 && data.lstNotiOld.length == 0) {
+                    $.fn.stopScrollPagination(obj, opts);
+                    $(obj).attr('scrollPagination', 'disabled');
                 }
                 var objectsRendered = $(obj).children('[rel!=loaded]');
                 // do after
@@ -82,6 +145,7 @@
                     opts.after(objectsRendered);
                 }
             },
+            timeout: 2000,
         });
     };
 
@@ -94,10 +158,10 @@
         if(opts.autoload === true){
             $(target).scroll(function(event){
                 if ($(obj).attr('scrollPagination') == 'enabled') {
-                    var mayLoadContent = (Math.ceil($(target).scrollTop()) + $(target).height() + opts.heightOffset) >= $('#contentLoading').height(); //nếu đã load quá độ dài của thẻ div chứa list các thông báo
+                    var mayLoadContent = (Math.ceil($(target).scrollTop()) + $(target).height()/* + opts.heightOffset*/) > $('#contentLoading').height(); //nếu đã load quá độ dài của thẻ div chứa list các thông báo
                     if(mayLoadContent){
                         $.fn.scrollPagination.loadContent(obj, opts);
-                        
+
                         console.log('load more called !');
                     }
                 }else{
@@ -122,8 +186,8 @@
     $.fn.fadeInWithDelay = function(){
         var delay = 0;
         return this.each(function(){
-            $(this).delay(delay).animate({opacity:1}, 200);
-            delay += 100;
+            $(this).delay(delay).animate({opacity:1}, 3000);
+            delay += 3000;
         });
     };
 })(jQuery);

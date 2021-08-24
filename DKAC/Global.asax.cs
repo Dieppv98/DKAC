@@ -49,10 +49,16 @@ namespace DKAC
 
         protected void Session_Start(object sender, EventArgs e)
         {
-            NotificationComponent NC = new NotificationComponent();
+            //NotificationComponent NC = new NotificationComponent();
             var currentTime = DateTime.Now;
             HttpContext.Current.Session["LastUpdated"] = currentTime;
         }
 
+        protected void Session_End(object sender, EventArgs e)
+        {
+            Application.Lock();
+            Application["TotalOnlineUsers"] = (int)Application["TotalOnlineUsers"] - 1;
+            Application.UnLock();
+        }
     }
 }

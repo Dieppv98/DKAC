@@ -101,10 +101,5 @@ namespace DKAC.Repository
         {
             return db.Users.AsNoTracking().Where(x => x.IsDeleted == 0 && x.UserName.Contains(userName) && x.Code.Contains(code)).FirstOrDefault();
         }
-
-        public void PushNotifi()
-        {
-            _nc.NotifyRegister();
-        }
     }
 }
