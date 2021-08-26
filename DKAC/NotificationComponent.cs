@@ -16,21 +16,27 @@ namespace DKAC
     {
         DKACDbContext db = new DKACDbContext();
 
-        public void NotifyRegister(List<int> lst)
+        //đẩy thông báo cho những user đang online
+        public void NotifyRegister()
         {
+            Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
+            var lstUserId = onlineUsers.Select(x => x.Key).ToList();
+            var lstUserOnline = db.UsersOnlines.Where(x=> lstUserId.Contains(x.id)).ToList() ?? new List<UsersOnline>();
             List<Notify> lstNoti = new List<Notify>();
-            var lstU = db.Users.Where(x => x.IsDeleted == 0 && lst.Contains(x.id)).ToList() ?? new List<User>();
-            foreach (var item in lstU)
+            foreach (var item in lstUserOnline)
             {
-                Notify notify = new Notify()
+                if(item.UserId > 0)
                 {
-                    ReceiveUserId = item.id,
-                    SeenStatus = null,
-                    TypeNoti = (int)TypeOfNoti.TypeRegister,
-                    CreatedDate = DateTime.Now,
-                    ContentNoti = $"{item.FullName.Split(' ')?.LastOrDefault() ?? "Bạn"} ơi! Vào đăng ký món ăn đi nào!!!"
-                };
-                lstNoti.Add(notify);
+                    Notify notify = new Notify()
+                    {
+                        ReceiveUserId = item.UserId,
+                        SeenStatus = null,
+                        TypeNoti = (int)TypeOfNoti.TypeRegister,
+                        CreatedDate = DateTime.Now,
+                        ContentNoti = $"{item.FullName.Split(' ')?.LastOrDefault() ?? "Bạn"} ơi! Vào đăng ký món ăn đi nào!!!"
+                    };
+                    lstNoti.Add(notify);
+                }
             }
             if(lstNoti.Count > 0)
             {
@@ -123,6 +129,39 @@ namespace DKAC
             foreach (var item in lstNoti)
             {
                 item.SeenStatus = (int)SeenStatus.Seen;
+            }
+
+            return db.SaveChanges();
+        }
+
+        public int CheckUserOnline(User user)
+        {
+            var now = DateTime.Now.AddMinutes(-2);
+            var lstUserOff = db.UsersOnlines.Where(x => x.TimeUpdate < now).ToList();
+            db.UsersOnlines.RemoveRange(lstUserOff);
+
+            var u = db.UsersOnlines.FirstOrDefault(x => x.UserId == user.id);
+            if(u == null)
+            {
+                var useronline = new UsersOnline()
+                {
+                    UserId = user.id,
+                    UserName = user.UserName,
+                    FullName = user.FullName,
+                    TimeUpdate = DateTime.Now,
+                };
+                db.UsersOnlines.Add(useronline);
+            }
+            else
+            {
+                if(u.TimeUpdate < DateTime.Now.AddMinutes(-2))
+                {
+                    db.UsersOnlines.Remove(u);
+                }
+                else
+                {
+                    u.TimeUpdate = DateTime.Now;
+                }
             }
 
             return db.SaveChanges();

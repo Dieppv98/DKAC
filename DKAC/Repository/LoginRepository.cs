@@ -59,7 +59,6 @@ namespace DKAC.Repository
             }
         }
 
-
         public AccountModulPageInfo GetAccountModulPageInfo(int UserId)
         {
             var model = new AccountModulPageInfo();
@@ -100,6 +99,26 @@ namespace DKAC.Repository
         public User GetUserByUserNameByCode(string userName, string code)
         {
             return db.Users.AsNoTracking().Where(x => x.IsDeleted == 0 && x.UserName.Contains(userName) && x.Code.Contains(code)).FirstOrDefault();
+        }
+
+        public void InsertOnlineUser(User user)
+        {
+            UsersOnline useronline = new UsersOnline()
+            {
+                UserId = user.id,
+                UserName = user.UserName,
+                FullName = user.FullName,
+                TimeUpdate = DateTime.Now,
+            };
+            db.UsersOnlines.Add(useronline);
+            db.SaveChanges();
+        }
+
+        public void RemoveOffUser(User user)
+        {
+            var userOff = db.UsersOnlines.FirstOrDefault(x => x.UserId == user.id) ?? new UsersOnline();
+            db.UsersOnlines.Remove(userOff);
+            db.SaveChanges();
         }
     }
 }

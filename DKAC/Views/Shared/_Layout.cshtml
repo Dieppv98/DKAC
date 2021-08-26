@@ -129,7 +129,7 @@
     <!-- ======= Header ======= -->
     <header id="header" class="fixed-top">
         <div class="container d-flex align-items-center">
-            <h1 class="logo mr-auto"><a href="index.html"><span>DKAC</span>.COM</a></h1>
+            <h1 class="logo mr-auto"><a href="/"><span>DKAC</span>.COM</a></h1>
             <!-- Uncomment below if you prefer to use an image logo -->
             <!-- <a href="index.html" class="logo mr-auto"><img src="~/assets/img/logo.png" alt="" class="img-fluid"></a>-->
 
@@ -687,7 +687,51 @@
                 }
 
                 updateNotificationCount();
+        }
+
+        setInterval(function () {
+            if (userId != null && userId != undefined && userId > 0) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/Home/RefreshListUserOnline',
+                    success: function (rs) {
+                        console.log('Đã làm mới list user đang online');
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                })
             }
+        }, 60000);
+
+        window.addEventListener('beforeunload', function (e) {
+            if (userId != null && userId != undefined && userId > 0) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/Home/UpdateOfflineUserClose',
+                    success: function (rs) {
+                        console.log('Đã update trạng thái user');
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                })
+            }
+        });
+
+        if (userId != null && userId != undefined && userId > 0) {
+            $.ajax({
+                type: 'GET',
+                url: '/Home/UpdateOnlineUserOnload',
+                success: function (rs) {
+                    console.log('Đã update trạng thái user');
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+        }
+        
     })
 
     function RedirectAllDishs(idNoti) {
@@ -774,7 +818,7 @@
                             }
                             html += `</div></div>`
                             if (data.lstNotiNew[i].SeenStatus != 1) {
-                                html += `<span class='dot' style='background-color:#0095ff;height:12px;width:19px;border-radius:100%;display:inline-block;'><span>`
+                                html += `<span class='dot' style='background-color:#0095ff;height:12px;width:17px;border-radius:100%;display:inline-block;'><span>`
                             }
                             html += `</a>`;
                         }
@@ -803,7 +847,7 @@
                             }
                             html += `</div></div>`
                             if (data.lstNotiOld[i].SeenStatus != 1) {
-                                html += `<span class='dot' style='background-color:#0095ff;height:12px;width:19px;border-radius:100%;display:inline-block;'><span>`
+                                html += `<span class='dot' style='background-color:#0095ff;height:12px;width:17px;border-radius:100%;display:inline-block;'><span>`
                             }
                             html += `</a>`;
                         }
@@ -840,4 +884,5 @@
             }
         })
     }
+    
 </script>

@@ -575,6 +575,7 @@
     <Compile Include="Models\EntityModel\User.cs" />
     <Compile Include="Models\EntityModel\UserGroup.cs" />
     <Compile Include="Models\EntityModel\UserRole.cs" />
+    <Compile Include="Models\EntityModel\UsersOnline.cs" />
     <Compile Include="Models\Enum\Enum.cs" />
     <Compile Include="Models\InfoModel\AccountModulPageInfo.cs" />
     <Compile Include="Models\InfoModel\ChartInfo.cs" />

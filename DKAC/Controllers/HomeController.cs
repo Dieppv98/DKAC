@@ -154,24 +154,145 @@ namespace DKAC.Controllers
         
         public Task<int> PushNotifi()
         {
-            List<int> lst = new List<int>();
-            List<string> loggedInUsers = (List<string>)HttpRuntime.Cache["LoggedInUsers"];
-            if(loggedInUsers != null && loggedInUsers.Count > 0)
-            {
-                var lstId = loggedInUsers.Select(x => x.Split('-').FirstOrDefault()?.Split('_').LastOrDefault()).ToList();
+            _nc.NotifyRegister();
 
-                foreach (var item in lstId)
+            int count = 1;
+            return Task.FromResult(count);
+        }
+
+        [HttpGet]
+        public Task<JsonResult> CheckUserOnline()
+        {
+            User user = (User)Session[CommonConstants.USER_SESSION];
+            var rs = _nc.CheckUserOnline(user);
+
+            return Task.FromResult(Json(rs, JsonRequestBehavior.AllowGet));
+        }
+
+        /// <summary>
+        /// cập nhật user online khi user mở ứng dụng
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public Task<int> UpdateOnlineUserOnload()
+        {
+            var user = (User)Session[CommonConstants.USER_SESSION];
+
+            if (HttpRuntime.Cache["LoggedInUsers"] != null)
+            {
+                Dictionary<int, string> loggedInUsers = (Dictionary<int, string>)HttpRuntime.Cache["LoggedInUsers"];
+                var cache = loggedInUsers.Where(x => x.Key == user.id).FirstOrDefault();
+                if (cache.Key <= 0) //kiểm tra nếu trong cache chưa có thì mới add vào
                 {
-                    int id = Int32.Parse(item);
-                    lst.Add(id);
+                    loggedInUsers.Add(user.id, $"{user.UserName}-{user.FullName}");
+                    HttpRuntime.Cache["LoggedInUsers"] = loggedInUsers;
+
+                    if(HttpRuntime.Cache["OnlineUsers"] != null)
+                    {
+                        Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
+                        var online = onlineUsers.Where(x => x.Key == user.id).FirstOrDefault();
+                        if (online.Key <= 0)
+                        {
+                            onlineUsers.Add(user.id, DateTime.Now);
+                            HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
+                        }
+                        else
+                        {
+                            onlineUsers.Remove(online.Key);
+                            onlineUsers.Add(user.id, DateTime.Now);
+                            HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
+                        }
+                    }
+                }
+                else
+                {
+                    if (HttpRuntime.Cache["OnlineUsers"] != null)
+                    {
+                        Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
+                        var online = onlineUsers.Where(x => x.Key == user.id).FirstOrDefault();
+                        if(online.Key <= 0)
+                        {
+                            onlineUsers.Add(user.id, DateTime.Now);
+                            HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
+                        }
+                        else
+                        {
+                            onlineUsers.Remove(online.Key);
+                            onlineUsers.Add(user.id, DateTime.Now);
+                            HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
+                        }
+                    }
                 }
             }
-            if(lst.Count > 0)
+
+            int count = 1;
+            return Task.FromResult(count);
+        }
+
+        /// <summary>
+        /// cập nhật user offline khi tắt tab hoặc đóng trình duyệt
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public Task<int> UpdateOfflineUserClose()
+        {
+            var user = (User)Session[CommonConstants.USER_SESSION];
+            //kiểm tra xem đã có cache chưa
+            if (HttpRuntime.Cache["OnlineUsers"] != null)
             {
-                _nc.NotifyRegister(lst);
+                Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
+                var online = onlineUsers.Where(x => x.Key == user.id).FirstOrDefault(); //lần user vừa đóng tab, thoát trình duyệt
+                if (online.Key > 0)
+                {
+                    onlineUsers.Remove(online.Key); //remove đi
+                    HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
+                }
             }
             int count = 1;
             return Task.FromResult(count);
+        }
+
+        /// <summary>
+        /// refresh lại list user đang online sau mỗi khoảng thời gian
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public Task<JsonResult> RefreshListUserOnline()
+        {
+            User user = (User)Session[CommonConstants.USER_SESSION];
+            var now = DateTime.Now.AddMinutes(-2);
+
+            if (HttpRuntime.Cache["OnlineUsers"] != null)
+            {
+                Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
+                var lstonline = onlineUsers.Where(x => x.Value <= now).ToList();
+                foreach (var item in lstonline)
+                {
+                    onlineUsers.Remove(item.Key);
+                }
+                var userParam = onlineUsers.FirstOrDefault(x => x.Key == user.id);
+                if(userParam.Key <= 0)
+                {
+                    onlineUsers.Add(user.id, now);
+                    HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
+                }
+                else
+                {
+                    onlineUsers.Remove(userParam.Key);
+                    onlineUsers.Add(user.id, now);
+                    HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
+                }
+
+                return Task.FromResult(Json(1, JsonRequestBehavior.AllowGet));
+            }
+            else
+            {
+                Dictionary<int, DateTime> onlineUsers = new Dictionary<int, DateTime>();
+                onlineUsers.Add(user.id, now);
+                HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
+            }
+
+            return Task.FromResult(Json(1, JsonRequestBehavior.AllowGet));
         }
     }
 }
