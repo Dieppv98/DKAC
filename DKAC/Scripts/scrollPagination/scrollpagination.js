@@ -96,13 +96,13 @@
                         }
                         html += `</div></div>`
                         if (value.SeenStatus != 1) {
-                            html += `<span class='dot' style='background-color:#0095ff;height:12px;width:17px;border-radius:100%;display:inline-block;'><span>`
+                            html += `<span class='dot' style='background-color:#0095ff;height:11px;width:16px;border-radius:100%;display:inline-block;'><span>`
                         }
                         html += `</a>`;
                     });
 
                     var notifyNew = $('#notifyNew');
-                    if (notifyNew != null || notifyNew != undefined || notifyNew.length > 0) {
+                    if (notifyNew != null && notifyNew != undefined && notifyNew.length > 0) {
                         var notifyOld = $('#notifyOld');
                         if (notifyOld == null || notifyOld == undefined || notifyOld.length <= 0) {
                             html += `<span id='notifyOld' style='font-size: 13px; padding-left: 25px;'><b>Trước đó</b></span>`;
@@ -127,7 +127,7 @@
                         }
                         html += `</div></div>`
                         if (value.SeenStatus != 1) {
-                            html += `<span class='dot' style='background-color:#0095ff;height:12px;width:17px;border-radius:100%;display:inline-block;'><span>`
+                            html += `<span class='dot' style='background-color:#0095ff;height:11px;width:16px;border-radius:100%;display:inline-block;'><span>`
                         }
                         html += `</a>`;
                     });

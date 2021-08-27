@@ -273,13 +273,13 @@ namespace DKAC.Controllers
                 var userParam = onlineUsers.FirstOrDefault(x => x.Key == user.id);
                 if(userParam.Key <= 0)
                 {
-                    onlineUsers.Add(user.id, now);
+                    onlineUsers.Add(user.id, DateTime.Now);
                     HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
                 }
                 else
                 {
                     onlineUsers.Remove(userParam.Key);
-                    onlineUsers.Add(user.id, now);
+                    onlineUsers.Add(user.id, DateTime.Now);
                     HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
                 }
 
@@ -288,7 +288,7 @@ namespace DKAC.Controllers
             else
             {
                 Dictionary<int, DateTime> onlineUsers = new Dictionary<int, DateTime>();
-                onlineUsers.Add(user.id, now);
+                onlineUsers.Add(user.id, DateTime.Now);
                 HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
             }
 

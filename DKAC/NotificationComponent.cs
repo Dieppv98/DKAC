@@ -20,32 +20,35 @@ namespace DKAC
         public void NotifyRegister()
         {
             Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
-            var lstUserId = onlineUsers.Select(x => x.Key).ToList();
-            var lstUserOnline = db.UsersOnlines.Where(x=> lstUserId.Contains(x.id)).ToList() ?? new List<UsersOnline>();
-            List<Notify> lstNoti = new List<Notify>();
-            foreach (var item in lstUserOnline)
+            if(onlineUsers != null)
             {
-                if(item.UserId > 0)
+                var lstUserId = onlineUsers.Select(x => x.Key).ToList();
+                var lstUserOnline = db.Users.Where(x => lstUserId.Contains(x.id)).ToList() ?? new List<User>();
+                List<Notify> lstNoti = new List<Notify>();
+                foreach (var item in lstUserOnline)
                 {
-                    Notify notify = new Notify()
+                    if (item.id > 0)
                     {
-                        ReceiveUserId = item.UserId,
-                        SeenStatus = null,
-                        TypeNoti = (int)TypeOfNoti.TypeRegister,
-                        CreatedDate = DateTime.Now,
-                        ContentNoti = $"{item.FullName.Split(' ')?.LastOrDefault() ?? "Bạn"} ơi! Vào đăng ký món ăn đi nào!!!"
-                    };
-                    lstNoti.Add(notify);
+                        Notify notify = new Notify()
+                        {
+                            ReceiveUserId = item.id,
+                            SeenStatus = null,
+                            TypeNoti = (int)TypeOfNoti.TypeRegister,
+                            CreatedDate = DateTime.Now,
+                            ContentNoti = $"{item.FullName.Split(' ')?.LastOrDefault() ?? "Bạn"} ơi! Vào đăng ký món ăn đi nào!!!"
+                        };
+                        lstNoti.Add(notify);
+                    }
                 }
-            }
-            if(lstNoti.Count > 0)
-            {
-                db.Notifies.AddRange(lstNoti);
-                db.SaveChanges();
-            }
+                if (lstNoti.Count > 0)
+                {
+                    db.Notifies.AddRange(lstNoti);
+                    db.SaveChanges();
+                }
 
-            var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
-            notificationHub.Clients.All.notify("notify");
+                var notificationHub = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
+                notificationHub.Clients.All.notify("notify");
+            }
         }
 
         public void NotifyAddNewDish(int id)
