@@ -36,6 +36,7 @@ namespace DKAC.Models.EntityModel
         public virtual DbSet<LogTimeCache> LogTimeCaches { get; set; }
         public virtual DbSet<Notify> Notifies { get; set; }
         public virtual DbSet<UsersOnline> UsersOnlines { get; set; }
+        public virtual DbSet<Chat> Chats { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -90,6 +91,10 @@ namespace DKAC.Models.EntityModel
             modelBuilder.Entity<UsersOnline>()
                .Property(e => e.FullName)
                .IsFixedLength();
+
+            modelBuilder.Entity<Chat>()
+              .Property(e => e.Message)
+              .IsFixedLength();
         }
     }
 }

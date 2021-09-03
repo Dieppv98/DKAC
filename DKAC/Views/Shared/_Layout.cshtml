@@ -4,11 +4,14 @@
 @using DKAC.Models.InfoModel
 @using DKAC.Models.Enum
 @{
+    /**/
+
     HomeController homeController = new HomeController();
     var em = (Employee)Session[CommonConstants.EMPLOYEE_SESSION];
     var user = (User)Session[CommonConstants.USER_SESSION];
     var per = (AccountModulPageInfo)Session[CommonConstants.PAGE_MODUL_SESSION];
     var userId = user.id;
+    var type = user.UserGroupId;
 }
 
 <!DOCTYPE html>
@@ -95,7 +98,7 @@
     <link href="~/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Roboto:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+    <link href="~/assets/font/GoogleFonts.css" rel="stylesheet" />
 
     <!-- Vendor CSS Files -->
     <link href="~/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -107,6 +110,7 @@
     <link href="~/assets/vendor/aos/aos.css" rel="stylesheet">
     <link href="~/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="~/assets/font/css/all.css" rel="stylesheet" />
+    <link href="~/assets/login/vendor/select2/select2.min.css" rel="stylesheet" />
 
     <!-- Template Main CSS File -->
     <link href="~/assets/css/style.css" rel="stylesheet">
@@ -285,7 +289,7 @@
         </div>
     </footer><!-- End Footer -->
 
-    <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+    <a href="#" class="back-to-top" title="Lên đầu trang"><i class="icofont-simple-up"></i></a>
     <!-- Vendor JS Files -->
     <script src="~/assets/vendor/jquery/jquery.min.js"></script>
     <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -355,26 +359,17 @@
 
             /* Button used to open the chat form - fixed at the bottom of the page */
             .open-button {
-                background-color: #555;
+                background-color: #ff0000;
                 color: white;
-                padding: 16px 20px;
+                border-radius: 50%;
                 border: none;
                 cursor: pointer;
                 opacity: 0.8;
                 position: fixed;
-                bottom: 23px;
-                right: 28px;
-                width: 280px;
-            }
-
-            /* The popup chat - hidden by default */
-            .chat-popup {
-                display: none;
-                position: fixed;
-                bottom: 0;
-                right: 15px;
-                border: 3px solid #f1f1f1;
-                z-index: 9;
+                right: 0px;
+                bottom: 10px;
+                height: 40px;
+                width: 40px;
             }
 
             /* Add styles to the form container */
@@ -422,169 +417,313 @@
                 .form-container .btn:hover, .open-button:hover {
                     opacity: 1;
                 }
+
+
+            /*///////////////////////////////////////////////*/
+
+            .popup-box {
+                background-color: #f9f9f9;
+                border: 1px solid #b0b0b0;
+                bottom: 0;
+                display: none;
+                height: 475px;
+                position: fixed;
+                font-family: 'Open Sans';
+                right: 0px;
+                z-index: auto;
+                width: 330px;
+            }
+
+            .round.hollow {
+                margin: 40px 0 0;
+            }
+
+                .round.hollow a {
+                    border: 2px solid #ff6701;
+                    border-radius: 35px;
+                    color: red;
+                    color: #ff6701;
+                    font-size: 23px;
+                    padding: 10px 21px;
+                    text-decoration: none;
+                    font-family: 'Open Sans', sans-serif;
+                }
+
+                    .round.hollow a:hover {
+                        border: 2px solid #000;
+                        border-radius: 35px;
+                        color: red;
+                        color: #000;
+                        font-size: 23px;
+                        padding: 10px 21px;
+                        text-decoration: none;
+                    }
+
+            .popup-box-on {
+                display: block !important;
+            }
+
+            .popup-box .popup-head {
+                background-color: #0081ff;
+                clear: both;
+                color: white;
+                display: block;
+                font-size: 16px;
+                padding: 12px 0px 5px 5px;
+                font-family: 'Open Sans';
+                font-weight: bold;
+            }
+
+            .bg_none i {
+                border: 1px solid #ff6701;
+                border-radius: 25px;
+                color: #ff6701;
+                font-size: 17px;
+                height: 33px;
+                line-height: 30px;
+                width: 33px;
+            }
+
+            .bg_none:hover i {
+                border: 1px solid #000;
+                border-radius: 25px;
+                color: #000;
+                font-size: 17px;
+                height: 33px;
+                line-height: 30px;
+                width: 33px;
+            }
+
+            .bg_none {
+                background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+                border: medium none;
+            }
+
+            .popup-box .popup-head .popup-head-right {
+                margin: 11px 7px 0;
+            }
+
+            .popup-head-left img {
+                border: 1px solid #7b7b7b;
+                border-radius: 50%;
+                width: 44px;
+            }
+
+            .popup-messages-footer {
+                background: #fff none repeat scroll 0 0;
+                bottom: 0;
+                position: absolute;
+                bottom: 3px;
+                width: 100%;
+            }
+
+            .simple_round {
+                background: #d1d1d1 none repeat scroll 0 0;
+                border-radius: 50%;
+                color: #4b4b4b !important;
+                height: 21px;
+                padding: 0 0 0 1px;
+                width: 21px;
+            }
+
+            .popup-box .popup-messages {
+                height: 380px;
+                overflow: auto;
+            }
+
+            .direct-chat-messages {
+                height: auto;
+                overflow: auto;
+                padding: 0px 10px 10px 10px;
+                transform: translate(0px, 0px);
+            }
+
+            .popup-messages .chat-box-single-line {
+                border-bottom: 1px solid #a4c6b5;
+                height: 12px;
+                margin: 7px 0 20px;
+                position: relative;
+                text-align: center;
+            }
+
+            .popup-messages .timestamp {
+                color: black;
+                padding: 5px 0px 5px 0px;
+                font-size: 12px;
+            }
+
+            .popup-head-right .btn-group {
+                display: inline-flex;
+                margin: 0 8px 0 0;
+                vertical-align: top !important;
+            }
+
+            .chat-header-button {
+                background: transparent none repeat scroll 0 0;
+                border: 1px solid #636364;
+                border-radius: 50%;
+                font-size: 14px;
+                height: 30px;
+                width: 30px;
+            }
+
+            .popup-head-right .btn-group .dropdown-menu {
+                border: medium none;
+                min-width: 122px;
+                padding: 0;
+            }
+
+                .popup-head-right .btn-group .dropdown-menu li a {
+                    font-size: 12px;
+                    padding: 3px 10px;
+                    color: #303030;
+                }
+
+            .popup-messages .direct-chat-name {
+                font-size: 15px;
+                font-weight: 600;
+                margin: 0 0 0 49px !important;
+                color: #fff;
+                opacity: 0.9;
+            }
+
+            .popup-messages .direct-chat-info {
+                display: block;
+                font-size: 12px;
+                margin-bottom: 0;
+            }
+
+            .popup-messages .big-round {
+                margin: -9px 0 0 !important;
+            }
+
+            .popup-messages .direct-chat-img {
+                border: 1px solid #fff;
+                background: #3f9684 none repeat scroll 0 0;
+                border-radius: 50%;
+                float: left;
+                height: 40px;
+                margin: -21px 0 0;
+                width: 40px;
+            }
+
+            .direct-chat-reply-name {
+                color: #fff;
+                font-size: 15px;
+                margin: 0 0 0 10px;
+                opacity: 0.9;
+            }
+
+            .direct-chat-img-reply-small {
+                border: 1px solid #fff;
+                border-radius: 50%;
+                float: left;
+                height: 20px;
+                margin: 0 8px;
+                width: 20px;
+                background: #3f9684;
+            }
+
+            .popup-messages .direct-chat-msg {
+                border-radius: 30px;
+                color: #fff;
+                padding: 10px 10px;
+                position: relative;
+                width: fit-content;
+                margin-bottom: 2px;
+                font-size: 14px;
+            }
+
+            .popup-messages-footer .btn-group-sm > .btn, .btn-sm {
+                padding: 0rem 0.8rem 0rem 0.4rem !important;
+                font-size: 1rem !important;
+                line-height: 0 !important;
+                border-radius: 0 !important;
+                border: none !important;
+                outline: none !important;
+                display: block !important;
+            }
+
+            .form-control:focus {
+                box-shadow: none !important
+            }
+
+            .message-right {
+                background: #0081ff;
+                margin-left: auto;
+                max-width: 80%;
+            }
+
+            .message-left {
+                background: #6c6c6c;
+                max-width: 80%;
+            }
         </style>
     </head>
     <body>
 
-        <button class="open-button" onclick="openForm()">Chat</button>
-
-        <div class="chat-popup" id="myForm">
-            <form action="" class="form-container" id="formChat">
-                <input type="hidden" id="displayname" />
-                <div>
-                    @if (user.UserName == "admin")
-                    {
-                        <label for="msg"><b>Phản hồi của người dùng</b></label>
-                    }
-                    else
-                    {<label for="msg"><b>Chat với quản trị viên</b></label>}
-                    <ul id="discussion" class="form-container" style="overflow: auto;overflow: auto; height: 230px; border: #dcdcdc solid 1px; background-color: #f1f1f1; margin-bottom: 5px; border-radius: 0.3rem;"></ul>
-                    <input style="width: 280px; height: 40px; margin-bottom: 5px;border-radius: 0.3rem;border: #5A5352 solid 1px;" placeholder="Nhập tin nhắn..." name="msg" id="message" required />
-                    @*<textarea placeholder="Nhập tin nhắn..." name="msg" id="message" required></textarea>*@
-                    <button type="submit" class="btn" id="sendmessage">Gửi</button>
-                    <button type="button" class="btn cancel" onclick="closeForm()">Đóng</button>
+        <button id="openChat" class="open-button" onclick="openForm()" title="Chat"><i class="fa fa-comment"></i></button>
+        <input type="hidden" id="idReceiverMessage" />
+        <div class="popup-box" id="myForm">
+            <div class="popup-head">
+                <div class="row">
+                    <div class="col-9 text-left" id="ChatWith">Chat với Admin</div>
+                    <div class="col-3 text-center">
+                        <button title="Đóng" onclick="closeForm()" class="close" style="padding:0px 10px 3px 0px;font-size:1.85rem;color:#000;opacity:0.8;">
+                            <span>&times;</span>
+                        </button>
+                    </div>
                 </div>
-            </form>
+            </div>
+
+            <div class="popup-messages wrapper" id="popupBody">
+                <div class="direct-chat-messages" id="lstMessages">
+
+                </div>
+            </div>
+
+            <div class="popup-messages-footer">
+                <div class="input-group">
+                    <input id="msg" type="text" placeholder="Nhập tin nhắn..." class="form-control" style="border-radius:50px;color:black;" maxlength="1998">
+                    <span class="input-group-btn">
+                        <button id="sendMsg" onclick="SendMesenger()" type="button" style="color:#0a86ff;" class="btn btn-sm form-control" title="Gửi"><i class="fa fa-paper-plane"></i></button>
+                    </span>
+                </div>
+            </div>
         </div>
-
-        <script>
-            $(document).ready(function () {
-                $("form#formChat").submit(function () {
-                    return false;
-                });
-            });
-            function openForm() {
-                document.getElementById("myForm").style.display = "block";
-            }
-            function closeForm() {
-                document.getElementById("myForm").style.display = "none";
-            }
-
-            @*$(function () {
-                // Start the connection
-                $.connection.hub.logging = true;
-                $.connection.hub.start().done(init);
-
-                var chat = $.connection.hub;
-                //var chat = $.connection.brewBattleHub;
-
-                // Create a function that the hub can call back to display messages.
-                chat.client.addNewMessageToPage = function (name, message) {
-                    // Add the message to the page.
-                    $('#discussion').append('<li><strong>' + htmlEncode(name)
-                        + '</strong>: ' + htmlEncode(message) + '</li>');
-                };
-                $('#displayname').val('@shortName');
-                $('#message').focus();
-
-                //$.connection.hub.logging = true;
-                //var chat = $.connection.brewBattleHub;
-                //$.connection.chatHub.start(({ transport: ['webSockets', 'serverSentEvents', 'longPolling'] })).done(function () {
-                //    $("#sendmessage").click(function () {
-                //        // Call the chat method on the server
-                //        chat.server.roll($('#displayname').val(), $('#message').val());
-                //    });
-                //    chat.server.sendMessage($('#displayname').val(), $('#message').val());
-                //}).fail(function (reason) {
-                //    console.log("SignalR connection failed: " + reason);
-                //});
-
-                $('#sendmessage').click(function () {
-                    $.connection.hub.start().done(function () {
-                        // Call the Send method on the hub.
-                        chat.server.send($('#displayname').val(), $('#message').val());
-                        // Clear text box and reset focus for next comment.
-                        $('#message').val('').focus();
-                    });
-                });
-
-            });
-
-
-
-
-            // This optional function html-encodes messages for display in the page.
-            function htmlEncode(value) {
-
-                var encodedValue = $('<div />').text(value).html();
-                return encodedValue;
-            }*@
-        </script>
-
-
     </body>
 </html>
 }
 
-
-
+<!--js signalR-->
 <script src="~/Scripts/jquery-3.3.1.min.js"></script>
-
-@*<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh" crossorigin="anonymous"></script>*@
-
-<script src="~/Scripts/jquery.signalR-2.4.1.min.js"></script>
-<script src="~/Scripts/jquery.signalR-2.4.1.js"></script>
+<script src="~/Scripts/jquery.signalR-2.4.2.js"></script>
+<script src="~/Scripts/jquery.signalR-2.4.2.min.js"></script>
 <script src="~/signalr/hubs"></script>
-
+<!--js scroll load more-->
 <script src="~/Scripts/scrollPagination/scrollpagination.js"></script>
 <script src="~/Scripts/jqueryblockUI/jquery.blockUI.js"></script>
 
+<!--js select2-->
+<script src="~/Scripts/select2.min.js"></script>
+
 <script type="text/javascript">
     var userId = @userId;
-    var pageIndex = 2;
+    var type = @type;
 
     $(function () {
         // Lúc mới vào load thông báo
         $.ajax({
-                type: 'GET',
-                url: '/Home/GetNotificationCoutByUserId/' + userId,
-                success: function (rs) {
-                    var countNoti = rs.length;
-                    $('span.count').html(countNoti);
-                },
-                error: function (error) {
-                    console.log(error);
-                }
-            })
-
-        // Click on notification icon for show notification
-        $('span.noti').click(function (e) {
-                e.stopPropagation();
-                $('.noti-content').show();
-                var count = 0;
-                count = parseInt($('span.count').html()) || 0;
-                //only load notification if not already loaded
-                if (count > 0) {
-                    updateNotification();
-                }
-                $('span.count', this).html('&nbsp;');
-            })
-        // hide notifications
-        $('html').click(function () {
-                $('.noti-content').hide();
-            })
-        // update notification
-        function updateNotification() {
-                $('#notiContent').empty();
-                $('#notiContent').append($('<li>Loading...</li>'));
-
-                $.ajax({
-                    type: 'GET',
-                    url: '/Home/GetNotificationContacts',
-                    success: function (response) {
-                        $('#notiContent').empty();
-                        if (response.length == 0) {
-                            $('#notiContent').append($('<li>No data available</li>'));
-                        }
-                        $.each(response, function (index, value) {
-                            $('#notiContent').append($('<li>New contact : ' + value.ContactName + ' (' + value.ContactNo + ') added</li>'));
-                        });
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                })
+            type: 'GET',
+            url: '/Home/GetNotificationCoutByUserId/' + userId,
+            success: function (rs) {
+                var countNoti = rs.length;
+                $('span.count').html(countNoti);
+            },
+            error: function (error) {
+                console.log(error);
             }
+        })
 
         // Đếm và hiện số thống báo ở icon quả chuông
         function updateNotificationCount() {
@@ -603,8 +742,9 @@
 
         // kết nối với server
         var connection = $.hubConnection("/signalr", { useDefaultPath: false });
-        $.connection.hub.start().done(function () { }).fail(function (e) {
-            console.log('Lỗi kết nối server');
+        $.connection.hub.start().done(function () {
+            notificationHub.server.online(userId, $.connection.hub.id); //Id của user và id của kết nối tới hub
+            //notificationHub.server.disconnected();
         });
         connection.logging = true;
         connection.start();
@@ -620,31 +760,59 @@
                         url: '/Home/GetNotiNewFirst',
                         success: function (rs) {
                             idNoti = rs.Id;
+
+                            toastr.options = {
+                                "closeButton": true,
+                                "debug": false,
+                                "newestOnTop": false,
+                                "progressBar": false,
+                                "positionClass": "toast-bottom-left",
+                                "preventDuplicates": false,
+                                "onclick": null,
+                                "showDuration": "500",
+                                "hideDuration": "1000",
+                                "timeOut": "10000",
+                                "extendedTimeOut": "10000",
+                                "showEasing": "swing",
+                                "hideEasing": "linear",
+                                "showMethod": "fadeIn",
+                                "hideMethod": "fadeOut",
+                            };
+
+                            toastr.info("Hãy vào đăng ký đi nào  <img src=\"/assets/img/notify.jpg\" style='width: 30px; height: 25px'/> </br><span style='color:#efff00'>Khoảng vài giây trước</span>", "Thông báo: Sắp đến giờ ăn!!!", { onclick: function () { RedirectAllDishs(idNoti) } });
+
+                            var notifyLoaded = $('#notifyLoaded');
+                            if (notifyLoaded != null && notifyLoaded != undefined && notifyLoaded.length > 0) {
+                                var html = "";
+                                var notifyNew = $('#notifyNew');
+                                if (notifyNew != null && notifyNew != undefined && notifyNew.length > 0) {
+                                    $('#notifyNew').remove();
+                                }
+
+                                html += `<span id='notifyNew' style='font-size: 13px; padding-left: 25px;'><b>Mới</b></span>`;
+                                html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;background-color:#d7d9db;' onclick='RedirectAllDishs(${idNoti})' href='#'>
+                                     <div class='mr-3'>
+                                         <div>
+                                             <img src='/Content/image/Dish/favicon.png' style='width:35px; height:35px;border-radius:25px;border:none;' />
+                                         </div>
+                                     </div>
+                                     <div class='text-wrap wrapper'>
+                                            <span>Bạn có thông báo mới: ${rs.ContentNoti.trim()}</span>
+                                            <div class='small'>
+                                                <span style='color:#138ce6;'>Vừa mới xong</span>
+                                            </div>
+                                    </div>
+                                    <span class='dot' style='background-color:#0095ff;height:11px;width:16px;border-radius:100%;display:inline-block;'><span>
+                                </a>`
+
+                                $('#contentLoading').prepend(html);
+                                pageSize = pageSize + 1;
+                            }
                         },
                         error: function (error) {
                             console.log(error);
                         }
                     })
-
-                    toastr.options = {
-                        "closeButton": true,
-                        "debug": false,
-                        "newestOnTop": false,
-                        "progressBar": false,
-                        "positionClass": "toast-bottom-left",
-                        "preventDuplicates": false,
-                        "onclick": null,
-                        "showDuration": "500",
-                        "hideDuration": "1000",
-                        "timeOut": "10000",
-                        "extendedTimeOut": "10000",
-                        "showEasing": "swing",
-                        "hideEasing": "linear",
-                        "showMethod": "fadeIn",
-                        "hideMethod": "fadeOut",
-                    };
-
-                    toastr.info("Hãy vào đăng ký đi nào  <img src=\"/assets/img/notify.jpg\" style='width: 30px; height: 25px'/> </br><span style='color:#efff00'>Khoảng vài giây trước</span>", "Thông báo: Sắp đến giờ ăn!!!", { onclick: function () { RedirectAllDishs(idNoti) } });
                 }
 
                 if (message && message.toLowerCase() == "notifyaddnewdish") {
@@ -679,6 +847,34 @@
                             };
 
                             toastr.info("Vào khám phá món mới ngay nào!  <img src=\"/Content/image/Dish/" + defautImage + "\" style='width: 30px; height: 25px'/> </br><span style='color:#efff00'>Khoảng vài giây trước</span>", "Hot: Đã có món mới!!!", { onclick: function () { RedirectViewNewDish(idNotiAddNewDish, idNewDish) } });
+
+                            var notifyLoaded = $('#notifyLoaded');
+                            if (notifyLoaded != null && notifyLoaded != undefined && notifyLoaded.length > 0) {
+                                var html = "";
+                                var notifyNew = $('#notifyNew');
+                                if (notifyNew != null && notifyNew != undefined && notifyNew.length > 0) {
+                                    $('#notifyNew').remove();
+                                }
+
+                                html += `<span id='notifyNew' style='font-size: 13px; padding-left: 25px;'><b>Mới</b></span>`;
+                                html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;background-color:#d7d9db;' onclick='RedirectViewNewDish(${idNotiAddNewDish},${idNoti})' href='#'>
+                                     <div class='mr-3'>
+                                         <div>
+                                             <img src='/Content/image/Dish/${defautImage}' style='width:35px; height:35px;border-radius:25px;border:none;' />
+                                         </div>
+                                     </div>
+                                     <div class='text-wrap wrapper'>
+                                            <span>Bạn có thông báo mới: ${rs.ContentNoti.trim()}</span>
+                                            <div class='small'>
+                                                <span style='color:#138ce6;'>Vừa mới xong</span>
+                                            </div>
+                                    </div>
+                                    <span class='dot' style='background-color:#0095ff;height:11px;width:16px;border-radius:100%;display:inline-block;'><span>
+                                </a>`
+
+                                $('#contentLoading').prepend(html);
+                                pageSize = pageSize + 1;
+                            }
                         },
                         error: function (error) {
                             console.log(error);
@@ -703,6 +899,13 @@
                 })
             }
         }, 60000);
+
+        setInterval(function () {
+            $('#scrollpagination').removeClass("show");
+            $('#contentLoading').empty();
+            pageSize = 15;
+            pageIndex = 2;
+        }, 600000);
 
         window.addEventListener('beforeunload', function (e) {
             if (userId != null && userId != undefined && userId > 0) {
@@ -731,7 +934,7 @@
                 }
             })
         }
-        
+
     })
 
     function RedirectAllDishs(idNoti) {
@@ -767,7 +970,7 @@
             'url': '/Home/LoadNoti',
             'data': {
                 'page': pageIndex,
-                'size': 15,
+                'size': pageSize,
             },
         });
     });
@@ -791,9 +994,10 @@
                 dataType: 'json',
                 success: function (data) {
                     var html = "";
+                    html += `<a id='notifyLoaded' style='display:none;'></a>`;
                     //load những thông báo mới
                     if (data.lstNotiNew != null && data.lstNotiNew.length > 0) {
-                        html += `<span id='notifyNew' style='font-size: 13px; padding-left: 25px;'><b>Mới</b></span><a id='appendHere'></a>`;
+                        html += `<span id='notifyNew' style='font-size: 13px; padding-left: 25px;'><b>Mới</b></span>`;
                         for (var i = 0; i < data.lstNotiNew.length; i++) {
                             html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;${data.lstNotiNew[i].SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${data.lstNotiNew[i].TypeNoti == 2 ? "RedirectViewNewDish(" + data.lstNotiNew[i].Id + "," + data.lstNotiNew[i].DishId + ")" : "RedirectAllDishs(" + data.lstNotiNew[i].Id + ")"}' href='#'>
                                      <div class='mr-3'>
@@ -887,5 +1091,230 @@
             }
         })
     }
-    
+
+    function openForm() {
+        $('div #myForm').block({
+            message: 'Đang tải...',
+            css: { border: '0.5px solid #000000', fontSize: '12px', margin: '90% 0% 0% 35%' }
+        });
+
+        $('#lstMessages').empty();
+        var html = ``;
+        var data = {
+            page: 1,
+            size: 20,
+        };
+        $.ajax({
+            type: 'POST',
+            url: '/Chat/GetChatByClinet',
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            success: function (rs) {
+                for (var i = 0; i < rs.length; i++) {
+                    if (rs[i].CreatedDate != null && rs[i].CreatedDate != "") {
+                        var datetime = new Date(parseInt(rs[i].CreatedDate.substr(6))).toLocaleString('vi', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
+                        html += `<div class="text-center"><div class="timestamp">${datetime}</div></div>`;
+                        for (var j = 0; j < rs[i].lstChat.length; j++) {
+
+                            var dateConvert = new Date(parseInt(rs[i].lstChat[j].CreatedDate.substr(6))) //convert định dạng
+                            var date = ("0" + dateConvert.getDate()).slice(-2) + "/" + ("0" + (dateConvert.getMonth() + 1)).slice(-2) + "/" + dateConvert.getFullYear() + " " + ("0" + dateConvert.getHours()).slice(-2) + ":" + ("0" + dateConvert.getMinutes()).slice(-2) + ":" + ("0" + dateConvert.getSeconds()).slice(-2);
+
+                            if (rs[i].lstChat[j].SenderId == userId) {
+                                html += `<div class='direct-chat-msg pull-right message-right' title='${date}'>${rs[i].lstChat[j].Message}</div>`;
+                            } else {
+                                html += `<div class='direct-chat-msg pull-left message-left' title='${date}'>${rs[i].lstChat[j].Message}</div>`;
+                            }
+                        }
+                    } else {
+                        //nếu như những tin nhắn của các ngày khác đã có
+                        if (rs[0].CreatedDate != null && rs[0].CreatedDate != "") {
+                            html += `<div id='messageToday' class="text-center"><div class="timestamp">Hôm nay</div></div>`;
+                        }
+                        for (var j = 0; j < rs[i].lstChatHour.length; j++) {
+                            html += `<div id='messageTodayHour_${rs[i].lstChatHour[j].Hour.substr(0, 2)}' class="text-center"><div class="timestamp">${rs[i].lstChatHour[j].Hour}</div></div>`
+                            for (var k = 0; k < rs[i].lstChatHour[j].lstChat.length; k++) {
+
+                                var dateConvert = new Date(parseInt(rs[i].lstChatHour[j].lstChat[k].CreatedDate.substr(6))) //convert định dạng
+                                var date = ("0" + dateConvert.getDate()).slice(-2) + "/" + ("0" + (dateConvert.getMonth() + 1)).slice(-2) + "/" + dateConvert.getFullYear() + " " + ("0" + dateConvert.getHours()).slice(-2) + ":" + ("0" + dateConvert.getMinutes()).slice(-2) + ":" + ("0" + dateConvert.getSeconds()).slice(-2);
+
+                                if (rs[i].lstChatHour[j].lstChat[k].SenderId == userId) {
+                                    html += `<div class='direct-chat-msg pull-right message-right' title='${date}'>${rs[i].lstChatHour[j].lstChat[k].Message}</div>`;
+                                } else {
+                                    html += `<div class='direct-chat-msg pull-left message-left' title='${date}'>${rs[i].lstChatHour[j].lstChat[k].Message}</div>`;
+                                }
+                            }
+                        }
+                    }
+                }
+                $('#lstMessages').append(html);
+
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        })
+
+        document.getElementById("myForm").style.display = "block";
+        document.getElementById("openChat").style.display = "none";
+        var heght = $('#lstMessages').height();
+        $('#popupBody').scrollTop(heght); //auto hiện cuối cùng scroll
+        $('div #myForm').unblock();
+        $('#msg').focus();
+    }
+
+    //$(".selcted2").select2({
+                //    theme: "bootstrap",
+                //    cache: true,
+                //    dropdownAutoWidth: true,
+                //});
+
+    function closeForm() {
+        document.getElementById("myForm").style.display = "none";
+        document.getElementById("openChat").style.display = "block";
+    }
+
+    $('#msg').keypress(function (event) {
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if (keycode == '13') {
+            SendMesenger();
+        }
+    });
+
+    function SendMesenger() {
+        var mesage = $('#msg').val().trim();
+        var id = $('#idReceiverMessage').val().trim() * 1;
+        if (mesage == "" || mesage == null || mesage == undefined) {
+            $('#msg').focus();
+            return false;
+        }
+        $('#msg').val('');
+        $('#msg').focus();
+        var receiverId = 0;
+        if (type == 3) receiverId = id;
+
+        var data = {
+            ReceiverId: receiverId,
+            Message: mesage,
+        };
+        $.post('/Chat/sendmsg', data,
+            function (rs) {
+                if (rs > 0) {
+                    var html = ``;
+                    var time = new Date();
+                    var year = time.getFullYear();
+                    var month = ("0" + (time.getMonth() + 1)).slice(-2);
+                    var date = ("0" + time.getDate()).slice(-2);
+                    var hour = ("0" + time.getHours()).slice(-2);
+                    var miu = ("0" + time.getMinutes()).slice(-2);
+                    var sec = ("0" + time.getSeconds()).slice(-2);
+                    var today = $('#messageToday');
+                    if (today == null || today == undefined || today.length == 0) {
+                        html += `<div id='messageToday' class="text-center"><div class="timestamp">Hôm nay</div></div>`;
+                        html += `<div id='messageTodayHour_${hour}' class="text-center"><div class="timestamp">${hour}:${miu}</div></div>`
+                    } else {
+                        var hourToday = $(`#messageTodayHour_${(("0" + new Date().getHours().toString()).slice(-2))}`);
+                        if (hourToday == null || hourToday == undefined || hourToday.length == 0) {
+                            html += `<div id='messageTodayHour_${hour}' class="text-center"><div class="timestamp">${hour}:${miu}</div></div>`
+                        }
+                    }
+                    html += `<div class='direct-chat-msg pull-right message-right' title='${date}/${month}/${year} ${hour}:${miu}:${sec}'>${mesage}</div>`;
+                    $('#lstMessages').append(html);
+                    var heght = $('#lstMessages').height();
+                    $('#popupBody').scrollTop(heght);
+                }
+                else {
+                    var html = `<div class='direct-chat-msg pull-right message-right' style='color:#f00;background:#cccccc;'>
+                                    Đã có lỗi xảy ra!
+                                    <i class="fa fa-remove"></i>
+                                </div>`;
+                    $('#lstMessages').append(html);
+                    console.log('Có lỗi xảy ra');
+                    var heght = $('#lstMessages').height();
+                    $('#popupBody').scrollTop(heght);
+                }
+            }).fail(function () {
+                var html = `<div class='direct-chat-msg pull-right message-right' style='color:#f00;background:#cccccc;'>
+                                Đã có lỗi xảy ra!
+                                <i class="fa fa-remove"></i>
+                            </div>`;
+                $('#lstMessages').append(html);
+                console.log('Có lỗi xảy ra');
+                var heght = $('#lstMessages').height();
+                $('#popupBody').scrollTop(heght);
+            });
+    }
+
 </script>
+
+@*<script type="text/javascript">
+        $(document).ready(function () {
+            $("#btnsend").click(function () {
+                send();
+            });
+            getmyfriends();
+            function getmyfriends()
+            {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("friendlist")",
+                    contentType: "application/json; charset=utf-8",
+                    data: '{}',
+                    dataType: "json",
+                    success: function (r) {
+                        var ddlfrined = $("[id*=ddlfriend]");
+                        // ddlfrined.empty().append('<option selected="selected" value="0">select</option>');
+                        for (var i = 0; i <r.length; i++) {
+                            ddlfrined.append($("<option></option>").val(r[i].Value).html(r[i].Text));
+                        }
+                    },
+                    error: function (r) {
+                        alert("error");
+                    }
+                });
+            }
+
+            setInterval(function () {
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: '{}',
+                    url: "@Url.Action("receive")",
+                    dataType: "json",
+                    success: function (response) {
+                        var data = $("#divmsg").html();
+                        $("#divmsg").html(data + "<br>Friend:" + response);
+
+                    },
+                    error: function (response) {
+
+                    }
+                });
+            }, 5000);
+
+            function send() {
+                var message = $("#txtmsg").val();
+                var friend = $("#ddlfriend").val();
+                var data = $("#divmsg").html();
+                $("#divmsg").html(data + "<br>Me:" + message);
+                $("#txtmsg").val("");
+                debugger;
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: '{"message":"' + message + '","friend":"'+friend+'"}',
+                    url: "@Url.Action("sendmsg")",
+                    dataType: "json",
+                    success: function (response) {
+                        var data = $("#divmsg").html();
+                        $("#divmsg").html(data + "<br>Me :" + message);
+                    },
+                    error: function (response) {
+
+                    }
+                });
+            }
+        });
+
+    </script>*@

@@ -34,13 +34,13 @@ h1, h2, h3, h4, h5, h6 {
   display: none;
   width: 40px;
   height: 40px;
-  border-radius: 3px;
-  right: 15px;
-  bottom: 15px;
+  border-radius: 50px;
+  right: 0px;
+  bottom: 55px;
   background: #1bbd36;
   color: #fff;
   transition: display 0.5s ease-in-out;
-  z-index: 99999;
+  z-index: auto;
 }
 
 .back-to-top i {

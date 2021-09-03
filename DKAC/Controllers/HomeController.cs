@@ -294,5 +294,10 @@ namespace DKAC.Controllers
 
             return Task.FromResult(Json(1, JsonRequestBehavior.AllowGet));
         }
+
+        public void Test()
+        {
+            //User user = (User)Session[CommonConstants.USER_SESSION];
+        }
     }
 }

@@ -128,21 +128,6 @@ namespace DKAC.Controllers
             for (int i = 0; i < lstCaches.Count; i++)
                 System.Runtime.Caching.MemoryCache.Default.Remove(lstCaches[i].Key);
         }
-
-        protected override void Initialize(System.Web.Routing.RequestContext requestContext)
-        {
-            var UrlId = "";
-
-            List<string> HistoryURLs = new List<string>();
-            HistoryURLs.Add(UrlId);
-            requestContext.HttpContext.Session["URLHistory"] = HistoryURLs;
-            requestContext.HttpContext.Session["VisitedURL"] = UrlId;
-
-            //Our code goes here
-            //Have this line to call base class initialize method.  
-            base.Initialize(requestContext);
-        }
-
-
+               
     }
 }

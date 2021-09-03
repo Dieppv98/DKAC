@@ -5,13 +5,17 @@
  * 2020/02/17
  */
 
-;(function($){
+var pageSize;
+var pageIndex = 2;
+
+; (function ($) {
+    pageSize = 15;
     var defaults = {
         'url': null,
         'autoload': true,
         'data': {
             'page': 1,
-            'size': 15,
+            'size': pageSize,
         }, 
         'before': function(){
             // Before load function, you can display a preloader div
@@ -55,6 +59,8 @@
 
     $.fn.scrollPagination.loadContent = function(obj, opts){
         var target = opts.scroller;
+        opts.data.size = pageSize;
+        opts.data.page = pageIndex;
         // do before
         if (opts.before != null){
             opts.before();
@@ -131,8 +137,8 @@
                         }
                         html += `</a>`;
                     });
-                    opts.data.page++; //tăng pageIndex lên 1 đơn vị
-
+                    //opts.data.page++; //tăng pageIndex lên 1 đơn vị
+                    pageIndex = pageIndex + 1;
                     $('#contentLoading').append(html);
                 }
                 if (data.lstNotiNew.length == 0 && data.lstNotiOld.length == 0) {

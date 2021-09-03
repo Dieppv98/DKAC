@@ -16,6 +16,18 @@ namespace DKAC.Models.Enum
         Seen = 1, // đã xem
     }
 
+    public enum MesageOfAdmin
+    {
+        admin = -1, //được gửi hoặc được nhận bởi admin(có UserGroup = 3)
+    }
+
+    public enum GroupUser
+    {
+        User = 1,
+        Management = 2,
+        admin = 3,
+    }
+
     public enum TypeOfNoti
     {
         TypeRegister = 1, //Thông báo đăng ký ăn hàng ngày

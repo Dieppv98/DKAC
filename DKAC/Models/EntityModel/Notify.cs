@@ -10,6 +10,7 @@ namespace DKAC.Models.EntityModel
     public class Notify
     {
         public int Id { get; set; }
+        [Index("IX_Notify_ReceiveUserId", IsClustered = false, IsUnique = false)]
         public int? ReceiveUserId { get; set; } // id của người nhận
         public int? DishId { get; set; } // id của món ăn vừa đc thêm
         public int? SeenStatus { get; set; } // Trạng thái đã xem hay chưa

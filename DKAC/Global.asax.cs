@@ -56,9 +56,9 @@ namespace DKAC
 
         protected void Session_End(object sender, EventArgs e)
         {
-            Application.Lock();
-            Application["TotalOnlineUsers"] = (int)Application["TotalOnlineUsers"] - 1;
-            Application.UnLock();
+            //Application.Lock();
+            //Application["TotalOnlineUsers"] = (int)Application["TotalOnlineUsers"] - 1;
+            //Application.UnLock();
         }
         
     }
