@@ -140,5 +140,20 @@ namespace DKAC.Controllers
             
             return Json(rs, JsonRequestBehavior.AllowGet);
         }
+
+        /// <summary>
+        /// Chức năng của admin, khi mở popup chát của ai thì đánh dấu là đã xem
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult UpdateSeenById(int updateSeeById)
+        {
+            User user = (User)Session[CommonConstants.USER_SESSION];
+            if (user.UserGroupId == (int)GroupUser.admin)
+            {
+                var rs = _chat.UpdateSeenById(updateSeeById);
+                return Json(rs, JsonRequestBehavior.AllowGet);
+            }
+            return Json(0, JsonRequestBehavior.AllowGet);
+        }
     }
 }

@@ -198,7 +198,7 @@
                                 <div class="row">
                                     <div class="col-5">
                                         <span class="dropdown-header" style="padding-bottom:0px;padding-left:10px;">
-                                            <b style="color:#dc3545" id="messageTo">Chat với Admin</b>
+                                            <b style="color:#dc3545" id="messageTo">Tin nhắn của bạn</b>
                                         </span>
                                     </div>
                                     <div class="col-7" style="text-align:right;">
@@ -211,7 +211,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-1"></div>
-                                    <div class="col-12" style="padding: 10px 20px 10px 25px;">
+                                    <div class="col-12" style="padding:10px 25px 10px 25px">
                                         <input class="form-control" style="border-radius:50px;" id="searchChat" placeholder="Tìm kiếm người dùng..." />
                                     </div>
                                     <div class="col-1"></div>
@@ -1293,7 +1293,22 @@
         if (to != -1) {
             toId = to;
             $('#ChatWith').text(chatWith);
-            $('#idReceiverMessage').val(to);
+            $('#idReceiverMessage').val(to); 
+            var updateSee = {
+                updateSeeById: to,
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/Chat/UpdateSeenById',
+                data: JSON.stringify(updateSee),
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                success: function (data) {
+                    console.log('Đã cập nhật tin nhắn là đã xem!')
+                },
+                error: function (error) {
+                },
+            });
         }
         var html = ``;
         var data = {
@@ -1473,44 +1488,48 @@
     });
 
     function LoadPopupSelectChat() {
-        var messageLoaded = $("#PopupSelectChat").css("display");//xem popup select chat đã được mở ra hay chưa
-        if (messageLoaded != 'block') {
-            $('div #PopupSelectChat').block({
-                message: 'Đang tải...',
-                css: { border: '0.5px solid #000000', fontSize: '12px', margin: '90% 0% 0% 35%' }
-            });
-            $.ajax({
-                type: 'POST',
-                url: '/Chat/LoadPopupSelectChat',
-                success: function (data) {
-                    var html = "";
-                    if (data != null && data.length > 0) {
-                        for (var i = 0; i < data.length; i++) {
-                            html += `<a class='row d-flex align-items-center' style='padding:5px 0px 5px 25px;cursor:pointer;text-transform:none;' onclick="openForm(${data[i].AdminTo}, '${data[i].AdminToUserName}')" href='javascript:void(0)'>
-                                     <div class='col-9'>
-                                        <div class='text-wrap wrapper'>
-                                            <span>${data[i].AdminToUserName.trim()}</span>
-                                            <div class='small'>
-                                                <span style='color:#138ce6;'>${data[i].TimeDisplay}</span>
+        if (@type == 3) {
+            var messageLoaded = $("#PopupSelectChat").css("display");//xem popup select chat đã được mở ra hay chưa
+            if (messageLoaded != 'block') {
+                $('div #PopupSelectChat').block({
+                    message: 'Đang tải...',
+                    css: { border: '0.5px solid #000000', fontSize: '12px', margin: '90% 0% 0% 35%' }
+                });
+                $.ajax({
+                    type: 'POST',
+                    url: '/Chat/LoadPopupSelectChat',
+                    success: function (data) {
+                        var html = "";
+                        if (data != null && data.length > 0) {
+                            for (var i = 0; i < data.length; i++) {
+                                html += `<a class='row d-flex align-items-center' style='padding:5px 0px 7px 25px;cursor:pointer;text-transform:none;${data[i].Status > 0 ? "background:#d7d9db;" : ""}' onclick="openForm(${data[i].AdminTo}, '${data[i].AdminToUserName}')" href='javascript:void(0)'>
+                                     <div class='col-10'>
+                                        <div style='text-overflow:ellipsis;'>
+                                            <span style='font-size:14px;'>${data[i].AdminToUserName.trim()}</span>
+                                            <div class='small' style='padding-top:5px;font-size:13px;'>
+                                                ${data[i].IdSender == -1 ? "<b>Bạn: </b>" : ""}
+                                                <span>${data[i].Message.trim().length > 20 ? data[i].Message.substr(0, 20) + "..." : data[i].Message.trim()}</span>
+                                                <span ${data[i].Status > 0 ? "style=color:#138ce6;" : ""}>&ensp;.${data[i].TimeDisplay}</span>
                                             </div>
                                         </div>
                                      </div>`
-                            if (data[i].Status > 0) {
-                                html += `<div>
+                                if (data[i].Status > 0) {
+                                    html += `<div>
                                             <span class='dot' style='background-color:#0095ff;height:13px;width:13px;border-radius:100%;display:inline-block;'><span>
                                         </div>`
+                                }
+                                html += `</a>`;
                             }
-                            html += `</a>`;
                         }
-                    }
-                    $('#lstSelectChat').html(html);
+                        $('#lstSelectChat').html(html);
 
-                    $('div #PopupSelectChat').unblock();
-                },
-                error: function (error) {
-                    console.log(error);
-                },
-            });
+                        $('div #PopupSelectChat').unblock();
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    },
+                });
+            }
         }
     }
 

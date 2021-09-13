@@ -66,6 +66,8 @@ namespace DKAC.Repository
             }
             else
             {
+                chatHistory.SenderId = model.SenderId;
+                chatHistory.ReceiverId = model.ReceiverId; 
                 chatHistory.Message = model.Message;
                 chatHistory.CreatedDate = DateTime.Now;
                 chatHistory.NumberMessageNotSeen = ((chatHistory.NumberMessageNotSeen ?? 0) + 1);
@@ -80,7 +82,7 @@ namespace DKAC.Repository
             page = (page - 1);
             //lst chat do client gửi và nhận
             List<Chat> lstChatSend = new List<Chat>();
-            if(toId == -1)
+            if (toId == -1)
             {
                 lstChatSend = db.Chats.Where(x => (x.SenderId == (int)MessageOfAdmin.admin && x.ReceiverId == userId) || (x.SenderId == userId && x.ReceiverId == (int)MessageOfAdmin.admin)).OrderByDescending(x => x.CreatedDate).Skip(page * size).Take(size).ToList() ?? new List<Chat>();
             }
@@ -88,7 +90,7 @@ namespace DKAC.Repository
             {
                 lstChatSend = db.Chats.Where(x => (x.SenderId == (int)MessageOfAdmin.admin && x.ReceiverId == toId) || (x.SenderId == toId && x.ReceiverId == (int)MessageOfAdmin.admin)).OrderByDescending(x => x.CreatedDate).Skip(page * size).Take(size).ToList() ?? new List<Chat>();
             }
-            
+
             var groupDay = lstChatSend.GroupBy(x => x.CreatedDate.Value.Date)
                 .Select(x => x.FirstOrDefault().CreatedDate).OrderBy(x => x.Value).ToList();
 
@@ -143,6 +145,17 @@ namespace DKAC.Repository
                       }).OrderByDescending(x => x.CreatedDate).Take(20).ToList() ?? new List<ChatInfo>();
 
             return rs;
+        }
+
+        public int UpdateSeenById(int updateSeeById)
+        {
+            var messageById = db.ChatHistoryGroupBies.FirstOrDefault(x => x.AdminTo == updateSeeById);
+            if (messageById != null)
+            {
+                messageById.NumberMessageNotSeen = 0;
+                return db.SaveChanges();
+            }
+            return 0;
         }
     }
 }
