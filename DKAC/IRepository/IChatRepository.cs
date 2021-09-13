@@ -11,7 +11,8 @@ namespace DKAC.IRepository
     public interface IChatRepository
     {
         List<ChatInfo> GetReceiverChatById(int id);
-        List<ChatGroupByInfo> GetChatByClinet(int page, int size, int id);
+        List<ChatGroupByInfo> GetChatByClient(int page, int size, int userId, int toId);
         Task<int> AddMessage(ChatReceiverInfo model);
+        List<SelectChatInfo> LoadPopupSelectChat();
     }
 }

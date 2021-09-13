@@ -19,5 +19,6 @@ namespace DKAC.Models.InfoModel
         public int Hours { get; set; }
         public int Minutes { get; set; }
         public int Seconds { get; set; }
+        public string Hour_Minute { get; set; }
     }
 }

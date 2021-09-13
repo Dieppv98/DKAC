@@ -1,6 +1,7 @@
 ﻿using DKAC.Common;
 using DKAC.Controllers;
 using DKAC.Models.EntityModel;
+using DKAC.Models.Enum;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using System;
@@ -14,12 +15,8 @@ namespace DKAC
 {
     public class NotificationHub : Hub
     {
-        static ConcurrentDictionary<int, string> dic = new ConcurrentDictionary<int, string>();
+        //public ConcurrentDictionary<int, string> messageUsers = new ConcurrentDictionary<int, string>();
         HomeController _home = new HomeController();
-        //public void Hello()
-        //{
-        //    Clients.All.hello();
-        //}
 
         [HubMethodName("conectionServer")]
         public static void ConectionServer()
@@ -28,16 +25,30 @@ namespace DKAC
             context.Clients.All.conectionServer();
         }
 
-        public void online(int userId, string hubConecId)
+        public void SendMessageTo(User userSend, string message, int? receiver)
         {
+            IHubContext context = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
+
+            if (userSend.UserGroupId == (int)GroupUser.admin)
+            {
+                Dictionary<int, string> messageUsers = (Dictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
+                if (messageUsers != null && messageUsers.Count > 0)
+                {
+                    var receive = messageUsers.FirstOrDefault(x => x.Key == receiver);
+                    //Clients.Caller.getmessage(name, message);
+                    context.Clients.Client(receive.Value).getmessage("getmessageclient", message, -1);
+                }
+            }
+            else
+            {
+                //gửi cho tất cả các admin userSend.id là người gửi message cho admin
+                context.Clients.All.getmessage("getmessageadmin", message, userSend.id);
+            }
         }
 
-        public Task disconnected()
+        public void online(int userId, string hubConecId)
         {
-            _home.Test();
-
-            int count = 1;
-            return Task.FromResult(count);
+            _home.UserOnline(userId, hubConecId);
         }
     }
 }

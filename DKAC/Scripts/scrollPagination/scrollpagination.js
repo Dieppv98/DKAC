@@ -95,10 +95,10 @@ var pageIndex = 2;
                             html += `<span style='color:#138ce6;'>Khoảng ${value.Hours} giờ trước</span>`
                         }
                         if (value.Days == 0 && value.Hours == 0 && value.Minutes > 0) {
-                            html += `<span style='color:#138ce6;'>Khoảng ${value.Minutes} phút trước</span>`
+                            html += `<span class='update-timeMinute' id='${value.Hour_Minute}' style='color:#138ce6;'>Khoảng ${value.Minutes} phút trước</span>`
                         }
                         if (value.Days == 0 && value.Hours == 0 && value.Minutes == 0 && value.Seconds > 0) {
-                            html += `<span style='color:#138ce6;'>Khoảng ${value.Seconds} giây trước</span>`
+                            html += `<span class='update-timeMinute' id='${value.Hour_Minute}' style='color:#138ce6;'>Khoảng ${value.Seconds} giây trước</span>`
                         }
                         html += `</div></div>`
                         if (value.SeenStatus != 1) {

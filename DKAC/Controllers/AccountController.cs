@@ -1,9 +1,11 @@
 ﻿using DKAC.Common;
 using DKAC.Models;
 using DKAC.Models.EntityModel;
+using DKAC.Models.Enum;
 using DKAC.Models.InfoModel;
 using DKAC.Repository;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -45,32 +47,23 @@ namespace DKAC.Controllers
                         //_loginRepo.InsertOnlineUser(user); // add vào bảng những user đang online khi đăng nhập thành công
 
                         //add những user online vào cache
-                        if (HttpRuntime.Cache["LoggedInUsers"] != null)
+                        if (HttpRuntime.Cache["OnlineUsers"] != null)
                         {
-                            Dictionary<int, string> loggedInUsers = (Dictionary<int, string>)HttpRuntime.Cache["LoggedInUsers"];
-                            var cache = loggedInUsers.Where(x => x.Key == user.id).FirstOrDefault();
-                            if (cache.Key <= 0) //kiểm tra nếu trong cache chưa có thì mới add vào
+                            Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
+                            var cache = onlineUsers.Where(x => x.Key == user.id).FirstOrDefault();
+                            if(cache.Key > 0)
                             {
-                                loggedInUsers.Add(user.id, $"{user.UserName}-{user.FullName}");
-                                HttpRuntime.Cache["LoggedInUsers"] = loggedInUsers;
-                                if(HttpRuntime.Cache["OnlineUsers"] != null)
-                                {
-                                    Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
-                                    onlineUsers.Add(user.id, DateTime.Now);
-                                    HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
-                                }
+                                onlineUsers.Remove(cache.Key);
                             }
+                            onlineUsers.Add(user.id, DateTime.Now);
+                            HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
                         }
                         else
                         {
-                            Dictionary<int, string> loggedInUsers =new Dictionary<int, string>();
                             Dictionary<int, DateTime> onlineUsers = new Dictionary<int, DateTime>();
-                            loggedInUsers.Add(user.id, $"{user.UserName}-{user.FullName}");
                             onlineUsers.Add(user.id, DateTime.Now);
-                            HttpRuntime.Cache["LoggedInUsers"] = loggedInUsers;
                             HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
                         }
-
                         return RedirectToAction("Index", "Home");
                     }
                 }
@@ -102,31 +95,29 @@ namespace DKAC.Controllers
         public ActionResult Logout()
         {
             User user = (User)Session[CommonConstants.USER_SESSION];
-            if (HttpRuntime.Cache["LoggedInUsers"] != null)
+            if (HttpRuntime.Cache["OnlineUsers"] != null)
             {
-                Dictionary<int, string> loggedInUsers = (Dictionary<int, string>)HttpRuntime.Cache["LoggedInUsers"];
-                var cache = loggedInUsers.Where(x => x.Key == user.id).FirstOrDefault();
-                if (cache.Key >= 0)
+                Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
+                var cache = onlineUsers.Where(x => x.Key == user.id).FirstOrDefault();
+                if(cache.Key > 0)
                 {
-                    loggedInUsers.Remove(cache.Key);
-                    HttpRuntime.Cache["LoggedInUsers"] = loggedInUsers;
-                    if(HttpRuntime.Cache["OnlineUsers"] != null)
-                    {
-                        Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
-                        onlineUsers.Remove(cache.Key);
-                    }
+                    onlineUsers.Remove(cache.Key);
+                    HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
                 }
-                
-                //string userCache = $"ID_{user.id}-";
-                //List<string> loggedInUsers = (List<string>)HttpRuntime.Cache["LoggedInUsers"];
-                //var cache = loggedInUsers.Where(x => x.Contains(userCache)).FirstOrDefault();
-
-                //if (cache != null)
-                //{
-                //    loggedInUsers.Remove(cache); //remove user khỏi list user đang online
-                //}
             }
 
+            if(user.UserGroupId != (int)GroupUser.admin)
+            {
+                if (HttpRuntime.Cache["MessageUsers"] != null)
+                {
+                    Dictionary<int, string> messageUsers = (Dictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
+                    var cache = messageUsers.Where(x => x.Key == user.id).FirstOrDefault();
+                    if (cache.Key > 0)
+                    {
+                        messageUsers.Remove(cache.Key);
+                    }
+                }
+            }
             //_loginRepo.RemoveOffUser(user); //xóa user khỏi bảng user đang online khi đăng xuất
 
             Session.Remove(CommonConstants.EMPLOYEE_SESSION);

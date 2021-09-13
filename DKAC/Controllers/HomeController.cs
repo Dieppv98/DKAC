@@ -3,6 +3,7 @@ using DKAC.Models.EntityModel;
 using DKAC.Models.InfoModel;
 using DKAC.Models.RequestModel;
 using DKAC.Repository;
+using Microsoft.AspNet.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using RabbitMQ.Client;
+using DKAC.Models.Enum;
+using System.Collections.Concurrent;
 
 namespace DKAC.Controllers
 {
@@ -134,6 +138,7 @@ namespace DKAC.Controllers
                 item.Hours = time.Hours;
                 item.Minutes = time.Minutes;
                 item.Seconds = time.Seconds;
+                item.Hour_Minute = $"{item.CreatedDate.Value.Hour}_{item.CreatedDate.Value.Minute}";
                 if (time.Days == 0 && time.Hours == 0)
                 {
                     lstNotiNew.Add(item);
@@ -160,6 +165,7 @@ namespace DKAC.Controllers
             return Task.FromResult(count);
         }
 
+        //Cái này là sử dụng database để lưu user on
         [HttpGet]
         public Task<JsonResult> CheckUserOnline()
         {
@@ -174,59 +180,55 @@ namespace DKAC.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public Task<int> UpdateOnlineUserOnload()
+        public Task<JsonResult> UpdateOnlineUserOnload()
         {
             var user = (User)Session[CommonConstants.USER_SESSION];
-
-            if (HttpRuntime.Cache["LoggedInUsers"] != null)
+            if (HttpRuntime.Cache["OnlineUsers"] != null)
             {
-                Dictionary<int, string> loggedInUsers = (Dictionary<int, string>)HttpRuntime.Cache["LoggedInUsers"];
-                var cache = loggedInUsers.Where(x => x.Key == user.id).FirstOrDefault();
-                if (cache.Key <= 0) //kiểm tra nếu trong cache chưa có thì mới add vào
+                Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
+                var online = onlineUsers.Where(x => x.Key == user.id).FirstOrDefault();
+                if (online.Key <= 0)
                 {
-                    loggedInUsers.Add(user.id, $"{user.UserName}-{user.FullName}");
-                    HttpRuntime.Cache["LoggedInUsers"] = loggedInUsers;
-
-                    if(HttpRuntime.Cache["OnlineUsers"] != null)
-                    {
-                        Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
-                        var online = onlineUsers.Where(x => x.Key == user.id).FirstOrDefault();
-                        if (online.Key <= 0)
-                        {
-                            onlineUsers.Add(user.id, DateTime.Now);
-                            HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
-                        }
-                        else
-                        {
-                            onlineUsers.Remove(online.Key);
-                            onlineUsers.Add(user.id, DateTime.Now);
-                            HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
-                        }
-                    }
+                    onlineUsers.Add(user.id, DateTime.Now);
+                    HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
                 }
                 else
                 {
-                    if (HttpRuntime.Cache["OnlineUsers"] != null)
-                    {
-                        Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
-                        var online = onlineUsers.Where(x => x.Key == user.id).FirstOrDefault();
-                        if(online.Key <= 0)
-                        {
-                            onlineUsers.Add(user.id, DateTime.Now);
-                            HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
-                        }
-                        else
-                        {
-                            onlineUsers.Remove(online.Key);
-                            onlineUsers.Add(user.id, DateTime.Now);
-                            HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
-                        }
-                    }
+                    onlineUsers.Remove(online.Key);
+                    onlineUsers.Add(user.id, DateTime.Now);
+                    HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
                 }
             }
+            else
+            {
+                Dictionary<int, DateTime> onlineUsers = new Dictionary<int, DateTime>();
+                onlineUsers.Add(user.id, DateTime.Now);
+                HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
+            }
+            
+            var rs = receive(user);
+            return Task.FromResult(Json(rs, JsonRequestBehavior.AllowGet));
+        }
 
-            int count = 1;
-            return Task.FromResult(count);
+        public JsonResult receive(User user)
+        {
+            try
+            {
+                string userqueue = "-1";
+                if (user.UserGroupId != 3)//nếu nhóm khác admin thì người nhận = id của user else = -1
+                    userqueue = user.id.ToString();
+
+                RabbitMQB obj = new RabbitMQB();
+                RabbitMQ.Client.IConnection con = obj.GetConnection();
+
+                string message = obj.receive(con, userqueue);
+                return Json(message);
+            }
+            catch (Exception ex)
+            {
+                var err = ex.Message;
+                return null;
+            }
         }
 
         /// <summary>
@@ -248,6 +250,20 @@ namespace DKAC.Controllers
                     HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
                 }
             }
+
+            if(user.UserGroupId != (int)GroupUser.admin)
+            {
+                if (HttpRuntime.Cache["MessageUsers"] != null)
+                {
+                    Dictionary<int, string> messageUsers = (Dictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
+                    var online = messageUsers.Where(x => x.Key == user.id).FirstOrDefault(); //lần user vừa đóng tab, thoát trình duyệt
+                    if (online.Key > 0)
+                    {
+                        messageUsers.Remove(online.Key); //remove đi
+                        HttpRuntime.Cache["MessageUsers"] = messageUsers;
+                    }
+                }
+            }
             int count = 1;
             return Task.FromResult(count);
         }
@@ -261,6 +277,8 @@ namespace DKAC.Controllers
         {
             User user = (User)Session[CommonConstants.USER_SESSION];
             var now = DateTime.Now.AddMinutes(-2);
+
+            Dictionary<int, string> messageUsers = (Dictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
 
             if (HttpRuntime.Cache["OnlineUsers"] != null)
             {
@@ -282,7 +300,6 @@ namespace DKAC.Controllers
                     onlineUsers.Add(user.id, DateTime.Now);
                     HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
                 }
-
                 return Task.FromResult(Json(1, JsonRequestBehavior.AllowGet));
             }
             else
@@ -291,13 +308,36 @@ namespace DKAC.Controllers
                 onlineUsers.Add(user.id, DateTime.Now);
                 HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
             }
-
             return Task.FromResult(Json(1, JsonRequestBehavior.AllowGet));
         }
 
-        public void Test()
+        public void UserOnline(int userId, string hubConecId)
         {
-            //User user = (User)Session[CommonConstants.USER_SESSION];
+            if (userId != -1)
+            {
+                if (HttpRuntime.Cache["MessageUsers"] != null)
+                {
+                    Dictionary<int, string> messageUsers = (Dictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
+                    var cache = messageUsers.Where(x => x.Key == userId).FirstOrDefault();
+                    if (cache.Key <= 0) //kiểm tra nếu trong cache chưa có thì mới add vào
+                    {
+                        messageUsers.Add(userId, hubConecId);
+                        HttpRuntime.Cache["MessageUsers"] = messageUsers;
+                    }
+                    else
+                    {
+                        messageUsers.Remove(cache.Key);
+                        messageUsers.Add(userId, hubConecId);
+                        HttpRuntime.Cache["MessageUsers"] = messageUsers;
+                    }
+                }
+                else
+                {
+                    Dictionary<int, string> messageUsers = new Dictionary<int, string>();
+                    messageUsers.Add(userId, hubConecId);
+                    HttpRuntime.Cache["MessageUsers"] = messageUsers;
+                }
+            }
         }
     }
 }

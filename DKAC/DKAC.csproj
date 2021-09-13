@@ -568,6 +568,7 @@
     <Compile Include="Models\EntityModel\Bill.cs" />
     <Compile Include="Models\EntityModel\BillDetail.cs" />
     <Compile Include="Models\EntityModel\Chat.cs" />
+    <Compile Include="Models\EntityModel\ChatHistoryGroupBy.cs" />
     <Compile Include="Models\EntityModel\Dish.cs" />
     <Compile Include="Models\EntityModel\DishType.cs" />
     <Compile Include="Models\EntityModel\DKACDbContext.cs" />
@@ -603,6 +604,7 @@
     <Compile Include="Models\InfoModel\PermissionActionInfo.cs" />
     <Compile Include="Models\InfoModel\RegisterByPersonalInfo.cs" />
     <Compile Include="Models\InfoModel\RoomInfo.cs" />
+    <Compile Include="Models\InfoModel\SelectChatInfo.cs" />
     <Compile Include="Models\InfoModel\SupplierInfo.cs" />
     <Compile Include="Models\InfoModel\UserRoleInfo.cs" />
     <Compile Include="Models\LoginModel.cs" />
@@ -2704,6 +2706,7 @@
     <Content Include="Scripts\notify.min.js" />
     <None Include="Scripts\SignalR\jquery-2.2.3.intellisense.js" />
     <Content Include="Scripts\scrollPagination\scrollpagination.js" />
+    <Content Include="Scripts\scrollPagination\scrollPaginationChatMessage.js" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\SignalR\jquery-2.2.3.js" />

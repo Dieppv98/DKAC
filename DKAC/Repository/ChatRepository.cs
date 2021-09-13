@@ -14,6 +14,25 @@ namespace DKAC.Repository
     {
         DKACDbContext db = new DKACDbContext();
 
+        public List<SelectChatInfo> LoadPopupSelectChat()
+        {
+            var data = (from c in db.ChatHistoryGroupBies
+                        join u in db.Users on c.AdminTo equals u.id
+                        select new SelectChatInfo()
+                        {
+                            Id = c.Id,
+                            IdSender = c.SenderId,
+                            IdReceiver = c.ReceiverId,
+                            AdminTo = c.AdminTo,
+                            AdminToUserName = u.FullName + "(" + u.UserName + ")",
+                            CreatedDate = c.CreatedDate,
+                            Message = c.Message,
+                            Status = c.NumberMessageNotSeen,
+                        }).OrderByDescending(x => x.CreatedDate).ToList() ?? new List<SelectChatInfo>();
+
+            return data;
+        }
+
         public Task<int> AddMessage(ChatReceiverInfo model)
         {
             Chat chat = new Chat()
@@ -24,24 +43,60 @@ namespace DKAC.Repository
                 ReceiverId = model.ReceiverId,
             };
             db.Chats.Add(chat);
+
+            int? adminto = -1;
+            if (model.SenderId == (int)MessageOfAdmin.admin)
+                adminto = model.ReceiverId;
+            if (model.ReceiverId == (int)MessageOfAdmin.admin)
+                adminto = model.SenderId;
+
+            var chatHistory = db.ChatHistoryGroupBies.FirstOrDefault(x => x.AdminTo == adminto);
+            if (chatHistory == null)
+            {
+                ChatHistoryGroupBy groupBy = new ChatHistoryGroupBy()
+                {
+                    CreatedDate = DateTime.Now,
+                    Message = model.Message,
+                    SenderId = model.SenderId,
+                    ReceiverId = model.ReceiverId,
+                    NumberMessageNotSeen = 1,
+                    AdminTo = adminto,
+                };
+                db.ChatHistoryGroupBies.Add(groupBy);
+            }
+            else
+            {
+                chatHistory.Message = model.Message;
+                chatHistory.CreatedDate = DateTime.Now;
+                chatHistory.NumberMessageNotSeen = ((chatHistory.NumberMessageNotSeen ?? 0) + 1);
+            }
+
             return Task.FromResult(db.SaveChanges());
         }
 
-        public List<ChatGroupByInfo> GetChatByClinet(int page, int size, int id)//  id của client
+        public List<ChatGroupByInfo> GetChatByClient(int page, int size, int userId, int toId)
         {
             var now = DateTime.Now.Date;
             page = (page - 1);
             //lst chat do client gửi và nhận
-            var lstChatSend = db.Chats.Where(x => (x.SenderId == (int)MesageOfAdmin.admin && x.ReceiverId == id) || (x.SenderId == id && x.ReceiverId == (int)MesageOfAdmin.admin)).OrderBy(x => x.CreatedDate).Take(20).Skip(page * size).Take(size).ToList() ?? new List<Chat>();
-
+            List<Chat> lstChatSend = new List<Chat>();
+            if(toId == -1)
+            {
+                lstChatSend = db.Chats.Where(x => (x.SenderId == (int)MessageOfAdmin.admin && x.ReceiverId == userId) || (x.SenderId == userId && x.ReceiverId == (int)MessageOfAdmin.admin)).OrderByDescending(x => x.CreatedDate).Skip(page * size).Take(size).ToList() ?? new List<Chat>();
+            }
+            else
+            {
+                lstChatSend = db.Chats.Where(x => (x.SenderId == (int)MessageOfAdmin.admin && x.ReceiverId == toId) || (x.SenderId == toId && x.ReceiverId == (int)MessageOfAdmin.admin)).OrderByDescending(x => x.CreatedDate).Skip(page * size).Take(size).ToList() ?? new List<Chat>();
+            }
+            
             var groupDay = lstChatSend.GroupBy(x => x.CreatedDate.Value.Date)
                 .Select(x => x.FirstOrDefault().CreatedDate).OrderBy(x => x.Value).ToList();
 
             List<ChatGroupByInfo> lstChatGroup = new List<ChatGroupByInfo>();
-            
+
             foreach (var item in groupDay)
             {
-                if(item.Value.Date == now)
+                if (item.Value.Date == now)
                 {
                     ChatGroupByInfo chatGroup = new ChatGroupByInfo();
                     List<ChatGroupByHourInfo> lstChatGroupHour = new List<ChatGroupByHourInfo>();
@@ -65,16 +120,16 @@ namespace DKAC.Repository
                 else
                 {
                     ChatGroupByInfo chatGroup = new ChatGroupByInfo();
-                    var lst = lstChatSend.Where(x => x.CreatedDate.Value.Date == item.Value.Date).ToList();
+                    var lst = lstChatSend.Where(x => x.CreatedDate.Value.Date == item.Value.Date).OrderBy(x => x.CreatedDate).ToList();
                     chatGroup.CreatedDate = item.Value.Date;
                     chatGroup.lstChat = lst;
                     lstChatGroup.Add(chatGroup);
                 }
             }
-            
+
             return lstChatGroup;
         }
-        
+
         public List<ChatInfo> GetReceiverChatById(int id)
         {
             var rs = (from u in db.Users

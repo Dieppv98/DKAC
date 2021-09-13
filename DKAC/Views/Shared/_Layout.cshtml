@@ -4,8 +4,6 @@
 @using DKAC.Models.InfoModel
 @using DKAC.Models.Enum
 @{
-    /**/
-
     HomeController homeController = new HomeController();
     var em = (Employee)Session[CommonConstants.EMPLOYEE_SESSION];
     var user = (User)Session[CommonConstants.USER_SESSION];
@@ -82,6 +80,21 @@
     .toast toast-info {
         background-color: #708f1c !important,
     }
+
+    .form-group-icon {
+        position: relative;
+    }
+
+        .form-group-icon > input {
+            padding-left: 32px;
+        }
+
+        .form-group-icon > i {
+            position: absolute;
+            color: rgba(0, 0, 0, .54);
+            left: 0;
+            bottom: calc(0.375rem - 1px);
+        }
 </style>
 
 <html lang="en">
@@ -167,11 +180,55 @@
 
                     <li><a href="#">Giới thiệu</a></li>
 
+                    @if (type == (int)GroupUser.admin)
+                    {
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" onclick="LoadPopupSelectChat()" href="#" title="Tin nhắn" id="alertsSelectChat" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <div class="row">
+                                    <div>
+                                        <i style="color:#0081ff;font-size:14px;" class="fab fa-facebook-messenger"></i>
+                                    </div>
+                                    <div>
+                                        <span class="badge badge-danger badge-counter"><span class="countMesssage">&nbsp;</span></span>
+                                    </div>
+                                </div>
+                            </a>
+                            <!-- Dropdown - Alerts -->
+                            <div id="PopupSelectChat" class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsSelectChat" style="height:655px;max-height:655px;background-color:#f9f9f9 !important;overflow-y:scroll;overflow-x:hidden;">
+                                <div class="row">
+                                    <div class="col-5">
+                                        <span class="dropdown-header" style="padding-bottom:0px;padding-left:10px;">
+                                            <b style="color:#dc3545" id="messageTo">Chat với Admin</b>
+                                        </span>
+                                    </div>
+                                    <div class="col-7" style="text-align:right;">
+                                        <span class="dropdown-header" style="padding-bottom:0px;padding-right:10px">
+                                            <a href="javascript:void(0)" onclick="" style="font-size:12px;cursor:pointer;color:#0095ff;padding-top:3px;text-transform:none;">
+                                                <u>Đánh dấu tất cả là đã đọc</u>
+                                            </a>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-1"></div>
+                                    <div class="col-12" style="padding: 10px 20px 10px 25px;">
+                                        <input class="form-control" style="border-radius:50px;" id="searchChat" placeholder="Tìm kiếm người dùng..." />
+                                    </div>
+                                    <div class="col-1"></div>
+                                </div>
+
+                                <div id="lstSelectChat">
+
+                                </div>
+                            </div>
+                        </li>
+                    }
+
                     <li class="nav-item dropdown no-arrow mx-1">
                         <a class="nav-link dropdown-toggle" onclick="LoadNoti()" href="#" title="Thông báo" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <div class="row">
                                 <div>
-                                    <i class="fas fa-bell fa-fw"></i>
+                                    <i style="color:#1bbd36;font-size:14px;" class="fas fa-bell fa-fw"></i>
                                 </div>
                                 <!-- Counter - Alerts -->
                                 <div>
@@ -627,7 +684,7 @@
             .popup-messages .direct-chat-msg {
                 border-radius: 30px;
                 color: #fff;
-                padding: 10px 10px;
+                padding: 10px 15px;
                 position: relative;
                 width: fit-content;
                 margin-bottom: 2px;
@@ -661,8 +718,10 @@
         </style>
     </head>
     <body>
-
-        <button id="openChat" class="open-button" onclick="openForm()" title="Chat"><i class="fa fa-comment"></i></button>
+        @if (type != (int)GroupUser.admin)
+        {
+            <button id="openChat" class="open-button" onclick="openForm(-1, '')" title="Chat"><i class="fa fa-comment"></i></button>
+        }
         <input type="hidden" id="idReceiverMessage" />
         <div class="popup-box" id="myForm">
             <div class="popup-head">
@@ -700,7 +759,10 @@
 <script src="~/Scripts/jquery.signalR-2.4.2.js"></script>
 <script src="~/Scripts/jquery.signalR-2.4.2.min.js"></script>
 <script src="~/signalr/hubs"></script>
-<!--js scroll load more-->
+
+<!--js scroll load more chat message-->
+<script src="~/Scripts/scrollPagination/scrollPaginationChatMessage.js"></script>
+<!--js scroll load more notify-->
 <script src="~/Scripts/scrollPagination/scrollpagination.js"></script>
 <script src="~/Scripts/jqueryblockUI/jquery.blockUI.js"></script>
 
@@ -709,7 +771,11 @@
 
 <script type="text/javascript">
     var userId = @userId;
-    var type = @type;
+    typeUser = @type;
+
+    function Hello() {
+        alert('hello');
+    }
 
     $(function () {
         // Lúc mới vào load thông báo
@@ -719,6 +785,7 @@
             success: function (rs) {
                 var countNoti = rs.length;
                 $('span.count').html(countNoti);
+                $('span.countMesssage').html(0);
             },
             error: function (error) {
                 console.log(error);
@@ -743,8 +810,11 @@
         // kết nối với server
         var connection = $.hubConnection("/signalr", { useDefaultPath: false });
         $.connection.hub.start().done(function () {
-            notificationHub.server.online(userId, $.connection.hub.id); //Id của user và id của kết nối tới hub
-            //notificationHub.server.disconnected();
+            if (@type == 3) {
+                notificationHub.server.online(-1, $.connection.hub.id); //nếu nằm trong nhóm admin thì gửi -1 sang
+            } else {
+                notificationHub.server.online(userId, $.connection.hub.id); //Id của user và id của kết nối tới hub
+            }
         });
         connection.logging = true;
         connection.start();
@@ -784,6 +854,7 @@
                             var notifyLoaded = $('#notifyLoaded');
                             if (notifyLoaded != null && notifyLoaded != undefined && notifyLoaded.length > 0) {
                                 var html = "";
+                                var now = new Date();
                                 var notifyNew = $('#notifyNew');
                                 if (notifyNew != null && notifyNew != undefined && notifyNew.length > 0) {
                                     $('#notifyNew').remove();
@@ -799,7 +870,7 @@
                                      <div class='text-wrap wrapper'>
                                             <span>Bạn có thông báo mới: ${rs.ContentNoti.trim()}</span>
                                             <div class='small'>
-                                                <span style='color:#138ce6;'>Vừa mới xong</span>
+                                                <span class='update-timeMinute' id='${now.getHours()}_${now.getMinutes()}' style='color:#138ce6;'>Vừa mới xong</span>
                                             </div>
                                     </div>
                                     <span class='dot' style='background-color:#0095ff;height:11px;width:16px;border-radius:100%;display:inline-block;'><span>
@@ -851,6 +922,7 @@
                             var notifyLoaded = $('#notifyLoaded');
                             if (notifyLoaded != null && notifyLoaded != undefined && notifyLoaded.length > 0) {
                                 var html = "";
+                                var now = new Date();
                                 var notifyNew = $('#notifyNew');
                                 if (notifyNew != null && notifyNew != undefined && notifyNew.length > 0) {
                                     $('#notifyNew').remove();
@@ -866,7 +938,7 @@
                                      <div class='text-wrap wrapper'>
                                             <span>Bạn có thông báo mới: ${rs.ContentNoti.trim()}</span>
                                             <div class='small'>
-                                                <span style='color:#138ce6;'>Vừa mới xong</span>
+                                                <span class='update-timeMinute' id='${now.getHours()}_${now.getMinutes()}' style='color:#138ce6;'>Vừa mới xong</span>
                                             </div>
                                     </div>
                                     <span class='dot' style='background-color:#0095ff;height:11px;width:16px;border-radius:100%;display:inline-block;'><span>
@@ -885,6 +957,96 @@
                 updateNotificationCount();
         }
 
+        notificationHub.client.getmessage = function (message, messageChat, senderToAdmin) {
+            if (@type == 3) {
+                if (message && message.toLowerCase() == "getmessageadmin") {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Chat/receive',
+                        success: function (rs) {
+                            var style = $('#myForm').css("display");;
+                            if (style == "block") {
+                                var html = ``;
+                                var time = new Date();
+                                var year = time.getFullYear();
+                                var month = ("0" + (time.getMonth() + 1)).slice(-2);
+                                var date = ("0" + time.getDate()).slice(-2);
+                                var hour = ("0" + time.getHours()).slice(-2);
+                                var miu = ("0" + time.getMinutes()).slice(-2);
+                                var sec = ("0" + time.getSeconds()).slice(-2);
+                                var today = $('#messageToday');
+                                if (today == null || today == undefined || today.length == 0) {
+                                    html += `<div id='messageToday' class="text-center"><div class="timestamp">Hôm nay</div></div>`;
+                                }
+                                var hourToday = $(`#messageTodayHour_${(("0" + new Date().getHours().toString()).slice(-2))}`);
+                                if (hourToday == null || hourToday == undefined || hourToday.length == 0) {
+                                    html += `<div id='messageTodayHour_${hour}' class="text-center"><div class="timestamp">${hour}:${miu}</div></div>`
+                                }
+
+                                var chatWithAdmin = $('#idReceiverMessage').val(); //id của người mà admin đang chat cùng(đang mở popup chat)
+                                if (senderToAdmin == chatWithAdmin) {
+                                    for (var i = 0; i < rs.length; i++) {
+                                        html += `<div class='direct-chat-msg pull-left message-left' title='${date}/${month}/${year} ${hour}:${miu}:${sec}'>${rs[i]}</div>`;
+                                    }
+
+                                    $('#lstMessages').append(html);
+                                    var heght = $('#lstMessages').height();
+                                    $('#popupBody').scrollTop(heght);
+                                    pageSizeChatMessage = pageSizeChatMessage + 1;
+                                }
+                            }
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    })
+                }
+            } else {
+                if (message && message.toLowerCase() == "getmessageclient") {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Chat/receive',
+                        success: function (rs) {
+                            if (rs.length > 0) {
+                                var style = $('#myForm').css("display");;
+                                if (style == "block") {
+                                    var html = ``;
+                                    var time = new Date();
+                                    var year = time.getFullYear();
+                                    var month = ("0" + (time.getMonth() + 1)).slice(-2);
+                                    var date = ("0" + time.getDate()).slice(-2);
+                                    var hour = ("0" + time.getHours()).slice(-2);
+                                    var miu = ("0" + time.getMinutes()).slice(-2);
+                                    var sec = ("0" + time.getSeconds()).slice(-2);
+                                    var today = $('#messageToday');
+                                    if (today == null || today == undefined || today.length == 0) {
+                                        html += `<div id='messageToday' class="text-center"><div class="timestamp">Hôm nay</div></div>`;
+                                    }
+                                    var hourToday = $(`#messageTodayHour_${(("0" + new Date().getHours().toString()).slice(-2))}`);
+                                    if (hourToday == null || hourToday == undefined || hourToday.length == 0) {
+                                        html += `<div id='messageTodayHour_${hour}' class="text-center"><div class="timestamp">${hour}:${miu}</div></div>`
+                                    }
+
+                                    for (var i = 0; i < rs.length; i++) {
+                                        
+                                        html += `<div class='direct-chat-msg pull-left message-left' title='${date}/${month}/${year} ${hour}:${miu}:${sec}'>${rs[i]}</div>`;
+                                    }
+
+                                    $('#lstMessages').append(html);
+                                    var heght = $('#lstMessages').height();
+                                    $('#popupBody').scrollTop(heght);
+                                    pageSizeChatMessage = pageSizeChatMessage + 1;
+                                }
+                            }
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    })
+                }
+            }
+        }
+
         setInterval(function () {
             if (userId != null && userId != undefined && userId > 0) {
                 $.ajax({
@@ -901,11 +1063,29 @@
         }, 60000);
 
         setInterval(function () {
-            $('#scrollpagination').removeClass("show");
-            $('#contentLoading').empty();
-            pageSize = 15;
-            pageIndex = 2;
-        }, 600000);
+            var now = new Date();
+            $('#contentLoading a .update-timeMinute').each(function (index, element) {
+                var id = $(element).attr('id');
+                if (id.length > 0) {
+                    var split = id.split('_');
+                    var curren = new Date(`${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`);
+                    var timeNoti = new Date(`${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${split[0]}:${split[1]}:0`);
+                    var timeSubtract = Math.abs(curren - timeNoti);
+                    if (timeSubtract > 0) {
+                        var sec = timeSubtract / 1000; //chia lấy số giây
+                        var hour = sec / 3600; // chia lấy giờ
+                        if (hour >= 1) {
+                            $(element).text(`Khoảng 1 giờ trước`)
+                        } else {
+                            var miu = sec / 60; // chia lấy phút
+                            if (miu >= 1) {
+                                $(element).text(`Khoảng ${miu.toFixed(0)} phút trước`)
+                            }
+                        }
+                    }
+                }
+            })
+        }, 60000);
 
         window.addEventListener('beforeunload', function (e) {
             if (userId != null && userId != undefined && userId > 0) {
@@ -924,9 +1104,20 @@
 
         if (userId != null && userId != undefined && userId > 0) {
             $.ajax({
+                type: 'POST',
+                url: '/Chat/receive',
+                success: function (rs) {
+                    console.log(rs);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+            $.ajax({
                 type: 'GET',
                 url: '/Home/UpdateOnlineUserOnload',
                 success: function (rs) {
+
                     console.log('Đã update trạng thái user');
                 },
                 error: function (error) {
@@ -1015,10 +1206,10 @@
                                 html += `<span style='color:#138ce6;'>Khoảng ${data.lstNotiNew[i].Hours} giờ trước</span>`
                             }
                             if (data.lstNotiNew[i].Days == 0 && data.lstNotiNew[i].Hours == 0 && data.lstNotiNew[i].Minutes > 0) {
-                                html += `<span style='color:#138ce6;'>Khoảng ${data.lstNotiNew[i].Minutes} phút trước</span>`
+                                html += `<span class='update-timeMinute' id='${data.lstNotiNew[i].Hour_Minute}' style='color:#138ce6;'>Khoảng ${data.lstNotiNew[i].Minutes} phút trước</span>`
                             }
                             if (data.lstNotiNew[i].Days == 0 && data.lstNotiNew[i].Hours == 0 && data.lstNotiNew[i].Minutes == 0 && data.lstNotiNew[i].Seconds > 0) {
-                                html += `<span style='color:#138ce6;'>Khoảng ${data.lstNotiNew[i].Seconds} giây trước</span>`
+                                html += `<span class='update-timeMinute' id='${data.lstNotiNew[i].Hour_Minute}' style='color:#138ce6;'>Khoảng ${data.lstNotiNew[i].Seconds} giây trước</span>`
                             }
                             html += `</div></div>`
                             if (data.lstNotiNew[i].SeenStatus != 1) {
@@ -1092,21 +1283,27 @@
         })
     }
 
-    function openForm() {
+    function openForm(to, chatWith) {
         $('div #myForm').block({
             message: 'Đang tải...',
             css: { border: '0.5px solid #000000', fontSize: '12px', margin: '90% 0% 0% 35%' }
         });
-
-        $('#lstMessages').empty();
+        pageSizeChatMessage = 15
+        pageIndexChatMessage = 2;
+        if (to != -1) {
+            toId = to;
+            $('#ChatWith').text(chatWith);
+            $('#idReceiverMessage').val(to);
+        }
         var html = ``;
         var data = {
             page: 1,
-            size: 20,
+            size: 15,
+            toId: to,
         };
         $.ajax({
             type: 'POST',
-            url: '/Chat/GetChatByClinet',
+            url: '/Chat/GetChatByClient',
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
@@ -1115,21 +1312,30 @@
                 for (var i = 0; i < rs.length; i++) {
                     if (rs[i].CreatedDate != null && rs[i].CreatedDate != "") {
                         var datetime = new Date(parseInt(rs[i].CreatedDate.substr(6))).toLocaleString('vi', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
-                        html += `<div class="text-center"><div class="timestamp">${datetime}</div></div>`;
+                        html += `<div id='messageDateTime_${datetime.replaceAll('/', '')}' class="text-center"><div class="timestamp">${datetime}</div></div>`;
                         for (var j = 0; j < rs[i].lstChat.length; j++) {
 
                             var dateConvert = new Date(parseInt(rs[i].lstChat[j].CreatedDate.substr(6))) //convert định dạng
                             var date = ("0" + dateConvert.getDate()).slice(-2) + "/" + ("0" + (dateConvert.getMonth() + 1)).slice(-2) + "/" + dateConvert.getFullYear() + " " + ("0" + dateConvert.getHours()).slice(-2) + ":" + ("0" + dateConvert.getMinutes()).slice(-2) + ":" + ("0" + dateConvert.getSeconds()).slice(-2);
 
-                            if (rs[i].lstChat[j].SenderId == userId) {
-                                html += `<div class='direct-chat-msg pull-right message-right' title='${date}'>${rs[i].lstChat[j].Message}</div>`;
+                            if (typeUser == 3) {
+                                if (rs[i].lstChat[j].SenderId == -1) {
+                                    html += `<div class='direct-chat-msg pull-right message-right' title='${date}'>${rs[i].lstChat[j].Message}</div>`;
+                                } else {
+                                    html += `<div class='direct-chat-msg pull-left message-left' title='${date}'>${rs[i].lstChat[j].Message}</div>`;
+                                }
                             } else {
-                                html += `<div class='direct-chat-msg pull-left message-left' title='${date}'>${rs[i].lstChat[j].Message}</div>`;
+                                if (rs[i].lstChat[j].SenderId == userId) {
+                                    html += `<div class='direct-chat-msg pull-right message-right' title='${date}'>${rs[i].lstChat[j].Message}</div>`;
+                                } else {
+                                    html += `<div class='direct-chat-msg pull-left message-left' title='${date}'>${rs[i].lstChat[j].Message}</div>`;
+                                }
                             }
                         }
                     } else {
                         //nếu như những tin nhắn của các ngày khác đã có
-                        if (rs[0].CreatedDate != null && rs[0].CreatedDate != "") {
+                        var today = $('#messageToday');
+                        if (today == null || today == undefined || today.length == 0) {
                             html += `<div id='messageToday' class="text-center"><div class="timestamp">Hôm nay</div></div>`;
                         }
                         for (var j = 0; j < rs[i].lstChatHour.length; j++) {
@@ -1139,40 +1345,48 @@
                                 var dateConvert = new Date(parseInt(rs[i].lstChatHour[j].lstChat[k].CreatedDate.substr(6))) //convert định dạng
                                 var date = ("0" + dateConvert.getDate()).slice(-2) + "/" + ("0" + (dateConvert.getMonth() + 1)).slice(-2) + "/" + dateConvert.getFullYear() + " " + ("0" + dateConvert.getHours()).slice(-2) + ":" + ("0" + dateConvert.getMinutes()).slice(-2) + ":" + ("0" + dateConvert.getSeconds()).slice(-2);
 
-                                if (rs[i].lstChatHour[j].lstChat[k].SenderId == userId) {
-                                    html += `<div class='direct-chat-msg pull-right message-right' title='${date}'>${rs[i].lstChatHour[j].lstChat[k].Message}</div>`;
+                                if (typeUser == 3) {
+                                    if (rs[i].lstChatHour[j].lstChat[k].SenderId == -1) {
+                                        html += `<div class='direct-chat-msg pull-right message-right' title='${date}'>${rs[i].lstChatHour[j].lstChat[k].Message}</div>`;
+                                    } else {
+                                        html += `<div class='direct-chat-msg pull-left message-left' title='${date}'>${rs[i].lstChatHour[j].lstChat[k].Message}</div>`;
+                                    }
                                 } else {
-                                    html += `<div class='direct-chat-msg pull-left message-left' title='${date}'>${rs[i].lstChatHour[j].lstChat[k].Message}</div>`;
+                                    if (rs[i].lstChatHour[j].lstChat[k].SenderId == userId) {
+                                        html += `<div class='direct-chat-msg pull-right message-right' title='${date}'>${rs[i].lstChatHour[j].lstChat[k].Message}</div>`;
+                                    } else {
+                                        html += `<div class='direct-chat-msg pull-left message-left' title='${date}'>${rs[i].lstChatHour[j].lstChat[k].Message}</div>`;
+                                    }
                                 }
                             }
                         }
                     }
                 }
                 $('#lstMessages').append(html);
-
             },
             error: function (error) {
+                html += `<div class='text-center'>
+                            <div style='color:red;margin-top:5px;' class='timestamp'>Mất kết nối <i class='fa fa-spin text-danger'></i></div>
+                         </div>`;
+                $('#lstMessages').append(html);
                 console.log(error);
             }
         })
 
         document.getElementById("myForm").style.display = "block";
-        document.getElementById("openChat").style.display = "none";
         var heght = $('#lstMessages').height();
         $('#popupBody').scrollTop(heght); //auto hiện cuối cùng scroll
         $('div #myForm').unblock();
         $('#msg').focus();
     }
 
-    //$(".selcted2").select2({
-                //    theme: "bootstrap",
-                //    cache: true,
-                //    dropdownAutoWidth: true,
-                //});
+    //$(".selcted2").select2({theme: "bootstrap", cache: true, dropdownAutoWidth: true,});
 
     function closeForm() {
         document.getElementById("myForm").style.display = "none";
-        document.getElementById("openChat").style.display = "block";
+        $('#lstMessages').empty();
+        pageSizeChatMessage = 15
+        pageIndexChatMessage = 2;
     }
 
     $('#msg').keypress(function (event) {
@@ -1192,7 +1406,7 @@
         $('#msg').val('');
         $('#msg').focus();
         var receiverId = 0;
-        if (type == 3) receiverId = id;
+        if (typeUser == 3) receiverId = id;
 
         var data = {
             ReceiverId: receiverId,
@@ -1223,11 +1437,12 @@
                     $('#lstMessages').append(html);
                     var heght = $('#lstMessages').height();
                     $('#popupBody').scrollTop(heght);
+                    pageSizeChatMessage = pageSizeChatMessage + 1;
                 }
                 else {
-                    var html = `<div class='direct-chat-msg pull-right message-right' style='color:#f00;background:#cccccc;'>
+                    var html = `<div class='direct-chat-msg pull-right message-right' style='color:#f00;background:#cccccc;margin-left:26%;'>
                                     Đã có lỗi xảy ra!
-                                    <i class="fa fa-remove"></i>
+                                    <i class='fa fa-spin text-danger'></i>
                                 </div>`;
                     $('#lstMessages').append(html);
                     console.log('Có lỗi xảy ra');
@@ -1235,9 +1450,9 @@
                     $('#popupBody').scrollTop(heght);
                 }
             }).fail(function () {
-                var html = `<div class='direct-chat-msg pull-right message-right' style='color:#f00;background:#cccccc;'>
+                var html = `<div class='direct-chat-msg pull-right message-right' style='color:#f00;background:#cccccc;margin-left:26%;'>
                                 Đã có lỗi xảy ra!
-                                <i class="fa fa-remove"></i>
+                                <i class='fa fa-spin text-danger'></i>
                             </div>`;
                 $('#lstMessages').append(html);
                 console.log('Có lỗi xảy ra');
@@ -1246,75 +1461,57 @@
             });
     }
 
-</script>
-
-@*<script type="text/javascript">
-        $(document).ready(function () {
-            $("#btnsend").click(function () {
-                send();
-            });
-            getmyfriends();
-            function getmyfriends()
-            {
-                $.ajax({
-                    type: "POST",
-                    url: "@Url.Action("friendlist")",
-                    contentType: "application/json; charset=utf-8",
-                    data: '{}',
-                    dataType: "json",
-                    success: function (r) {
-                        var ddlfrined = $("[id*=ddlfriend]");
-                        // ddlfrined.empty().append('<option selected="selected" value="0">select</option>');
-                        for (var i = 0; i <r.length; i++) {
-                            ddlfrined.append($("<option></option>").val(r[i].Value).html(r[i].Text));
-                        }
-                    },
-                    error: function (r) {
-                        alert("error");
-                    }
-                });
-            }
-
-            setInterval(function () {
-                $.ajax({
-                    type: "POST",
-                    contentType: "application/json; charset=utf-8",
-                    data: '{}',
-                    url: "@Url.Action("receive")",
-                    dataType: "json",
-                    success: function (response) {
-                        var data = $("#divmsg").html();
-                        $("#divmsg").html(data + "<br>Friend:" + response);
-
-                    },
-                    error: function (response) {
-
-                    }
-                });
-            }, 5000);
-
-            function send() {
-                var message = $("#txtmsg").val();
-                var friend = $("#ddlfriend").val();
-                var data = $("#divmsg").html();
-                $("#divmsg").html(data + "<br>Me:" + message);
-                $("#txtmsg").val("");
-                debugger;
-                $.ajax({
-                    type: "POST",
-                    contentType: "application/json; charset=utf-8",
-                    data: '{"message":"' + message + '","friend":"'+friend+'"}',
-                    url: "@Url.Action("sendmsg")",
-                    dataType: "json",
-                    success: function (response) {
-                        var data = $("#divmsg").html();
-                        $("#divmsg").html(data + "<br>Me :" + message);
-                    },
-                    error: function (response) {
-
-                    }
-                });
-            }
+    $(function () {
+        $('#popupBody').scrollPaginationChatMessage({
+            'url': '/Chat/GetChatByClient',
+            'data': {
+                'page': pageIndexChatMessage,
+                'size': pageSizeChatMessage,
+                'toId': toId,
+            },
         });
+    });
 
-    </script>*@
+    function LoadPopupSelectChat() {
+        var messageLoaded = $("#PopupSelectChat").css("display");//xem popup select chat đã được mở ra hay chưa
+        if (messageLoaded != 'block') {
+            $('div #PopupSelectChat').block({
+                message: 'Đang tải...',
+                css: { border: '0.5px solid #000000', fontSize: '12px', margin: '90% 0% 0% 35%' }
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/Chat/LoadPopupSelectChat',
+                success: function (data) {
+                    var html = "";
+                    if (data != null && data.length > 0) {
+                        for (var i = 0; i < data.length; i++) {
+                            html += `<a class='row d-flex align-items-center' style='padding:5px 0px 5px 25px;cursor:pointer;text-transform:none;' onclick="openForm(${data[i].AdminTo}, '${data[i].AdminToUserName}')" href='javascript:void(0)'>
+                                     <div class='col-9'>
+                                        <div class='text-wrap wrapper'>
+                                            <span>${data[i].AdminToUserName.trim()}</span>
+                                            <div class='small'>
+                                                <span style='color:#138ce6;'>${data[i].TimeDisplay}</span>
+                                            </div>
+                                        </div>
+                                     </div>`
+                            if (data[i].Status > 0) {
+                                html += `<div>
+                                            <span class='dot' style='background-color:#0095ff;height:13px;width:13px;border-radius:100%;display:inline-block;'><span>
+                                        </div>`
+                            }
+                            html += `</a>`;
+                        }
+                    }
+                    $('#lstSelectChat').html(html);
+
+                    $('div #PopupSelectChat').unblock();
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
+        }
+    }
+
+</script>

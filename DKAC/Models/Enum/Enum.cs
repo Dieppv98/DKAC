@@ -16,7 +16,7 @@ namespace DKAC.Models.Enum
         Seen = 1, // đã xem
     }
 
-    public enum MesageOfAdmin
+    public enum MessageOfAdmin
     {
         admin = -1, //được gửi hoặc được nhận bởi admin(có UserGroup = 3)
     }

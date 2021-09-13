@@ -16,6 +16,7 @@ namespace DKAC.Models.EntityModel
         public int? ReceiverId { get; set; } // id của người nhận
         public int? Status { get; set; } // Trạng thái đã xem hay chưa
         public string Message { get; set; } // nội dung của tin nhắn
+        [Index("IX_Chat_CreatedDate", IsClustered = false, IsUnique = false)]
         public DateTime? CreatedDate { get; set; } //Thời gian gửi tin nhắn
     }
 }
