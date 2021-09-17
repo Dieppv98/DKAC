@@ -83,9 +83,9 @@ namespace DKAC
             return db.Users.Where(x => x.IsDeleted == 0).ToList();
         }
         
-        public List<Notify> GetNotify(int id)
+        public int GetNotify(int id)
         {
-            return db.Notifies.Where(x => x.SeenStatus != (int)SeenStatus.Seen && x.ReceiveUserId == id).OrderByDescending(x => x.CreatedDate).ToList();
+            return db.Notifies.Where(x => x.SeenStatus != (int)SeenStatus.Seen && x.ReceiveUserId == id).OrderByDescending(x => x.CreatedDate).Count();
         }
 
         public Notify GetNotifyNewFirst(int id)

@@ -157,5 +157,22 @@ namespace DKAC.Repository
             }
             return 0;
         }
+
+        public int GetMessageCoutByUserId(User user)
+        {
+            if(user.UserGroupId == (int)GroupUser.admin)
+            {
+                //số tin nhắn chưa đọc của admin
+                var numberMessage = db.ChatHistoryGroupBies.Where(x => x.SenderId != (int)MessageOfAdmin.admin && x.NumberMessageNotSeen > 0).Count();
+                return numberMessage;
+            }
+            else
+            {
+                //số tin nhắn chưa đọc của user đang request
+                var numberMessage = db.ChatHistoryGroupBies.Where(x => x.SenderId == (int)MessageOfAdmin.admin && x.ReceiverId == user.id && x.NumberMessageNotSeen > 0).Count();
+                return numberMessage;
+            }
+            throw new NotImplementedException();
+        }
     }
 }

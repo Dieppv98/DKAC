@@ -14,6 +14,7 @@ using System.Web.Mvc;
 using RabbitMQ.Client;
 using DKAC.Models.Enum;
 using System.Collections.Concurrent;
+using DKAC.IRepository;
 
 namespace DKAC.Controllers
 {
@@ -21,6 +22,7 @@ namespace DKAC.Controllers
     {
         private IMemoryCache _cache;
 
+        public static IChatRepository _chat = new ChatRepository();
         HomeRepository _homeRepo = new HomeRepository();
         NotificationComponent _nc = new NotificationComponent();
 
@@ -90,11 +92,24 @@ namespace DKAC.Controllers
             return View();
         }
         
+        /// <summary>
+        /// lúc mới vào số tin nhắn và thông báo của user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet]
-        public JsonResult GetNotificationCoutByUserId(int id)
+        public JsonResult GetNotificationCoutByUserId()
         {
-            var rs = _nc.GetNotify(id);
-            return Json(rs, JsonRequestBehavior.AllowGet);
+            User user = (User)Session[CommonConstants.USER_SESSION];
+            List<int> lstInt = new List<int>();
+            var numberNoti = _nc.GetNotify(user.id); //số lượng thông báo của user
+            var numberMessage = _chat.GetMessageCoutByUserId(user); //số lượng tin nhắn của user
+            var data = new
+            {
+                countNoti = numberNoti,
+                countMessage = numberMessage,
+            };
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -255,11 +270,12 @@ namespace DKAC.Controllers
             {
                 if (HttpRuntime.Cache["MessageUsers"] != null)
                 {
-                    Dictionary<int, string> messageUsers = (Dictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
+                    ConcurrentDictionary<int, string> messageUsers = (ConcurrentDictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
                     var online = messageUsers.Where(x => x.Key == user.id).FirstOrDefault(); //lần user vừa đóng tab, thoát trình duyệt
                     if (online.Key > 0)
                     {
-                        messageUsers.Remove(online.Key); //remove đi
+                        var value = online.Value;
+                        messageUsers.TryRemove(online.Key, out value); //remove đi
                         HttpRuntime.Cache["MessageUsers"] = messageUsers;
                     }
                 }
@@ -277,8 +293,6 @@ namespace DKAC.Controllers
         {
             User user = (User)Session[CommonConstants.USER_SESSION];
             var now = DateTime.Now.AddMinutes(-2);
-
-            Dictionary<int, string> messageUsers = (Dictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
 
             if (HttpRuntime.Cache["OnlineUsers"] != null)
             {
@@ -317,24 +331,24 @@ namespace DKAC.Controllers
             {
                 if (HttpRuntime.Cache["MessageUsers"] != null)
                 {
-                    Dictionary<int, string> messageUsers = (Dictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
+                    ConcurrentDictionary<int, string> messageUsers = (ConcurrentDictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
                     var cache = messageUsers.Where(x => x.Key == userId).FirstOrDefault();
                     if (cache.Key <= 0) //kiểm tra nếu trong cache chưa có thì mới add vào
                     {
-                        messageUsers.Add(userId, hubConecId);
+                        messageUsers.TryAdd(userId, hubConecId);
                         HttpRuntime.Cache["MessageUsers"] = messageUsers;
                     }
                     else
                     {
-                        messageUsers.Remove(cache.Key);
-                        messageUsers.Add(userId, hubConecId);
+                        var value = cache.Value;
+                        messageUsers.TryUpdate(userId, hubConecId, value);
                         HttpRuntime.Cache["MessageUsers"] = messageUsers;
                     }
                 }
                 else
                 {
-                    Dictionary<int, string> messageUsers = new Dictionary<int, string>();
-                    messageUsers.Add(userId, hubConecId);
+                    ConcurrentDictionary<int, string> messageUsers = new ConcurrentDictionary<int, string>();
+                    messageUsers.TryAdd(userId, hubConecId);
                     HttpRuntime.Cache["MessageUsers"] = messageUsers;
                 }
             }

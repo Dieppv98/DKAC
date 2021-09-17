@@ -110,11 +110,12 @@ namespace DKAC.Controllers
             {
                 if (HttpRuntime.Cache["MessageUsers"] != null)
                 {
-                    Dictionary<int, string> messageUsers = (Dictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
+                    ConcurrentDictionary<int, string> messageUsers = (ConcurrentDictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
                     var cache = messageUsers.Where(x => x.Key == user.id).FirstOrDefault();
                     if (cache.Key > 0)
                     {
-                        messageUsers.Remove(cache.Key);
+                        var value = cache.Value;
+                        messageUsers.TryRemove(cache.Key, out value);
                     }
                 }
             }

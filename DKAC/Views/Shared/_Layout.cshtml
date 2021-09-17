@@ -781,11 +781,13 @@
         // Lúc mới vào load thông báo
         $.ajax({
             type: 'GET',
-            url: '/Home/GetNotificationCoutByUserId/' + userId,
+            url: '/Home/GetNotificationCoutByUserId',
             success: function (rs) {
-                var countNoti = rs.length;
-                $('span.count').html(countNoti);
-                $('span.countMesssage').html(0);
+                $('span.count').html(rs.countNoti);
+                if (@type == 3) {
+                    $('span.countMesssage').html(rs.countMessage);
+                }
+                
             },
             error: function (error) {
                 console.log(error);
@@ -798,8 +800,8 @@
                     type: 'GET',
                     url: '/Home/GetQuantityNoti',
                     success: function (rs) {
-                        var countNoti = rs.length;
-                        $('span.count').html(countNoti);
+                        //var countNoti = rs.length;
+                        $('span.count').html(rs);
                     },
                     error: function (error) {
                         console.log(error);
@@ -964,7 +966,11 @@
                         type: 'POST',
                         url: '/Chat/receive',
                         success: function (rs) {
-                            var style = $('#myForm').css("display");;
+                            var popupSelectChat = $("#PopupSelectChat").css("display");
+                            var style = $('#myForm').css("display");
+                            var chatWithAdmin = $('#idReceiverMessage').val(); //id của người mà admin đang chat cùng(đang mở popup chat)
+
+                            // xử lý load tin nhắn ra ở popup chat
                             if (style == "block") {
                                 var html = ``;
                                 var time = new Date();
@@ -983,7 +989,6 @@
                                     html += `<div id='messageTodayHour_${hour}' class="text-center"><div class="timestamp">${hour}:${miu}</div></div>`
                                 }
 
-                                var chatWithAdmin = $('#idReceiverMessage').val(); //id của người mà admin đang chat cùng(đang mở popup chat)
                                 if (senderToAdmin == chatWithAdmin) {
                                     for (var i = 0; i < rs.length; i++) {
                                         html += `<div class='direct-chat-msg pull-left message-left' title='${date}/${month}/${year} ${hour}:${miu}:${sec}'>${rs[i]}</div>`;
@@ -993,7 +998,78 @@
                                     var heght = $('#lstMessages').height();
                                     $('#popupBody').scrollTop(heght);
                                     pageSizeChatMessage = pageSizeChatMessage + 1;
+
+                                     var updateSee = {
+                                         updateSeeById: senderToAdmin,
+                                    }
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '/Chat/UpdateSeenById',
+                                        data: JSON.stringify(updateSee),
+                                        contentType: "application/json; charset=utf-8",
+                                        dataType: 'json',
+                                        success: function (data) {
+                                            if (@type == 3) {
+                                                $('span.countMesssage').html(data);
+                                            }
+                                            console.log('Đã cập nhật tin nhắn là đã xem!')
+                                        },
+                                        error: function (error) {
+                                        },
+                                    });
                                 }
+                            }
+
+                            //xử lý load tin nhắn mới ở modal chọn người chat
+                            if (popupSelectChat == 'block') {
+                                var element = $(`#lstSelectChat #user_${senderToAdmin}`);
+                                var messageToName = element.find('.messageToName').text();
+                                $(`#lstSelectChat #user_${senderToAdmin}`).remove();
+                                if (rs.length > 0) {
+                                    var data = rs[rs.length - 1];
+                                    var html = `<a id='user_${senderToAdmin}' class='row d-flex align-items-center' style='padding:5px 0px 7px 25px;cursor:pointer;text-transform:none;${(style != "block") ? "background:#d7d9db;" : ""}' onclick="openForm(${senderToAdmin}, '${messageToName}')" href='javascript:void(0)'>
+                                     <div class='col-10'>
+                                        <div style='text-overflow:ellipsis;'>
+                                            <span class='messageToName' style='font-size:14px;'>${messageToName}</span>
+                                            <div class='small' style='padding-top:5px;font-size:13px;'>
+                                                <span class='messageTrim'>${data.trim().length > 20 ? data.substr(0, 20) + "..." : data.trim()}</span>
+                                                <span class='messageime' ${(style != "block") ? "style=color:#138ce6;" : ""}>&ensp;.Vừa xong</span>
+                                            </div>
+                                        </div>
+                                     </div>`
+                                    if (style != "block") {
+                                        html += `<div>
+                                                <span class='dot' style='background-color:#0095ff;height:13px;width:13px;border-radius:100%;display:inline-block;'><span>
+                                            </div>`
+                                    }
+                                    html += `</a><hr style="margin:0px 25px 0px 26px;color:#d7d9db;" />`;
+                                    $('#lstSelectChat').prepend(html);
+                                }
+                            }
+
+                            if (style != "block") {
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '/Chat/UpdateNumberMessageWhenPopupClose',
+                                    success: function (data) {
+                                        if (@type == 3) {
+                                            if (data > 0) playSoundMessage();
+                                            $('span.countMesssage').html(data);
+                                        }
+                                    },
+                                })
+                            }
+                            if (style == "block" && senderToAdmin != chatWithAdmin) {
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '/Chat/UpdateNumberMessageWhenPopupClose',
+                                    success: function (data) {
+                                        if (@type == 3) {
+                                            if (data > 0) playSoundMessage();
+                                            $('span.countMesssage').html(data);
+                                        }
+                                    },
+                                })
                             }
                         },
                         error: function (error) {
@@ -1028,7 +1104,7 @@
                                     }
 
                                     for (var i = 0; i < rs.length; i++) {
-                                        
+
                                         html += `<div class='direct-chat-msg pull-left message-left' title='${date}/${month}/${year} ${hour}:${miu}:${sec}'>${rs[i]}</div>`;
                                     }
 
@@ -1036,7 +1112,8 @@
                                     var heght = $('#lstMessages').height();
                                     $('#popupBody').scrollTop(heght);
                                     pageSizeChatMessage = pageSizeChatMessage + 1;
-                                }
+                                } else
+                                    playSoundMessage();
                             }
                         },
                         error: function (error) {
@@ -1117,7 +1194,6 @@
                 type: 'GET',
                 url: '/Home/UpdateOnlineUserOnload',
                 success: function (rs) {
-
                     console.log('Đã update trạng thái user');
                 },
                 error: function (error) {
@@ -1293,7 +1369,7 @@
         if (to != -1) {
             toId = to;
             $('#ChatWith').text(chatWith);
-            $('#idReceiverMessage').val(to); 
+            $('#idReceiverMessage').val(to);
             var updateSee = {
                 updateSeeById: to,
             }
@@ -1304,6 +1380,9 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: 'json',
                 success: function (data) {
+                    if (@type == 3) {
+                        $('span.countMesssage').html(data);
+                    }
                     console.log('Đã cập nhật tin nhắn là đã xem!')
                 },
                 error: function (error) {
@@ -1502,23 +1581,25 @@
                         var html = "";
                         if (data != null && data.length > 0) {
                             for (var i = 0; i < data.length; i++) {
-                                html += `<a class='row d-flex align-items-center' style='padding:5px 0px 7px 25px;cursor:pointer;text-transform:none;${data[i].Status > 0 ? "background:#d7d9db;" : ""}' onclick="openForm(${data[i].AdminTo}, '${data[i].AdminToUserName}')" href='javascript:void(0)'>
+                                html += `<a id='user_${data[i].AdminTo}' class='row d-flex align-items-center' style='padding:5px 0px 7px 25px;cursor:pointer;text-transform:none;${(data[i].Status > 0 && data[i].IdSender != -1) ? "background:#d7d9db;" : ""}' onclick="openForm(${data[i].AdminTo}, '${data[i].AdminToUserName}')" href='javascript:void(0)'>
                                      <div class='col-10'>
                                         <div style='text-overflow:ellipsis;'>
-                                            <span style='font-size:14px;'>${data[i].AdminToUserName.trim()}</span>
+                                            <span class='messageToName' style='font-size:14px;'>${data[i].AdminToUserName.trim()}</span>
                                             <div class='small' style='padding-top:5px;font-size:13px;'>
                                                 ${data[i].IdSender == -1 ? "<b>Bạn: </b>" : ""}
-                                                <span>${data[i].Message.trim().length > 20 ? data[i].Message.substr(0, 20) + "..." : data[i].Message.trim()}</span>
-                                                <span ${data[i].Status > 0 ? "style=color:#138ce6;" : ""}>&ensp;.${data[i].TimeDisplay}</span>
+                                                <span class='messageTrim'>${data[i].Message.trim().length > 20 ? data[i].Message.substr(0, 20) + "..." : data[i].Message.trim()}</span>
+                                                <span class='messageTime' ${data[i].Status > 0 ? "style=color:#138ce6;" : ""}>&ensp;.${data[i].TimeDisplay}</span>
                                             </div>
                                         </div>
                                      </div>`
-                                if (data[i].Status > 0) {
-                                    html += `<div>
+                                if (data[i].IdSender != -1) {
+                                    if (data[i].Status > 0) {
+                                        html += `<div>
                                             <span class='dot' style='background-color:#0095ff;height:13px;width:13px;border-radius:100%;display:inline-block;'><span>
                                         </div>`
+                                    }
                                 }
-                                html += `</a>`;
+                                html += `</a><hr style="margin:0px 25px 0px 26px;color:#d7d9db;" />`;
                             }
                         }
                         $('#lstSelectChat').html(html);
@@ -1533,4 +1614,9 @@
         }
     }
 
+    function playSoundMessage() {
+        var url = '/Content/soundMessage.mp3';
+        const audio = new Audio(url);
+        audio.play();
+    }
 </script>

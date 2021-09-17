@@ -31,11 +31,11 @@ namespace DKAC
 
             if (userSend.UserGroupId == (int)GroupUser.admin)
             {
-                Dictionary<int, string> messageUsers = (Dictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
+                ConcurrentDictionary<int, string> messageUsers = (ConcurrentDictionary<int, string>)HttpRuntime.Cache["MessageUsers"];
                 if (messageUsers != null && messageUsers.Count > 0)
                 {
                     var receive = messageUsers.FirstOrDefault(x => x.Key == receiver);
-                    //Clients.Caller.getmessage(name, message);
+                    //Clients.Caller.getmessage(receive.Value, message, -1);
                     context.Clients.Client(receive.Value).getmessage("getmessageclient", message, -1);
                 }
             }

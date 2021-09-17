@@ -151,9 +151,23 @@ namespace DKAC.Controllers
             if (user.UserGroupId == (int)GroupUser.admin)
             {
                 var rs = _chat.UpdateSeenById(updateSeeById);
-                return Json(rs, JsonRequestBehavior.AllowGet);
+                var numberMessage = _chat.GetMessageCoutByUserId(user);
+                return Json(numberMessage, JsonRequestBehavior.AllowGet);
             }
             return Json(0, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// lấy lại số tin nhắn mà admin chưa xem khi có tin nhắn mới đến mà popup chat không mở
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public JsonResult UpdateNumberMessageWhenPopupClose()
+        {
+            User user = (User)Session[CommonConstants.USER_SESSION];
+            var numberMessage = _chat.GetMessageCoutByUserId(user); //số lượng tin nhắn của user
+            return Json(numberMessage, JsonRequestBehavior.AllowGet);
         }
     }
 }

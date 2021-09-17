@@ -15,5 +15,6 @@ namespace DKAC.IRepository
         Task<int> AddMessage(ChatReceiverInfo model);
         List<SelectChatInfo> LoadPopupSelectChat();
         int UpdateSeenById(int updateSeeById);
+        int GetMessageCoutByUserId(User user);
     }
 }
