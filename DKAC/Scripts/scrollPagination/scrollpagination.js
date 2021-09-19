@@ -79,7 +79,7 @@ var pageIndex = 2;
                     $(opts.loading).text(opts.loadingText);
 
                     $.each(data.lstNotiNew,function(index, value){
-                        html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;${value.SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${value.TypeNoti == 2 ? "RedirectViewNewDish(" + value.Id + "," + value.DishId + ")" : "RedirectAllDishs(" + value.Id + ")"}' href='#'>
+                        html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:10px;cursor:pointer;text-transform:none;${value.SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${value.TypeNoti == 2 ? "RedirectViewNewDish(" + value.Id + "," + value.DishId + ")" : "RedirectAllDishs(" + value.Id + ")"}' href='#'>
                                      <div class='mr-3'>
                                          <div>
                                              <img src='/Content/image/Dish/${value.TypeNoti == 2 ? value.Image : "favicon.png"}' style='width:35px; height:35px;border-radius:25px;border:none;' />
@@ -102,7 +102,7 @@ var pageIndex = 2;
                         }
                         html += `</div></div>`
                         if (value.SeenStatus != 1) {
-                            html += `<span class='dot' style='background-color:#0095ff;height:11px;width:16px;border-radius:100%;display:inline-block;'><span>`
+                            html += `<span class='dot'><span>`
                         }
                         html += `</a>`;
                     });
@@ -116,7 +116,7 @@ var pageIndex = 2;
                     }
                     
                     $.each(data.lstNotiOld, function (index, value) {
-                        html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;${value.SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${value.TypeNoti == 2 ? "RedirectViewNewDish(" + value.Id + "," + value.DishId + ")" : "RedirectAllDishs(" + value.Id + ")"}' href='#'>
+                        html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:10px;cursor:pointer;text-transform:none;${value.SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${value.TypeNoti == 2 ? "RedirectViewNewDish(" + value.Id + "," + value.DishId + ")" : "RedirectAllDishs(" + value.Id + ")"}' href='#'>
                                      <div class='mr-3'>
                                          <div>
                                              <img src='/Content/image/Dish/${value.TypeNoti == 2 ? value.Image : "favicon.png"}' style='width:35px; height:35px;border-radius:25px;border:none;' />
@@ -133,7 +133,7 @@ var pageIndex = 2;
                         }
                         html += `</div></div>`
                         if (value.SeenStatus != 1) {
-                            html += `<span class='dot' style='background-color:#0095ff;height:11px;width:16px;border-radius:100%;display:inline-block;'><span>`
+                            html += `<span class='dot'><span>`
                         }
                         html += `</a>`;
                     });

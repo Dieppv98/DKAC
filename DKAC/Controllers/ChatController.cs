@@ -169,5 +169,44 @@ namespace DKAC.Controllers
             var numberMessage = _chat.GetMessageCoutByUserId(user); //số lượng tin nhắn của user
             return Json(numberMessage, JsonRequestBehavior.AllowGet);
         }
+        
+        /// <summary>
+        /// update là đã xem tin nhắn và cập nhật lại số tin nhắn chưa xem khi customer mở popup
+        /// </summary>
+        [HttpGet]
+        public JsonResult UpdateSeenCustomerOpenPopup()
+        {
+            User user = (User)Session[CommonConstants.USER_SESSION];
+            var numberMessage = _chat.UpdateSeenCustomerOpenPopup(user); //số lượng tin nhắn của user
+            return Json(numberMessage, JsonRequestBehavior.AllowGet);
+        }
+        
+        /// <summary>
+        /// Khi admin click vào nút đánh dấu đọc tất cả tin nhắn
+        /// </summary>
+        [HttpGet]
+        public JsonResult TickALLReadedMessage()
+        {
+            User user = (User)Session[CommonConstants.USER_SESSION];
+            if(user.UserGroupId == (int)GroupUser.admin)
+            {
+                var rs = _chat.TickALLReadedMessage();
+                return Json(rs, JsonRequestBehavior.AllowGet);
+            }
+            return Json(0, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult SearchUserChatAutoComplete(string keySearch)
+        {
+            User user = (User)Session[CommonConstants.USER_SESSION];
+            List<User> lst = new List<User>();
+            if (user.UserGroupId == (int)GroupUser.admin)
+            {
+                lst = _chat.SearchUserChatAutoComplete(keySearch);
+            }
+            
+            return Json(lst, JsonRequestBehavior.AllowGet);
+        }
     }
 }

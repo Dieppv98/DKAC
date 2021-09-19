@@ -85,7 +85,7 @@ namespace DKAC
         
         public int GetNotify(int id)
         {
-            return db.Notifies.Where(x => x.SeenStatus != (int)SeenStatus.Seen && x.ReceiveUserId == id).OrderByDescending(x => x.CreatedDate).Count();
+            return db.Notifies.Where(x => x.SeenStatus != (int)SeenStatus.Seen && x.ReceiveUserId == id).Count();
         }
 
         public Notify GetNotifyNewFirst(int id)

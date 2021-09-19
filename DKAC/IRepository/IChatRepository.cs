@@ -16,5 +16,8 @@ namespace DKAC.IRepository
         List<SelectChatInfo> LoadPopupSelectChat();
         int UpdateSeenById(int updateSeeById);
         int GetMessageCoutByUserId(User user);
+        int UpdateSeenCustomerOpenPopup(User user);
+        int TickALLReadedMessage();
+        List<User> SearchUserChatAutoComplete(string keySearch);
     }
 }

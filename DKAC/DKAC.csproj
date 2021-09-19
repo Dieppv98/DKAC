@@ -2392,6 +2392,7 @@
     <Content Include="Content\DKAC\index.min.css" />
     <Content Include="Content\image\Dish\favicon.png" />
     <Content Include="Content\image\Dish\notify.jpg" />
+    <Content Include="Content\share.css" />
     <Content Include="Content\soundMessage.mp3" />
     <Content Include="Content\sweet-alert.css" />
     <Content Include="Content\toastr.css" />
@@ -2400,6 +2401,8 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Scripts\autocomplete\jquery-ui-1.12.1.min.js" />
+    <Content Include="Scripts\autocomplete\jquery-ui.css" />
     <Content Include="Scripts\bootstrap-select.js" />
     <Content Include="Scripts\bootstrap-select.min.js" />
     <Content Include="Scripts\bootstrap.js" />

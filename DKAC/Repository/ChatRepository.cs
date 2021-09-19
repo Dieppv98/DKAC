@@ -174,5 +174,43 @@ namespace DKAC.Repository
             }
             throw new NotImplementedException();
         }
+
+        public int UpdateSeenCustomerOpenPopup(User user)
+        {
+            if (user.UserGroupId != (int)GroupUser.admin)
+            {
+                //số tin nhắn chưa đọc của user đang request
+                var numberMessage = db.ChatHistoryGroupBies.Where(x => x.SenderId == (int)MessageOfAdmin.admin && x.ReceiverId == user.id && x.NumberMessageNotSeen > 0).FirstOrDefault();
+                if(numberMessage != null)
+                {
+                    numberMessage.NumberMessageNotSeen = 0;
+                    return db.SaveChanges();
+                }
+            }
+            return 1;
+        }
+
+        public int TickALLReadedMessage()
+        {
+            //số tin nhắn chưa đọc của admin
+            var numberMessage = db.ChatHistoryGroupBies.Where(x => x.SenderId != (int)MessageOfAdmin.admin && x.NumberMessageNotSeen > 0).ToList();
+
+            if(numberMessage.Count > 0)
+            {
+                foreach (var item in numberMessage)
+                {
+                    item.NumberMessageNotSeen = 0;
+                }
+                return db.SaveChanges();
+            }
+            return 1;
+        }
+
+        public List<User> SearchUserChatAutoComplete(string keySearch)
+        {
+            var rs = db.Users.Where(x => x.IsDeleted == 0 && x.UserGroupId != (int)GroupUser.admin && (x.FullName.Contains(keySearch) || x.UserName.Contains(keySearch))).ToList() ?? new List<User>();
+
+            return rs;
+        }
     }
 }

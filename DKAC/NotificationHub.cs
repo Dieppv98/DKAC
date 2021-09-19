@@ -35,8 +35,11 @@ namespace DKAC
                 if (messageUsers != null && messageUsers.Count > 0)
                 {
                     var receive = messageUsers.FirstOrDefault(x => x.Key == receiver);
-                    //Clients.Caller.getmessage(receive.Value, message, -1);
-                    context.Clients.Client(receive.Value).getmessage("getmessageclient", message, -1);
+                    if(receive.Key != 0 && receive.Value != null)
+                    {
+                        //Clients.Caller.getmessage(receive.Value, message, -1);
+                        context.Clients.Client(receive.Value).getmessage("getmessageclient", message, -1);
+                    }
                 }
             }
             else

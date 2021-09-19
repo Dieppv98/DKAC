@@ -13,90 +13,7 @@
 }
 
 <!DOCTYPE html>
-
-<style>
-    .alert-minimalist {
-        background-color: rgb(241, 242, 240);
-        border-color: rgba(149, 149, 149, 0.3);
-        border-radius: 3px;
-        color: rgb(149, 149, 149);
-        padding: 10px;
-    }
-
-        .alert-minimalist > [data-notify="icon"] {
-            height: 100px;
-            margin-right: 12px;
-        }
-
-        .alert-minimalist > [data-notify="title"] {
-            color: rgb(51, 51, 51);
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .alert-minimalist > [data-notify="message"] {
-            font-size: 80%;
-        }
-
-    .notifyjs-bootstrap-base {
-        padding: 30px 150px 25px 110px !important;
-    }
-
-    .notifyjs-bootstrap-error {
-        background-color: #e8e8e8;
-        opacity: 0.8;
-        border: #bfbfbf solid 1px;
-    }
-
-    .nav-link {
-        padding: 0px !important;
-    }
-
-    .dropdown-toggle::after {
-        display: none !important;
-    }
-
-    .badge {
-        display: block !important;
-        line-height: 0.8 !important;
-    }
-
-    .dropdown-menu.show {
-        transform: translate3d(-298px, 30px, 21px) !important;
-        width: 350px !important;
-        border-radius: 10px !important;
-        background-color: #fffcfc !important;
-    }
-
-    .dropdown-header {
-        color: #000000 !important;
-    }
-
-    .dropdown-item {
-        font-size: 12px !important;
-    }
-
-    .toast toast-info {
-        background-color: #708f1c !important,
-    }
-
-    .form-group-icon {
-        position: relative;
-    }
-
-        .form-group-icon > input {
-            padding-left: 32px;
-        }
-
-        .form-group-icon > i {
-            position: absolute;
-            color: rgba(0, 0, 0, .54);
-            left: 0;
-            bottom: calc(0.375rem - 1px);
-        }
-</style>
-
+<link href="~/Content/share.css" rel="stylesheet" />
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -157,7 +74,7 @@
                     @foreach (var item in per.ListModul)
                     {
                         <li class="drop-down">
-                            <a href="">@item.ModulName</a>
+                            <a href="javascript:void(0)">@item.ModulName</a>
                             <ul>
                                 @foreach (var page in per.ListPage)
                                 {
@@ -171,14 +88,14 @@
                     }
 
                     <li class="drop-down">
-                        <a href="">Tài khoản</a>
+                        <a href="javascript:void(0)">Tài khoản</a>
                         <ul>
                             <li><a href="/Employee/EditEmployeeInfo">Thông tin cá nhân</a></li>
                             <li><a href="/Account/Logout">Đăng xuất</a></li>
                         </ul>
                     </li>
 
-                    <li><a href="#">Giới thiệu</a></li>
+                    <li><a href="javascript:void(0)">Giới thiệu</a></li>
 
                     @if (type == (int)GroupUser.admin)
                     {
@@ -203,7 +120,7 @@
                                     </div>
                                     <div class="col-7" style="text-align:right;">
                                         <span class="dropdown-header" style="padding-bottom:0px;padding-right:10px">
-                                            <a href="javascript:void(0)" onclick="" style="font-size:12px;cursor:pointer;color:#0095ff;padding-top:3px;text-transform:none;">
+                                            <a href="javascript:void(0)" onclick="TickALLReadedMessage()" style="font-size:12px;cursor:pointer;color:#0095ff;padding-top:3px;text-transform:none;">
                                                 <u>Đánh dấu tất cả là đã đọc</u>
                                             </a>
                                         </span>
@@ -211,8 +128,8 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-1"></div>
-                                    <div class="col-12" style="padding:10px 25px 10px 25px">
-                                        <input class="form-control" style="border-radius:50px;" id="searchChat" placeholder="Tìm kiếm người dùng..." />
+                                    <div class="col-12 ui-front" style="padding:10px 25px 10px 25px">
+                                        <input class="form-control" style="border-radius:50px;" oninput="SearchUserChatAutoComplete()" id="searchChat" placeholder="Tìm kiếm người dùng..." />
                                     </div>
                                     <div class="col-1"></div>
                                 </div>
@@ -240,7 +157,7 @@
                         <div id="scrollpagination" class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown" style="height:655px;max-height:655px;background-color:#f9f9f9 !important;overflow-y:scroll;overflow-x:hidden;">
                             <div class="row">
                                 <div class="col-5">
-                                    <span class="dropdown-header" style="padding-bottom: 0px;">
+                                    <span class="dropdown-header" style="padding-bottom:0px;margin-bottom:10px;">
                                         <b style="color: #dc3545">Thông báo <i class="fas fa-bell fa-fw" title="Thông báo"></i></b>
                                     </span>
                                 </div>
@@ -720,7 +637,14 @@
     <body>
         @if (type != (int)GroupUser.admin)
         {
-            <button id="openChat" class="open-button" onclick="openForm(-1, '')" title="Chat"><i class="fa fa-comment"></i></button>
+            <button id="openChat" class="open-button" onclick="openForm(-1, '')" title="Chat">
+                <div class="row" style="margin-left:-18px;">
+                    <div>
+                        <span class="badge badge-danger badge-counter" style="font-size:10px;"><span class="countMesssageCustomer">&nbsp;</span></span>
+                    </div>
+                </div>
+                <i style="color:white;font-size:15px;margin-bottom:10px;" class="fab fa-facebook-messenger"></i>
+            </button>
         }
         <input type="hidden" id="idReceiverMessage" />
         <div class="popup-box" id="myForm">
@@ -769,6 +693,10 @@
 <!--js select2-->
 <script src="~/Scripts/select2.min.js"></script>
 
+<!--js autocomplete-->
+<script src="~/Scripts/autocomplete/jquery-ui-1.12.1.min.js"></script>
+<link href="~/Scripts/autocomplete/jquery-ui.css" rel="stylesheet" />
+
 <script type="text/javascript">
     var userId = @userId;
     typeUser = @type;
@@ -786,8 +714,10 @@
                 $('span.count').html(rs.countNoti);
                 if (@type == 3) {
                     $('span.countMesssage').html(rs.countMessage);
+                } else {
+                    $('span.countMesssageCustomer').html(rs.countMessage);
                 }
-                
+
             },
             error: function (error) {
                 console.log(error);
@@ -862,8 +792,8 @@
                                     $('#notifyNew').remove();
                                 }
 
-                                html += `<span id='notifyNew' style='font-size: 13px; padding-left: 25px;'><b>Mới</b></span>`;
-                                html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;background-color:#d7d9db;' onclick='RedirectAllDishs(${idNoti})' href='#'>
+                                html += `<span id='notifyNew' style='font-size:13px;padding-left:25px;'><b>Mới</b></span>`;
+                                html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:10px;cursor:pointer;text-transform:none;background-color:#d7d9db;' onclick='RedirectAllDishs(${idNoti})' href='#'>
                                      <div class='mr-3'>
                                          <div>
                                              <img src='/Content/image/Dish/favicon.png' style='width:35px; height:35px;border-radius:25px;border:none;' />
@@ -875,7 +805,7 @@
                                                 <span class='update-timeMinute' id='${now.getHours()}_${now.getMinutes()}' style='color:#138ce6;'>Vừa mới xong</span>
                                             </div>
                                     </div>
-                                    <span class='dot' style='background-color:#0095ff;height:11px;width:16px;border-radius:100%;display:inline-block;'><span>
+                                    <span class='dot'><span>
                                 </a>`
 
                                 $('#contentLoading').prepend(html);
@@ -930,8 +860,8 @@
                                     $('#notifyNew').remove();
                                 }
 
-                                html += `<span id='notifyNew' style='font-size: 13px; padding-left: 25px;'><b>Mới</b></span>`;
-                                html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;background-color:#d7d9db;' onclick='RedirectViewNewDish(${idNotiAddNewDish},${idNoti})' href='#'>
+                                html += `<span id='notifyNew' style='font-size:13px;padding-left:25px;'><b>Mới</b></span>`;
+                                html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:10px;cursor:pointer;text-transform:none;background-color:#d7d9db;' onclick='RedirectViewNewDish(${idNotiAddNewDish},${idNoti})' href='#'>
                                      <div class='mr-3'>
                                          <div>
                                              <img src='/Content/image/Dish/${defautImage}' style='width:35px; height:35px;border-radius:25px;border:none;' />
@@ -943,7 +873,7 @@
                                                 <span class='update-timeMinute' id='${now.getHours()}_${now.getMinutes()}' style='color:#138ce6;'>Vừa mới xong</span>
                                             </div>
                                     </div>
-                                    <span class='dot' style='background-color:#0095ff;height:11px;width:16px;border-radius:100%;display:inline-block;'><span>
+                                    <span class='dot'><span>
                                 </a>`
 
                                 $('#contentLoading').prepend(html);
@@ -1039,7 +969,7 @@
                                      </div>`
                                     if (style != "block") {
                                         html += `<div>
-                                                <span class='dot' style='background-color:#0095ff;height:13px;width:13px;border-radius:100%;display:inline-block;'><span>
+                                                <span class='dotMessage'><span>
                                             </div>`
                                     }
                                     html += `</a><hr style="margin:0px 25px 0px 26px;color:#d7d9db;" />`;
@@ -1113,7 +1043,16 @@
                                     $('#popupBody').scrollTop(heght);
                                     pageSizeChatMessage = pageSizeChatMessage + 1;
                                 } else
-                                    playSoundMessage();
+                                    $.ajax({
+                                        type: 'GET',
+                                        url: '/Chat/UpdateNumberMessageWhenPopupClose',
+                                        success: function (data) {
+                                            if (@type != 3) {
+                                                if (data > 0) playSoundMessage();
+                                                $('span.countMesssageCustomer').html(data);
+                                            }
+                                        },
+                                    })
                             }
                         },
                         error: function (error) {
@@ -1266,7 +1205,7 @@
                     if (data.lstNotiNew != null && data.lstNotiNew.length > 0) {
                         html += `<span id='notifyNew' style='font-size: 13px; padding-left: 25px;'><b>Mới</b></span>`;
                         for (var i = 0; i < data.lstNotiNew.length; i++) {
-                            html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;${data.lstNotiNew[i].SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${data.lstNotiNew[i].TypeNoti == 2 ? "RedirectViewNewDish(" + data.lstNotiNew[i].Id + "," + data.lstNotiNew[i].DishId + ")" : "RedirectAllDishs(" + data.lstNotiNew[i].Id + ")"}' href='#'>
+                            html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:10px;cursor: pointer;text-transform: none;${data.lstNotiNew[i].SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${data.lstNotiNew[i].TypeNoti == 2 ? "RedirectViewNewDish(" + data.lstNotiNew[i].Id + "," + data.lstNotiNew[i].DishId + ")" : "RedirectAllDishs(" + data.lstNotiNew[i].Id + ")"}' href='#'>
                                      <div class='mr-3'>
                                          <div>
                                              <img src='/Content/image/Dish/${data.lstNotiNew[i].TypeNoti == 2 ? data.lstNotiNew[i].Image : "favicon.png"}' style='width:35px; height:35px;border-radius:25px;border:none;' />
@@ -1289,7 +1228,7 @@
                             }
                             html += `</div></div>`
                             if (data.lstNotiNew[i].SeenStatus != 1) {
-                                html += `<span class='dot' style='background-color:#0095ff;height:11px;width:16px;border-radius:100%;display:inline-block;'><span>`
+                                html += `<span class='dot'><span>`
                             }
                             html += `</a>`;
                         }
@@ -1304,7 +1243,7 @@
                             html += `<a id='appendHere'></a>`;
                         }
                         for (var i = 0; i < data.lstNotiOld.length; i++) {
-                            html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:5px;cursor: pointer;text-transform: none;${data.lstNotiOld[i].SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${data.lstNotiOld[i].TypeNoti == 2 ? "RedirectViewNewDish(" + data.lstNotiOld[i].Id + "," + data.lstNotiOld[i].DishId + ")" : "RedirectAllDishs(" + data.lstNotiOld[i].Id + ")"}' href='#'>
+                            html += `<a class='dropdown-item d-flex align-items-center' style='padding-bottom:10px;cursor: pointer;text-transform: none;${data.lstNotiOld[i].SeenStatus != 1 ? "background-color:#d7d9db;" : ""}' onclick='${data.lstNotiOld[i].TypeNoti == 2 ? "RedirectViewNewDish(" + data.lstNotiOld[i].Id + "," + data.lstNotiOld[i].DishId + ")" : "RedirectAllDishs(" + data.lstNotiOld[i].Id + ")"}' href='#'>
                                      <div class='mr-3'>
                                          <div>
                                              <img src='/Content/image/Dish/${data.lstNotiOld[i].TypeNoti == 2 ? data.lstNotiOld[i].Image : "favicon.png"}' style='width:35px; height:35px;border-radius:25px;border:none;' />
@@ -1321,7 +1260,7 @@
                             }
                             html += `</div></div>`
                             if (data.lstNotiOld[i].SeenStatus != 1) {
-                                html += `<span class='dot' style='background-color:#0095ff;height:11px;width:16px;border-radius:100%;display:inline-block;'><span>`
+                                html += `<span class='dot'><span>`
                             }
                             html += `</a>`;
                         }
@@ -1348,7 +1287,7 @@
                 if (rs > 0) {
                     $('span.count').html(0);
                     $('#contentLoading a').each(function (index, element) {
-                        $(element).attr('style', 'padding-bottom:5px;cursor: pointer;text-transform: none;')
+                        $(element).attr('style', 'padding-bottom:10px;cursor:pointer;text-transform:none;')
                         $(element).find('.dot').remove();
                     })
                 }
@@ -1366,29 +1305,6 @@
         });
         pageSizeChatMessage = 15
         pageIndexChatMessage = 2;
-        if (to != -1) {
-            toId = to;
-            $('#ChatWith').text(chatWith);
-            $('#idReceiverMessage').val(to);
-            var updateSee = {
-                updateSeeById: to,
-            }
-            $.ajax({
-                type: 'POST',
-                url: '/Chat/UpdateSeenById',
-                data: JSON.stringify(updateSee),
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json',
-                success: function (data) {
-                    if (@type == 3) {
-                        $('span.countMesssage').html(data);
-                    }
-                    console.log('Đã cập nhật tin nhắn là đã xem!')
-                },
-                error: function (error) {
-                },
-            });
-        }
         var html = ``;
         var data = {
             page: 1,
@@ -1472,6 +1388,40 @@
         $('#popupBody').scrollTop(heght); //auto hiện cuối cùng scroll
         $('div #myForm').unblock();
         $('#msg').focus();
+        //cập nhật trạng thái là đã xem tin nhắn
+        if (to != -1) {
+            toId = to;
+            $('#ChatWith').text(chatWith);
+            $('#idReceiverMessage').val(to);
+            var updateSee = {
+                updateSeeById: to,
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/Chat/UpdateSeenById',
+                data: JSON.stringify(updateSee),
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                success: function (data) {
+                    if (@type == 3) {
+                        $('span.countMesssage').html(data);
+                    }
+                    console.log('Đã cập nhật tin nhắn là đã xem!')
+                },
+                error: function (error) {
+                },
+            });
+        } else {
+            $.ajax({
+                type: 'GET',
+                url: '/Chat/UpdateSeenCustomerOpenPopup',
+                success: function (data) {
+                    if (@type != 3) {
+                        $('span.countMesssageCustomer').html(0);
+                    }
+                },
+            })
+        }
     }
 
     //$(".selcted2").select2({theme: "bootstrap", cache: true, dropdownAutoWidth: true,});
@@ -1568,6 +1518,7 @@
 
     function LoadPopupSelectChat() {
         if (@type == 3) {
+            $('#searchChat').val('');
             var messageLoaded = $("#PopupSelectChat").css("display");//xem popup select chat đã được mở ra hay chưa
             if (messageLoaded != 'block') {
                 $('div #PopupSelectChat').block({
@@ -1587,7 +1538,7 @@
                                             <span class='messageToName' style='font-size:14px;'>${data[i].AdminToUserName.trim()}</span>
                                             <div class='small' style='padding-top:5px;font-size:13px;'>
                                                 ${data[i].IdSender == -1 ? "<b>Bạn: </b>" : ""}
-                                                <span class='messageTrim'>${data[i].Message.trim().length > 20 ? data[i].Message.substr(0, 20) + "..." : data[i].Message.trim()}</span>
+                                                <span class='messageTrim'>${data[i].Message.trim().length > 25 ? data[i].Message.substr(0, 25) + "..." : data[i].Message.trim()}</span>
                                                 <span class='messageTime' ${data[i].Status > 0 ? "style=color:#138ce6;" : ""}>&ensp;.${data[i].TimeDisplay}</span>
                                             </div>
                                         </div>
@@ -1595,7 +1546,7 @@
                                 if (data[i].IdSender != -1) {
                                     if (data[i].Status > 0) {
                                         html += `<div>
-                                            <span class='dot' style='background-color:#0095ff;height:13px;width:13px;border-radius:100%;display:inline-block;'><span>
+                                            <span class='dotMessage'><span>
                                         </div>`
                                     }
                                 }
@@ -1618,5 +1569,60 @@
         var url = '/Content/soundMessage.mp3';
         const audio = new Audio(url);
         audio.play();
+    }
+
+    function TickALLReadedMessage() {
+            $.ajax({
+                type: 'GET',
+                url: '/Chat/TickALLReadedMessage/',
+                success: function (rs) {
+                    if (rs > 0) {
+                        $('span.countMesssage').html(0);
+                        $('#lstSelectChat a').each(function (index, element) {
+                            $(element).attr('style', 'padding:5px 0px 7px 25px;cursor:pointer;text-transform:none;')
+                            $(element).find('.dotMessage').remove();
+                        })
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            })
+    }
+    
+    function SearchUserChatAutoComplete() {
+        var value = $('#searchChat').val();
+        if (value != undefined && value.length > 0) {
+            $('#searchChat').autocomplete({
+                minLength: 2,
+                source: function (request, response) {
+                    $.ajax({
+                        type: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        url: "/Chat/SearchUserChatAutoComplete",
+                        data: "{'keySearch':'" + value + "'}",
+                        success: function (rs) {
+                            response($.map(rs, function (item) {
+                                return {
+                                    label: item.FullName + "(" + item.UserName + ")",
+                                    value: item.FullName + "(" + item.UserName + ")",
+                                    id: item.id
+                                };
+                            }));
+                        },
+
+                        error: function (result) {
+                            alert("No Match");
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    closeForm();
+                    openForm(ui.item.id, ui.item.value);
+                    $("#PopupSelectChat").removeClass("show");
+                }
+            });
+        }
     }
 </script>
