@@ -12,10 +12,10 @@ namespace DKAC.Repository
     {
         DKACDbContext db = new DKACDbContext();
 
-        public List<RegisterByPersonalInfo> GetListRegisterReport(int month, int fromDate, int toDate, int emId, string dish)
+        public List<RegisterByPersonalInfo> GetListRegisterReport(DateTime? fDate, DateTime? tDate, int? emId, string dish)
         {
             var query = from r in db.Registers
-                        where r.RegisterDate.Month == month && r.RegisterDate.Day >= fromDate && r.RegisterDate.Day <= toDate && r.EmployeeId == emId
+                        where r.EmployeeId == emId && ((!fDate.HasValue || r.RegisterDate >= fDate) && (!tDate.HasValue || r.RegisterDate <= tDate))
                         join e in db.Employees on r.EmployeeId equals e.id into le
                         from lr1 in le.DefaultIfEmpty()
                         join d in db.Dishes on r.DishId equals d.id into ld
@@ -37,7 +37,7 @@ namespace DKAC.Repository
                             Quantity = r.Quantity,
                             RegisterDate = r.RegisterDate,
                         };
-            return query.ToList();
+            return query.OrderByDescending(x => x.RegisterDate).ToList();
         }
 
         public List<RegisterByPersonalInfo> GetListRegisterByMonth(int month, int fromDate, int toDate)

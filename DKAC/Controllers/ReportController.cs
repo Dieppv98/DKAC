@@ -29,22 +29,22 @@ namespace DKAC.Controllers
             return View();
         }
 
-        public PartialViewResult ReportByPersonalSearch(int month, int fromDate, int toDate, string dish)
+        public PartialViewResult ReportByPersonalSearch(DateTime? fDate, DateTime? tDate, string dish)
         {
             var em = (User)Session[CommonConstants.USER_SESSION];
-            var lstReg = _reportRepo.GetListRegisterReport(month, fromDate, toDate, em.id, dish);
+            var lstReg = _reportRepo.GetListRegisterReport(fDate, tDate, em.id, dish);
             ViewBag.emName = em.FullName;
             var roomName = _roomRepo.GetRoomNameByRoomId(em.RoomID);
             ViewBag.RoomName = roomName;
             return PartialView(lstReg);
         }
 
-        public ActionResult ExportExcelReportByPersonal(int month, int fromDate, int toDate, string dish)
+        public ActionResult ExportExcelReportByPersonal(DateTime? fDate, DateTime? tDate, string dish)
         {
             #region Lấy dữ liệu
             var em = (User)Session[CommonConstants.USER_SESSION];
             var roomName = _roomRepo.GetRoomNameByRoomId(em.RoomID);
-            var lstReg = _reportRepo.GetListRegisterReport(month, fromDate, toDate, em.id, dish);
+            var lstReg = _reportRepo.GetListRegisterReport(fDate, tDate, em.id, dish);
             int? totalQty = 0;
             int? totalMoney = 0;
             foreach (var item in lstReg)
@@ -57,7 +57,7 @@ namespace DKAC.Controllers
             #region Xuất excel
             string rootPath = AppDomain.CurrentDomain.BaseDirectory;
             string filepath = string.Concat(rootPath + Ultilities.GetPathTemplateExcel(), "/DanhSachThongKe.xlsx");
-            string v_filename = "Thống kê đăng ký ăn ca theo tháng " + month + "_" + DateTime.Now.Date.ToString("dd/MM/yyyy/hhmmss");
+            string v_filename = "Thống kê đăng ký ăn ca theo tháng_" + DateTime.Now.Date.ToString("dd/MM/yyyy/hhmmss");
             string filepathtemp = string.Concat(rootPath + Ultilities.GetPathTempFolder(), "/Temp/DanhSachThongKe.xlsx");
 
             System.IO.FileInfo fileInfo = new System.IO.FileInfo(filepath);
@@ -74,7 +74,7 @@ namespace DKAC.Controllers
                     #region Thống kê đăng ký ăn ca cá nhân
                     ExcelWorksheet ws = p.Workbook.Worksheets[0];
                     #region - Khu vực header chung ở trên
-                    ws.Cells[1, 1].Value = "THỐNG KÊ ĂN CA CÁ NHÂN THÁNG " + month + " NĂM " + DateTime.Now.Year + " TỪ NGÀY " + fromDate + " ĐẾN NGÀY " + toDate;
+                    ws.Cells[1, 1].Value = "THỐNG KÊ ĂN CA CÁ NHÂN " + (fDate.HasValue ? "TỪ " + fDate.Value.ToString("dd/MM/yyyy") : "TỪ TRƯỚC") + (tDate.HasValue ? " ĐẾN " + tDate.Value.ToString("dd/MM/yyyy") : " ĐẾN NAY");
                     ws.Cells[1, 1, 1, tongcot].Merge = true;
                     ws.Cells[1, 1, 1, tongcot].Style.Font.Bold = true;
 

@@ -10,6 +10,6 @@ namespace DKAC.IRepository
 {
     public interface IReportRepository
     {
-        List<RegisterByPersonalInfo> GetListRegisterReport(int month, int fromDate, int toDate, int emId, string dish);
+        List<RegisterByPersonalInfo> GetListRegisterReport(DateTime? fDate, DateTime? tDate, int? emId, string dish);
     }
 }
