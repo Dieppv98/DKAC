@@ -170,25 +170,37 @@ namespace DKAC.Controllers
             ViewBag.emName = em.FullName;
             var roomName = _roomRepo.GetRoomNameByRoomId(em.RoomID);
             ViewBag.RoomName = roomName;
-            return View();
+
+            var lstUser = _reportRepo.GetLstUserByRoomId(em.RoomID);
+            RegisterByPersonalInfo model = new RegisterByPersonalInfo();
+            List<SelectListItem> lstU = lstUser.ConvertAll(a =>
+            {
+                return new SelectListItem()
+                {
+                    Text = $"{a.FullName} ({a.UserName})",
+                    Value = a.id.ToString()
+                };
+            });
+            model.lstU = lstU;
+            return View(model);
         }
 
-        public PartialViewResult ReportByGroupSearch(int month, int fromDate, int toDate, string dish)
+        public PartialViewResult ReportByGroupSearch(DateTime? fDate, DateTime? tDate, int? userId)
         {
             var em = (User)Session[CommonConstants.USER_SESSION];
-            var lstReg = _reportRepo.GetListRegisterGroupByRoomId(month, fromDate, toDate, em.RoomID, dish);
+            var lstReg = _reportRepo.GetListRegisterGroupByRoomId(fDate, tDate, em.RoomID, userId);
             ViewBag.emName = em.FullName;
             var roomName = _roomRepo.GetRoomNameByRoomId(em.RoomID);
             ViewBag.RoomName = roomName;
             return PartialView(lstReg);
         }
 
-        public ActionResult ExportExcelReportByGroup(int month, int fromDate, int toDate, string dish)
+        public ActionResult ExportExcelReportByGroup(DateTime? fDate, DateTime? tDate, int? userId)
         {
             #region Lấy dữ liệu
             var em = (User)Session[CommonConstants.USER_SESSION];
             var roomName = _roomRepo.GetRoomNameByRoomId(em.RoomID);
-            var lstReg = _reportRepo.GetListRegisterGroupByRoomId(month, fromDate, toDate, em.RoomID, dish);
+            var lstReg = _reportRepo.GetListRegisterGroupByRoomId(fDate, tDate, em.RoomID, userId);
             int? totalQty = 0;
             int? totalMoney = 0;
             foreach (var item in lstReg)
@@ -201,7 +213,7 @@ namespace DKAC.Controllers
             #region Xuất excel
             string rootPath = AppDomain.CurrentDomain.BaseDirectory;
             string filepath = string.Concat(rootPath + Ultilities.GetPathTemplateExcel(), "/DanhSachThongKe.xlsx");
-            string v_filename = "Thống kê đăng ký ăn ca tập thể tháng " + month + "_" + DateTime.Now.Date.ToString("dd/MM/yyyy/hhmmss");
+            string v_filename = "Thống kê đăng ký ăn ca tập thể " + (fDate.HasValue ? $"từ {fDate.Value.ToString("dd/MM/yyyy")}" : "từ trước") + (tDate.HasValue ? $" đến {tDate.Value.ToString("dd/MM/yyyy")}" : " đến nay");
             string filepathtemp = string.Concat(rootPath + Ultilities.GetPathTempFolder(), "/Temp/DanhSachThongKe.xlsx");
 
             System.IO.FileInfo fileInfo = new System.IO.FileInfo(filepath);
@@ -218,7 +230,7 @@ namespace DKAC.Controllers
                     #region Thống kê đăng ký ăn ca cá nhân
                     ExcelWorksheet ws = p.Workbook.Worksheets[0];
                     #region - Khu vực header chung ở trên
-                    ws.Cells[1, 1].Value = "THỐNG KÊ ĂN CA TẬP THỂ THÁNG " + month + " NĂM " + DateTime.Now.Year + " TỪ NGÀY " + fromDate + " ĐẾN NGÀY " + toDate;
+                    ws.Cells[1, 1].Value = "THỐNG KÊ ĂN CA TẬP THỂ THÁNG " + (fDate.HasValue ? $"TỪ {fDate.Value.ToString("dd/MM/yyyy")}" : " TỪ TRƯỚC") + (tDate.HasValue ? $" ĐẾN {tDate.Value.ToString("dd/MM/yyyy")}" : " ĐẾN NAY");
                     ws.Cells[1, 1, 1, tongcot].Merge = true;
                     ws.Cells[1, 1, 1, tongcot].Style.Font.Bold = true;
 
@@ -253,7 +265,7 @@ namespace DKAC.Controllers
                         int? m = 0;
                         foreach (var reg in lstReg)
                         {
-                            if (reg.EmployeeId == e.id)
+                            if (reg.UserId == e.id)
                             {
                                 sl += reg.Quantity;
                                 m += reg.Quantity * reg.Dish.Cost;

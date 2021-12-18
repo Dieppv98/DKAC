@@ -15,8 +15,8 @@ namespace DKAC.Repository
         public List<RegisterByPersonalInfo> GetListRegisterReport(DateTime? fDate, DateTime? tDate, int? emId, string dish)
         {
             var query = from r in db.Registers
-                        where r.EmployeeId == emId && ((!fDate.HasValue || r.RegisterDate >= fDate) && (!tDate.HasValue || r.RegisterDate <= tDate))
-                        join e in db.Employees on r.EmployeeId equals e.id into le
+                        where r.UserId == emId && ((!fDate.HasValue || r.RegisterDate >= fDate) && (!tDate.HasValue || r.RegisterDate <= tDate))
+                        join e in db.Users on r.UserId equals e.id into le
                         from lr1 in le.DefaultIfEmpty()
                         join d in db.Dishes on r.DishId equals d.id into ld
                         from lr2 in ld.DefaultIfEmpty()
@@ -28,7 +28,7 @@ namespace DKAC.Repository
                             id = r.id,
                             DishId = lr2.id,
                             Dish = lr2,
-                            EmployeeId = lr1.id,
+                            UserId = lr1.id,
                             EmployeeName = lr1.FullName,
                             RegisterCode = r.RegisterCode,
                             RoomId = lr1.RoomID,
@@ -40,22 +40,23 @@ namespace DKAC.Repository
             return query.OrderByDescending(x => x.RegisterDate).ToList();
         }
 
-        public List<RegisterByPersonalInfo> GetListRegisterByMonth(int month, int fromDate, int toDate)
+        public List<RegisterByPersonalInfo> GetListRegisterByMonth(DateTime? fDate, DateTime? tDate, int? roomId)
         {
             var query = from r in db.Registers
-                        where r.RegisterDate.Month == month && r.RegisterDate.Day >= fromDate && r.RegisterDate.Day <= toDate
-                        join e in db.Employees on r.EmployeeId equals e.id into le
+                        where ((!fDate.HasValue || r.RegisterDate >= fDate) && (!tDate.HasValue || r.RegisterDate <= tDate))
+                        join e in db.Users on r.UserId equals e.id into le
                         from lr1 in le.DefaultIfEmpty()
                         join d in db.Dishes on r.DishId equals d.id into ld
                         from lr2 in ld.DefaultIfEmpty()
                         join ro in db.Rooms on lr1.RoomID equals ro.id into lro
                         from lr3 in lro.DefaultIfEmpty()
+                        where (!roomId.HasValue || lr3.id == roomId)
                         select new RegisterByPersonalInfo()
                         {
                             id = r.id,
                             DishId = lr2.id,
                             Dish = lr2,
-                            EmployeeId = lr1.id,
+                            UserId = lr1.id,
                             EmployeeName = lr1.FullName,
                             RegisterCode = r.RegisterCode,
                             RoomId = lr1.RoomID,
@@ -67,23 +68,23 @@ namespace DKAC.Repository
             return query.ToList();
         }
 
-        public List<RegisterByPersonalInfo> GetListRegisterGroupByRoomId(int month, int fromDate, int toDate, int? roomId, string dish)
+        public List<RegisterByPersonalInfo> GetListRegisterGroupByRoomId(DateTime? fDate, DateTime? tDate, int? roomId, int? userId)
         {
             var query = from r in db.Registers
-                        where r.RegisterDate.Month == month && r.RegisterDate.Day >= fromDate && r.RegisterDate.Day <= toDate
-                        join e in db.Employees on r.EmployeeId equals e.id into le
+                        where (!userId.HasValue || r.UserId == userId) && ((!fDate.HasValue || r.RegisterDate >= fDate) && (!tDate.HasValue || r.RegisterDate <= tDate))
+                        join e in db.Users on r.UserId equals e.id into le
                         from lr1 in le.DefaultIfEmpty()
                         join d in db.Dishes on r.DishId equals d.id into ld
                         from lr2 in ld.DefaultIfEmpty()
                         join ro in db.Rooms on lr1.RoomID equals ro.id into lro
                         from lr3 in lro.DefaultIfEmpty()
-                        where lr3.id == roomId && lr2.DishName == dish
+                        where lr3.id == roomId
                         select new RegisterByPersonalInfo()
                         {
                             id = r.id,
                             DishId = lr2.id,
                             Dish = lr2,
-                            EmployeeId = lr1.id,
+                            UserId = lr1.id,
                             EmployeeName = lr1.FullName,
                             RegisterCode = r.RegisterCode,
                             RoomId = lr1.RoomID,
@@ -93,6 +94,11 @@ namespace DKAC.Repository
                             RegisterDate = r.RegisterDate,
                         };
             return query.ToList();
+        }
+
+        public List<User> GetLstUserByRoomId(int? roomId)
+        {
+            return db.Users.Where(x => x.IsDeleted == 0 && x.RoomID == roomId).ToList() ?? new List<User>();
         }
 
         public PermissionActionInfo GetPermissionActionInfo()

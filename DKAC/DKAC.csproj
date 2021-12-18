@@ -606,6 +606,7 @@
     <Compile Include="Models\InfoModel\RoomInfo.cs" />
     <Compile Include="Models\InfoModel\SelectChatInfo.cs" />
     <Compile Include="Models\InfoModel\SupplierInfo.cs" />
+    <Compile Include="Models\InfoModel\UserInfo.cs" />
     <Compile Include="Models\InfoModel\UserRoleInfo.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\RequestModel\DishRequestModel.cs" />
@@ -614,6 +615,7 @@
     <Compile Include="Models\RequestModel\MenuRequestModel.cs" />
     <Compile Include="Models\RequestModel\RoomRequestModel.cs" />
     <Compile Include="Models\RequestModel\SupplierRequestModel.cs" />
+    <Compile Include="Models\RequestModel\UserRequestModel.cs" />
     <Compile Include="NotificationComponent.cs" />
     <Compile Include="NotificationHub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

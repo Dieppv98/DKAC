@@ -38,7 +38,7 @@
                 int? m = 0;
                 foreach (var reg in Model)
                 {
-                    if (reg.EmployeeId == em.id)
+                    if (reg.UserId == em.id)
                     {
                         sl += reg.Quantity;
                         m += reg.Quantity * reg.Dish.Cost;

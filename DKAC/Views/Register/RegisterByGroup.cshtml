@@ -183,27 +183,27 @@
                                     {
                                         if (hour < 9)
                                         {
-                                            <a onclick="Delete(@item.id)" class="delete btn btn-sm btn-danger" style="cursor: pointer"><i class="fa fa-trash" style="color: white" title="Hủy đăng ký"></i></a>
+                                            <a onclick="Delete(@item.id)" class="delete btn btn-sm" style="cursor: pointer"><i class="fa fa-trash" style="color: red" title="Hủy đăng ký"></i></a>
                                         }
                                         else if (hour >= 9 && hour <= 15)
                                         {
                                             if (item.Ca > 1)
                                             {
-                                                <a onclick="Delete(@item.id)" class="delete btn btn-sm btn-danger" style="cursor: pointer"><i class="fa fa-trash" style="color: white" title="Hủy đăng ký"></i></a>
+                                                <a onclick="Delete(@item.id)" class="delete btn btn-sm" style="cursor: pointer"><i class="fa fa-trash" style="color: red" title="Hủy đăng ký"></i></a>
                                             }
                                         }
                                         else if (hour >= 15 && hour < 22)
                                         {
                                             if (item.Ca > 2)
                                             {
-                                                <a onclick="Delete(@item.id)" class="delete btn btn-sm btn-danger" style="cursor: pointer"><i class="fa fa-trash" style="color: white" title="Hủy đăng ký"></i></a>
+                                                <a onclick="Delete(@item.id)" class="delete btn btn-sm" style="cursor: pointer"><i class="fa fa-trash" style="color: red" title="Hủy đăng ký"></i></a>
                                             }
                                         }
                                         else { }
                                     }
                                     else
                                     {
-                                        <a onclick="Delete(@item.id)" class="delete btn btn-sm btn-danger" style="cursor: pointer"><i class="fa fa-trash" style="color: white" title="Hủy đăng ký"></i></a>
+                                        <a onclick="Delete(@item.id)" class="delete btn btn-sm" style="cursor: pointer"><i class="fa fa-trash" style="color: red" title="Hủy đăng ký"></i></a>
                                     }
                                 </td>
                             </tr>
@@ -268,7 +268,7 @@
                             <div class="row">
                                 <div class="col-md-3"><p>Họ tên: </p></div>
                                 <div class="col-md-8">
-                                    @Html.HiddenFor(m => m[i].EmployeeId, new { @class = "form-control", @id = "emId_" + i })
+                                    @Html.HiddenFor(m => m[i].UserId, new { @class = "form-control", @id = "emId_" + i })
                                     @Html.TextBoxFor(m => m[i].EmployeeName, new { @class = "form-control", @id = "emName_" + i, @disabled = true })
                                 </div>
                             </div>
@@ -459,7 +459,7 @@
                 Ca: $("#ca_" + j).val(),
                 Quantity: $("#quantity_" + j).val(),
                 RegisterDate: $("#regDate").val(),
-                EmployeeId: $("#emId_" + j).val(),
+                UserId: $("#emId_" + j).val(),
             };
             lstReg.push(reg);
         }

@@ -50,6 +50,8 @@ namespace DKAC.Models.Enum
         QuanLyQuyenTruyCap = 12,
         QuanLyVaiTro = 13,
         ThongKeLuotSuDungHeThong = 14,
+        DangKyCaNhan = 15,
+        DangKyTapThe = 16
     }
 
     public enum Actions

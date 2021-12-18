@@ -1,4 +1,4 @@
-﻿@model DKAC.Models.InfoModel.EmployeeInfo
+﻿@model DKAC.Models.InfoModel.UserInfo
 
 @{
     /**/
@@ -92,38 +92,6 @@
                 <div class="row">
                     <div class="col-md-2"></div>
                     <div class="col-md-2">
-                        <label>Giới tính: </label>
-                    </div>
-                    <div class="col-md-6">
-                        @Html.DropDownListFor(m=> m.Gender, new List<SelectListItem>
-                                              {
-                                                 new SelectListItem {Value = "1", Text = "Nam"},
-                                                 new SelectListItem {Value = "2", Text = "Nữ"},
-                                                 new SelectListItem {Value = "3", Text = "Khác"},
-                                              }, new { @class = "form-control", @id = "Gender" })
-
-                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
-                            @Html.ValidationMessageFor(m => m.Gender)
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-2"></div>
-                    <div class="col-md-2">
-                        <label>Ngày sinh: </label>
-                    </div>
-                    <div class="col-md-6">
-                        @Html.TextBoxFor(m => m.Birthday, new { @class = "form-control", @id = "BirthDay", @placeholder = "yyyy/mm/dd", @type = "date" })
-                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
-                            @Html.ValidationMessageFor(m => m.Birthday)
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-2"></div>
-                    <div class="col-md-2">
                         <label>Phòng ban: </label>
                     </div>
                     <div class="col-md-6">
@@ -156,55 +124,21 @@
                 <div class="row">
                     <div class="col-md-2"></div>
                     <div class="col-md-2">
-                        <label>Số điện thoại: </label>
+                        <label>Vị trí: </label>
                     </div>
                     <div class="col-md-6">
-                        @Html.TextBoxFor(m => m.Tel, new { @class = "form-control", @id = "Tel", @maxlength = "15" })
+                        @Html.DropDownListFor(m=> m.UserGroupId, new List<SelectListItem>
+                                              {
+                                                 new SelectListItem {Value = "1", Text = "Nhân viên"},
+                                                 new SelectListItem {Value = "2", Text = "Quản lý"},
+                                                 new SelectListItem {Value = "3", Text = "Admin"},
+                                              }, new { @class = "form-control", @id = "UserGroupId" })
+
                         <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
-                            @Html.ValidationMessageFor(m => m.Tel)
+                            @Html.ValidationMessageFor(m => m.Role)
                         </div>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div class="col-md-2"></div>
-                    <div class="col-md-2">
-                        <label>Email: </label>
-                    </div>
-                    <div class="col-md-6">
-                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @id = "Email", @maxlength = "200", @type = "email" })
-                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
-                            @Html.ValidationMessageFor(m => m.Email)
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-2"></div>
-                    <div class="col-md-2">
-                        <label>CMND: </label>
-                    </div>
-                    <div class="col-md-6">
-                        @Html.TextBoxFor(m => m.CMND, new { @class = "form-control", @id = "CMND", @maxlength = "15" })
-                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
-                            @Html.ValidationMessageFor(m => m.CMND)
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-2"></div>
-                    <div class="col-md-2">
-                        <label>Địa chỉ: </label>
-                    </div>
-                    <div class="col-md-6">
-                        @Html.TextBoxFor(m => m.Address, new { @class = "form-control", @id = "Address", @maxlength = "500" })
-                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
-                            @Html.ValidationMessageFor(m => m.Address)
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </form>
 
@@ -231,6 +165,7 @@
         $("#edit").submit(function () {
             return false;
         });
+        $('#PassWord').val('');
     });
 
     $("#UserName").on({
@@ -245,18 +180,13 @@
 
     function AddOrUpdate() {
         var data = {
+            id: $('#Id').val(),
             FullName: $('#FullName').val(),
             UserName: $('#UserName').val(),
             PassWord: $('#PassWord').val(),
-            Gender: $('#Gender').val().trim(),
-            BirthDay: $('#BirthDay').val(),
             RoomId: $('#RoomId').val(),
-            Permission: $('#Permission').val(),
             Role: $('#Role').val(),
-            Tel: $('#Tel').val(),
-            Email: $('#Email').val(),
-            CMND: $('#CMND').val(),
-            Address: $('#Address').val(),
+            UserGroupId: $('#UserGroupId').val(),
         };
 
         var title2 = "Bạn có đồng ý thêm mới không?";

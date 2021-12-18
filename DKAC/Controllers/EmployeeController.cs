@@ -18,9 +18,7 @@ namespace DKAC.Controllers
         // GET: Employee
         public ActionResult Index(string KeySearch, int page = 1, int pageSize = 20)
         {
-            Employee employee = (Employee)Session[CommonConstants.EMPLOYEE_SESSION];
-            User user = (User)Session[CommonConstants.USER_SESSION];
-            EmployeeRequestModel model = new EmployeeRequestModel();
+            UserRequestModel model = new UserRequestModel();
             var currentUser = (User)Session[CommonConstants.USER_SESSION];
             ViewBag.hasViewPermission = CheckPermission((int)PageId.QuanLyNguoiDung, (int)Actions.Xem, currentUser);
             ViewBag.hasAddPermission = CheckPermission((int)PageId.QuanLyNguoiDung, (int)Actions.Them, currentUser);
@@ -30,47 +28,47 @@ namespace DKAC.Controllers
             {
                 return RedirectToAction("NotPermission", "Home");
             }
-            model = _empRepo.GetListAllEmployee(employee, user, KeySearch, page, pageSize);
+            model = _empRepo.GetListAllEmployee(currentUser, KeySearch, page, pageSize);
             return View(model);
         }
 
-        [HttpGet]
-        public ActionResult EditEmployeeInfo()
-        {
-            var allRoom = _empRepo.GetAllRoom();
-            List<SelectListItem> lstAllRoom = allRoom.ConvertAll(a =>
-            {
-                return new SelectListItem()
-                {
-                    Text = a.RoomName.ToString(),
-                    Value = a.id.ToString()
-                };
-            });
-            ViewBag.All = lstAllRoom;
+        //[HttpGet]
+        //public ActionResult EditEmployeeInfo()
+        //{
+        //    var allRoom = _empRepo.GetAllRoom();
+        //    List<SelectListItem> lstAllRoom = allRoom.ConvertAll(a =>
+        //    {
+        //        return new SelectListItem()
+        //        {
+        //            Text = a.RoomName.ToString(),
+        //            Value = a.id.ToString()
+        //        };
+        //    });
+        //    ViewBag.All = lstAllRoom;
 
-            Employee em = (Employee)Session[CommonConstants.EMPLOYEE_SESSION];
-            User u = (User)Session[CommonConstants.USER_SESSION];
-            int? id = null;
-            if (em != null) { id = em.id; }
-            if (u != null) { id = u.id; }
-            Employee emp = _empRepo.GetById(id);
-            EmployeeInfo empInfo = new EmployeeInfo()
-            {
-                id = emp.id,
-                FullName = emp.FullName,
-                PassWord = emp.PassWord,
-                UserName = emp.UserName,
-                Birthday = emp.Birthday,
-                Gender = emp.Gender,
-                RoomID = emp.RoomID,
-                Role = emp.Role,
-                Email = emp.Email,
-                CMND = emp.CMND,
-                Tel = emp.Tel,
-                Address = emp.Address,
-            };
-            return View("EditEmployeeInfo", empInfo);
-        }
+        //    Employee em = (Employee)Session[CommonConstants.EMPLOYEE_SESSION];
+        //    User u = (User)Session[CommonConstants.USER_SESSION];
+        //    int? id = null;
+        //    if (em != null) { id = em.id; }
+        //    if (u != null) { id = u.id; }
+        //    Employee emp = _empRepo.GetById(id);
+        //    EmployeeInfo empInfo = new EmployeeInfo()
+        //    {
+        //        id = emp.id,
+        //        FullName = emp.FullName,
+        //        PassWord = emp.PassWord,
+        //        UserName = emp.UserName,
+        //        Birthday = emp.Birthday,
+        //        Gender = emp.Gender,
+        //        RoomID = emp.RoomID,
+        //        Role = emp.Role,
+        //        Email = emp.Email,
+        //        CMND = emp.CMND,
+        //        Tel = emp.Tel,
+        //        Address = emp.Address,
+        //    };
+        //    return View("EditEmployeeInfo", empInfo);
+        //}
 
         [HttpGet]
         public ActionResult Details(int id)
@@ -81,23 +79,8 @@ namespace DKAC.Controllers
             {
                 return RedirectToAction("NotPermission", "Home");
             }
-            Employee emp = _empRepo.GetById(id);
-            EmployeeInfo empInfo = new EmployeeInfo()
-            {
-                id = emp.id,
-                FullName = emp.FullName,
-                PassWord = emp.PassWord,
-                UserName = emp.UserName,
-                Birthday = emp.Birthday,
-                Gender = emp.Gender,
-                RoomID = emp.RoomID,
-                Role = emp.Role,
-                Email = emp.Email,
-                CMND = emp.CMND,
-                Tel = emp.Tel,
-                Address = emp.Address,
-            };
-            return View("Details", empInfo);
+            UserInfo emp = _empRepo.GetById(id);
+            return View("Details", emp);
         }
 
         [HttpGet]
@@ -141,28 +124,12 @@ namespace DKAC.Controllers
                 };
             });
             ViewBag.All = lstAllRoom;
-            Employee emp = _empRepo.GetById(id);
-            EmployeeInfo empInfo = new EmployeeInfo()
-            {
-                id = emp.id,
-                FullName = emp.FullName,
-                PassWord = emp.PassWord,
-                UserName = emp.UserName,
-                Birthday = emp.Birthday,
-                Gender = emp.Gender,
-                RoomID = emp.RoomID,
-                Role = emp.Role,
-                Email = emp.Email,
-                CMND = emp.CMND,
-                Tel = emp.Tel,
-                Address = emp.Address,
-
-            };
-            return View("Edit", empInfo);
+            UserInfo emp = _empRepo.GetById(id);
+            return View("Edit", emp);
         }
 
         [HttpPost]
-        public ActionResult Add(Employee employee)
+        public ActionResult Add(User employee)
         {
             var currentUser = (User)Session[CommonConstants.USER_SESSION];
             var hasPermission = CheckPermission((int)PageId.QuanLyNguoiDung, (int)Actions.Them, currentUser);
@@ -170,9 +137,8 @@ namespace DKAC.Controllers
             {
                 return RedirectToAction("NotPermission", "Home");
             }
-            User user = (User)Session[CommonConstants.USER_SESSION];
-            employee.CreatedBy = user.id;
-            employee.ModifyBy = user.id;
+            employee.CreatedBy = currentUser.id;
+            employee.ModifyBy = currentUser.id;
             employee.PassWord = Encryption.EncryptPassword(employee.PassWord);
             var result = _empRepo.Add(employee);
             if (result == 1)
@@ -183,7 +149,7 @@ namespace DKAC.Controllers
         }
 
         [HttpPost]
-        public ActionResult EditInfo(Employee employee)
+        public ActionResult EditInfo(UserInfo employee)
         {
             Employee em = (Employee)Session[CommonConstants.EMPLOYEE_SESSION];
             employee.ModifyBy = em.id;
@@ -197,7 +163,7 @@ namespace DKAC.Controllers
         }
 
         [HttpPost]
-        public ActionResult Edit(Employee employee)
+        public ActionResult Edit(UserInfo employee)
         {
             var currentUser = (User)Session[CommonConstants.USER_SESSION];
             var hasPermission = CheckPermission((int)PageId.QuanLyNguoiDung, (int)Actions.Sua, currentUser);
@@ -205,8 +171,7 @@ namespace DKAC.Controllers
             {
                 return RedirectToAction("NotPermission", "Home");
             }
-            User user = (User)Session[CommonConstants.USER_SESSION];
-            employee.ModifyBy = user.id;
+            employee.ModifyBy = currentUser.id;
             employee.ModifyDate = DateTime.Now;
             var result = _empRepo.Update(employee);
             if (result == 1)
@@ -225,8 +190,6 @@ namespace DKAC.Controllers
                 return RedirectToAction("NotPermission", "Home");
             }
             User user = (User)Session[CommonConstants.USER_SESSION];
-            var emp = _empRepo.GetById(id);
-            emp.ModifyBy = user.id;
             var result = _empRepo.Delete(id);
             if (result == 1)
             {
