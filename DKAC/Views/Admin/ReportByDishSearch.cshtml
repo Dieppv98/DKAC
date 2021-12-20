@@ -1,0 +1,45 @@
+﻿@model List<DKAC.Models.InfoModel.ReportByDishInfo>
+
+<table class="table table-bordered table-hover" id="reportByPersonal">
+    <thead>
+        <tr>
+            <th class="text-center" width="50">STT</th>
+            <th class="text-center">Tên món ăn</th>
+            <th class="text-center">Chi tiết phòng</th>
+            <th class="text-center" width="100">Tổng số lượng</th>
+        </tr>
+    </thead>
+    <tbody id="tbodyReportByPersonal">
+        @{
+            var count = 0;
+        }
+        @foreach (var item in Model)
+        {
+            count++;
+            <tr>
+                <td class="text-center">@count</td>
+                <td class="text-center">@item.DishName</td>
+                <td class="text-center">
+                    <table style="width:100%">
+                        <thead>
+                            <tr>
+                                <td>Tên phòng</td>
+                                <td>Số lượng đặt</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var g in item.lstData)
+                            {
+                                <tr>
+                                    <td>@g.RoomName</td>
+                                    <td>@String.Format("{0:N0} Suất", g.NumberRegister)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </td>
+                <td class="text-center">@String.Format("{0:N0} Suất", item.NumberTotal)</td>
+            </tr>
+        }
+    </tbody>
+</table>

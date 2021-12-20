@@ -321,6 +321,32 @@ namespace DKAC.Controllers
             #endregion
         }
 
+        public ActionResult ReportByDish()
+        {
+            RegisterByPersonalInfo model = new RegisterByPersonalInfo();
+            var allDish = _emRepo.GetAllDish() ?? new List<Dish>();
+            var allRoom = _emRepo.GetAllRoom() ?? new List<Room>();
+            model.lstR = allRoom.ConvertAll(a => new SelectListItem()
+            {
+                Value = a.id.ToString(),
+                Text = $"{a.RoomName} ({a.RoomShortName})",
+            }).ToList() ?? new List<SelectListItem>();
+
+            model.lstDish = allDish.ConvertAll(a => new SelectListItem()
+            {
+                Value = a.id.ToString(),
+                Text = $"{a.DishName} ({a.DishCode})",
+            }).ToList() ?? new List<SelectListItem>();
+            return View(model);
+        }
+        
+        public PartialViewResult ReportByDishSearch(DateTime? fDate, DateTime? tDate, int? roomId, int? dishId)
+        {
+            var data = _reportRepo.GetListRegisterByDish(fDate, tDate, roomId, dishId);
+            return PartialView(data);
+        }
+
+
         public ActionResult PermissionManagerment()
         {
             var model = _reportRepo.GetPermissionActionInfo();

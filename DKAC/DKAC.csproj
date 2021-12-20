@@ -603,6 +603,7 @@
     <Compile Include="Models\InfoModel\NotifyInfo.cs" />
     <Compile Include="Models\InfoModel\PermissionActionInfo.cs" />
     <Compile Include="Models\InfoModel\RegisterByPersonalInfo.cs" />
+    <Compile Include="Models\InfoModel\ReportByDishInfo.cs" />
     <Compile Include="Models\InfoModel\RoomInfo.cs" />
     <Compile Include="Models\InfoModel\SelectChatInfo.cs" />
     <Compile Include="Models\InfoModel\SupplierInfo.cs" />
@@ -2778,6 +2779,8 @@
     <Content Include="Views\Chart\Index.cshtml" />
     <Content Include="Views\Home\Chat.cshtml" />
     <Content Include="Views\Home\ListAllDish.cshtml" />
+    <Content Include="Views\Admin\ReportByDish.cshtml" />
+    <Content Include="Views\Admin\ReportByDishSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -78,7 +78,7 @@ namespace DKAC.Repository
                         from lr2 in ld.DefaultIfEmpty()
                         join ro in db.Rooms on lr1.RoomID equals ro.id into lro
                         from lr3 in lro.DefaultIfEmpty()
-                        where lr3.id == roomId
+                        where (!roomId.HasValue || lr3.id == roomId)
                         select new RegisterByPersonalInfo()
                         {
                             id = r.id,
@@ -94,6 +94,72 @@ namespace DKAC.Repository
                             RegisterDate = r.RegisterDate,
                         };
             return query.ToList();
+        }
+
+
+        public List<ReportByDishInfo> GetListRegisterByDish(DateTime? fDate, DateTime? tDate, int? roomId, int? dishId)
+        {
+            List<ReportByDishInfo> lst = new List<ReportByDishInfo>();
+            var query = (from r in db.Registers
+                         where ((!fDate.HasValue || r.RegisterDate >= fDate) && (!tDate.HasValue || r.RegisterDate <= tDate))
+                         join e in db.Users on r.UserId equals e.id into le
+                         from lr1 in le.DefaultIfEmpty()
+                         join d in db.Dishes on r.DishId equals d.id into ld
+                         from lr2 in ld.DefaultIfEmpty()
+                         join ro in db.Rooms on lr1.RoomID equals ro.id into lro
+                         from lr3 in lro.DefaultIfEmpty()
+                         where (!roomId.HasValue || lr3.id == roomId) && (!dishId.HasValue || lr2.id == dishId)
+                         select new ReportByDishInfo()
+                         {
+                             Id = r.id,
+                             DishId = lr2.id,
+                             DishName = lr2.DishName,
+                             RoomId = lr1.RoomID,
+                             RoomName = lr3.RoomName,
+                         }).ToList() ?? new List<ReportByDishInfo>();
+
+            if(query.Count > 0)
+            {
+                var group = query.GroupBy(x => x.DishId).Select(g => new ReportByDishInfo()
+                {
+                    Id = g.FirstOrDefault().Id,
+                    DishId = g.FirstOrDefault().DishId,
+                    DishName = g.FirstOrDefault().DishName,
+                }).ToList() ?? new List<ReportByDishInfo>();
+
+                foreach (var item in group)
+                {
+                    ReportByDishInfo reportByDishInfo = new ReportByDishInfo();
+                    List<ListReportByDish> listReportByDishes = new List<ListReportByDish>();
+                    var lstReByDish = query.Where(x => x.DishId == item.DishId).ToList() ?? new List<ReportByDishInfo>();
+
+                    var groupByRoom = lstReByDish.GroupBy(x => x.RoomId).Select(g => new ListReportByDish()
+                    {
+                        RoomId = g.FirstOrDefault().RoomId,
+                    }).ToList() ?? new List<ListReportByDish>();
+
+                    foreach (var g in groupByRoom)
+                    {
+                        ListReportByDish info = new ListReportByDish();
+                        var lstRegisterDishByRoom = lstReByDish.Where(x => x.RoomId == g.RoomId).ToList() ?? new List<ReportByDishInfo>();
+                        if (lstRegisterDishByRoom.Count > 0)
+                        {
+                            info.RoomId = lstRegisterDishByRoom.FirstOrDefault().RoomId;
+                            info.RoomName = lstRegisterDishByRoom.FirstOrDefault().RoomName;
+                            info.NumberRegister = lstRegisterDishByRoom.Count;
+                            listReportByDishes.Add(info);
+                        }
+                    }
+
+                    reportByDishInfo.NumberTotal = lstReByDish.Count;
+                    reportByDishInfo.DishId = item.DishId;
+                    reportByDishInfo.DishName = item.DishName;
+                    reportByDishInfo.lstData = listReportByDishes;
+                    lst.Add(reportByDishInfo);
+                }
+            }
+
+            return lst;
         }
 
         public List<User> GetLstUserByRoomId(int? roomId)

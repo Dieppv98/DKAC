@@ -117,9 +117,9 @@
     });
 
     $('#exportExcel').click(function () {
-        var month = $("#month").val();
-        var fromDate = $("#fromDate").val();
-        var toDate = $("#toDate").val();
+        var fromDate = $("#fDate").val();
+        var toDate = $("#tDate").val();
+        var roomId = $("#RoomId").val();
         window.location.href = `/Admin/ExportExcelReportByMonth?fDate=${fromDate}&tDate=${toDate}&roomId=${roomId}`;
     });
 

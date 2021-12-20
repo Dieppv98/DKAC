@@ -45,5 +45,6 @@ namespace DKAC.Models.InfoModel
 
         public List<SelectListItem> lstU { get; set; }
         public List<SelectListItem> lstR { get; set; }
+        public List<SelectListItem> lstDish { get; set; }
     }
 }

@@ -1,0 +1,145 @@
+﻿@model DKAC.Models.InfoModel.RegisterByPersonalInfo
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <style>
+        #btnSearch {
+            padding: 7px 15px 7px 15px !important;
+        }
+
+        .lbl {
+            padding: 0px;
+            width: auto;
+            margin-top: 8px;
+            padding-left: 15px;
+        }
+
+        table {
+            border: 2px solid #e8e4e4;
+        }
+
+        .paging {
+            padding: 0px 15px 0px 15px;
+            text-align: right;
+        }
+
+        ul {
+            margin: 0px !important;
+        }
+
+        .select2-container .select2-selection--single {
+            height: 37px !important;
+        }
+
+            .select2-container .select2-selection--single .select2-selection__rendered {
+                padding-top: 4px !important;
+            }
+    </style>
+
+    <title>Thống kê món ăn</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h2>Chọn ngày tháng</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-md-3">
+                    <label class="lbl">Từ ngày: </label>
+                    <input class="form-control" type="date" id="fDate">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="lbl">Đến ngày: </label>
+                    <input class="form-control" type="date" id="tDate">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="lbl">Món ăn: </label>
+                    @Html.DropDownListFor(a => a.DishId, (List<SelectListItem>)Model.lstDish, "---Chọn món---",
+                                                              new { @class = "form-control", @id = "DishId" })
+                </div>
+
+                <div class="col-md-3">
+                    <label class="lbl">Phòng: </label>
+                    @Html.DropDownListFor(a => a.RoomId, (List<SelectListItem>)Model.lstR, "---Chọn phòng---",
+                                                              new { @class = "form-control", @id = "RoomId" })
+                </div>
+            </div>
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-md-5"></div>
+                <div class="col-md-2">
+                    <button id="btnSearch" class="btn btn-sm btn-primary filter-submit">
+                        <i class="fa fa-search"></i> Thống kê
+                    </button>
+                </div>
+                <div class="col-md-5"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h2>Thống kê <b>Đăng ký ăn ca</b></h2>
+                    </div>
+                    <div class="col-sm-6">
+                        <button id="exportExcel" class="btn btn-success" style="padding: 10px 30px 10px 30px; border-radius: 5px"><i class="fa fa-file-excel"></i> Xuất excel</button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-bordered table-hover" id="reportByDish">
+                <thead>
+                    <tr>
+                        <th class="text-center" width="50">STT</th>
+                        <th class="text-center">Tên món ăn</th>
+                        <th class="text-center">Tên phòng</th>
+                        <th class="text-center">Tổng số lượng</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyreportByDish"></tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+
+<script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#DishId").select2();
+    });
+
+    $("#btnSearch").on("click", function () {
+        var fromDate = $("#fDate").val();
+        var toDate = $("#tDate").val();
+        var roomId = $("#RoomId").val();
+        var dishId = $("#DishId").val();
+        $("#reportByDish #tbodyreportByDish").empty();
+        $("#reportByDish").load(`/Admin/ReportByDishSearch?fDate=${fromDate}&tDate=${toDate}&roomId=${roomId}&dishId=${dishId}`);
+    });
+
+    $('#exportExcel').click(function () {
+        var fromDate = $("#fDate").val();
+        var toDate = $("#tDate").val();
+        var roomId = $("#RoomId").val();
+        var dishId = $("#DishId").val();
+        window.location.href = `/Admin/ExportExcelReportByDishSearch?fDate=${fromDate}&tDate=${toDate}&roomId=${roomId}&dishId=${dishId}`;
+    });
+
+</script>
+

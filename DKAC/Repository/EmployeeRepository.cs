@@ -184,5 +184,10 @@ namespace DKAC.Repository
             return query.ToList();
         }
 
+        public List<Dish> GetAllDish()
+        {
+            return db.Dishes.Where(x => x.IsDeleted == 0).ToList();
+        }
+
     }
 }
