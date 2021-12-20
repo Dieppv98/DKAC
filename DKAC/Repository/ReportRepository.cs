@@ -137,6 +137,7 @@ namespace DKAC.Repository
                     {
                         DishId = g.FirstOrDefault().DishId,
                         RoomId = g.FirstOrDefault().RoomId,
+                        RoomName = g.FirstOrDefault().RoomName,
                     }).ToList() ?? new List<ListReportByDish>();
 
                     foreach (var g in groupByRoom)
@@ -161,7 +162,7 @@ namespace DKAC.Repository
                 }
             }
 
-            return lst;
+            return lst.OrderByDescending(x => x.NumberTotal).ToList() ?? new List<ReportByDishInfo>() ;
         }
 
         public List<User> GetLstUserByRoomId(int? roomId)
