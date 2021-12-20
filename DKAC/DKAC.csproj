@@ -670,7 +670,6 @@
     <Content Include="assets\font\js\solid.min.js" />
     <Content Include="assets\font\js\v4-shims.js" />
     <Content Include="assets\font\js\v4-shims.min.js" />
-    <Content Include="assets\font\LICENSE.txt" />
     <Content Include="assets\font\sprites\brands.svg" />
     <Content Include="assets\font\sprites\regular.svg" />
     <Content Include="assets\font\sprites\solid.svg" />
@@ -2333,7 +2332,6 @@
     <Content Include="assets\login\vendor\font-awesome-4.7\css\font-awesome.css" />
     <Content Include="assets\login\vendor\font-awesome-4.7\css\font-awesome.min.css" />
     <Content Include="assets\login\vendor\font-awesome-4.7\fonts\fontawesome-webfont.svg" />
-    <Content Include="assets\login\vendor\font-awesome-4.7\HELP-US-OUT.txt" />
     <Content Include="assets\login\vendor\jquery\jquery.js" />
     <Content Include="assets\login\vendor\jquery\jquery.min.js" />
     <Content Include="assets\login\vendor\mdi-font\css\material-design-iconic-font.css" />
