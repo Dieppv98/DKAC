@@ -352,7 +352,7 @@ namespace DKAC.Controllers
         {
             var data = _reportRepo.GetListRegisterByDish(fDate, tDate, roomId, dishId);
             var dataDetails = data.SelectMany(x => x.lstData).ToList() ?? new List<ListReportByDish>();
-            var path = Path.Combine(Server.MapPath("~/FileTemplate"), "RepotDish.xlsx");
+            var path = Path.Combine(Server.MapPath("~/FileTemplate"), "ReportDish.xlsx");
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             var file = new FileInfo(path);
             var excel = new ExcelPackage(file);
