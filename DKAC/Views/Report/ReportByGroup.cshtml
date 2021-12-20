@@ -1,4 +1,4 @@
-﻿@model List<DKAC.Models.InfoModel.RegisterByPersonalInfo>
+﻿@model DKAC.Models.InfoModel.RegisterByPersonalInfo
 @{
     ViewBag.Title = "Thống kê đăng ký ăn ca tập thể";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -7,7 +7,7 @@
 <head>
     <style>
         #btnSearch {
-            padding: 7px 15px 7px 15px;
+            padding: 7px 15px 7px 15px !important;
         }
 
         .lbl {
@@ -30,6 +30,8 @@
             margin: 0px !important;
         }
     </style>
+
+    <title>Thống kê đăng ký ăn ca tập thể</title>
 </head>
 
 <body>
@@ -44,45 +46,30 @@
             </div>
 
             <div class="row" style="margin-top: 20px;">
-                <div class="col-md-2"></div>
-                <label class="lbl">Tháng: </label>
-                <div class="col-md-2" style="margin-bottom: 10px;">
-                    <select class="form-control" id="month" name="month">
-                        <option value="1" selected="selected">Tháng 1</option>
-                        <option value="2">Tháng 2</option>
-                        <option value="3">Tháng 3</option>
-                        <option value="4">Tháng 4</option>
-                        <option value="5">Tháng 5</option>
-                        <option value="6">Tháng 6</option>
-                        <option value="7">Tháng 7</option>
-                        <option value="8">Tháng 8</option>
-                        <option value="9">Tháng 9</option>
-                        <option value="10">Tháng 10</option>
-                        <option value="11">Tháng 11</option>
-                        <option value="12">Tháng 12</option>
-                    </select>
+                <div class="col-md-4">
+                    <label class="lbl">Từ ngày: </label>
+                    <input class="form-control" type="date" id="fDate">
                 </div>
 
-                <label class="lbl">Từ ngày: </label>
-                <div class="col-md-1" style="margin-bottom: 10px; padding-left: 5px;">
-                    <select class="form-control" style="width: 75px" id="fromDate" name="fromDate"></select>
+                <div class="col-md-4">
+                    <label class="lbl">Đến ngày: </label>
+                    <input class="form-control" type="date" id="tDate">
                 </div>
 
-                <label class="lbl">Đến ngày: </label>
-                <div class="col-md-1" style="margin-bottom: 10px; padding-left: 5px;">
-                    <select class="form-control" style="width: 75px" id="toDate" name="toDate"></select>
+                <div class="col-md-4">
+                    <label class="lbl">Nhân viên: </label>
+                    @Html.DropDownListFor(a => a.UserId, (List<SelectListItem>)Model.lstU, "---Chọn nhân viên---",
+                                                              new { @class = "form-control", @id = "UserId" })
                 </div>
-
-                <label class="lbl">Món ăn: </label>
-                <div class="col-md-1" style="margin-bottom: 10px; padding-left: 5px;">
-                    <select class="form-control" style="width: 75px" id="toDate" name="dish"></select>
-                </div>
-
+            </div>
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-md-5"></div>
                 <div class="col-md-2">
                     <button id="btnSearch" class="btn btn-sm btn-primary filter-submit">
                         <i class="fa fa-search"></i> Thống kê
                     </button>
                 </div>
+                <div class="col-md-5"></div>
             </div>
         </div>
     </div>
@@ -132,85 +119,19 @@
 
 <script type="text/javascript">
 
-    //datetime
-    var now = new Date();
-    var currentYear = now.getFullYear();
-
-    for (i = 1; i <= 30; i++) {
-        $("#fromDate").append('<option value=' + i + '>' + i + '</option>');
-        $("#toDate").append('<option value=' + i + '>' + i + '</option>');
-    }
-    $("#fromDate").append('<option value="31">31</option>');
-    $("#toDate").append('<option value="31" selected ="selected">31</option>');
-
-    //event
-    $("#month").on("change", function () {
-        var month = $(this).val();
-        var n = 0;
-        if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
-            n = 31;
-        }
-        else if (month == 2) {
-            if (currentYear % 4 == 0) {
-                n = 29;
-            }
-            else {
-                n = 28;
-            }
-        }
-        else {
-            n = 30;
-        }
-        $("#fromDate").empty();
-        $("#toDate").empty();
-        for (i = 1; i <= n - 1; i++) {
-            $("#fromDate").append('<option value=' + i + '>' + i + '</option>');
-            $("#toDate").append('<option value=' + i + '>' + i + '</option>');
-        }
-        $("#fromDate").append('<option value=' + n + '>' + n + '</option>');
-        $("#toDate").append('<option value=' + n + ' selected="selected">' + n + '</option>');
-    });
-
-    $("#fromDate").on("change", function () {
-        var month = $("#month").val();
-        var n = 0;
-        if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
-            n = 31;
-        }
-        else if (month == 2) {
-            if (currentYear % 4 == 0) {
-                n = 29;
-            }
-            else {
-                n = 28;
-            }
-        }
-        else {
-            n = 30;
-        }
-        var fromDate = $(this).val();
-        var toDate = $("#toDate");
-        toDate.empty();
-        for (i = fromDate; i <= n; i++) {
-            toDate.append('<option value=' + i + '>' + i + '</option>');
-        }
-    });
-
     $("#btnSearch").on("click", function () {
-        var month = $("#month").val();
-        var fromDate = $("#fromDate").val();
-        var toDate = $("#toDate").val();
-        var dish = $("#dish").val();
+        var fromDate = $("#fDate").val();
+        var toDate = $("#tDate").val();
+        var userId = $("#UserId").val();
         $("#reportByGroup #tbodyreportByGroup").empty();
-        $("#reportByGroup").load("/Report/ReportByGroupSearch?month=" + month + "&fromDate=" + fromDate + "&toDate=" + toDate + "&dish=" + dish);
+        $("#reportByGroup").load(`/Report/ReportByGroupSearch?fDate=${fromDate}&tDate=${toDate}&userId=${userId}`);
     });
 
     $('#exportExcel').click(function () {
-        var month = $("#month").val();
-        var fromDate = $("#fromDate").val();
-        var toDate = $("#toDate").val();
-        var dish = $("#dish").val();
-        window.location.href = '/Report/ExportExcelReportByGroup?month=' + month + "&fromDate=" + fromDate + "&toDate=" + toDate + "&dish=" + dish;
+        var fromDate = $("#fDate").val();
+        var toDate = $("#tDate").val();
+        var userId = $("#UserId").val();
+        window.location.href = `/Report/ExportExcelReportByGroup?fDate=${fromDate}&tDate=${toDate}&userId=${userId}`;
     });
 
 </script>

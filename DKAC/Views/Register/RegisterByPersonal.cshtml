@@ -181,27 +181,27 @@
                                     {
                                         if (hour < 9)
                                         {
-                                            <a onclick="Delete(@item.id)" class="delete btn btn-sm btn-danger" style="cursor: pointer"><i class="fa fa-trash" style="color: white" title="Hủy đăng ký"></i></a>
+                                            <a onclick="Delete(@item.id)" class="delete btn btn-sm" style="cursor: pointer"><i class="fa fa-trash" style="color: red" title="Hủy đăng ký"></i></a>
                                         }
                                         else if (hour >= 9 && hour <= 15)
                                         {
                                             if (item.Ca > 1)
                                             {
-                                                <a onclick="Delete(@item.id)" class="delete btn btn-sm btn-danger" style="cursor: pointer"><i class="fa fa-trash" style="color: white" title="Hủy đăng ký"></i></a>
+                                                <a onclick="Delete(@item.id)" class="delete btn btn-sm" style="cursor: pointer"><i class="fa fa-trash" style="color: red" title="Hủy đăng ký"></i></a>
                                             }
                                         }
                                         else if (hour >= 15 && hour < 22)
                                         {
                                             if (item.Ca > 2)
                                             {
-                                                <a onclick="Delete(@item.id)" class="delete btn btn-sm btn-danger" style="cursor: pointer"><i class="fa fa-trash" style="color: white" title="Hủy đăng ký"></i></a>
+                                                <a onclick="Delete(@item.id)" class="delete btn btn-sm" style="cursor: pointer"><i class="fa fa-trash" style="color: red" title="Hủy đăng ký"></i></a>
                                             }
                                         }
                                         else { }
                                     }
                                     else
                                     {
-                                        <a onclick="Delete(@item.id)" class="delete btn btn-sm btn-danger" style="cursor: pointer"><i class="fa fa-trash" style="color: white" title="Hủy đăng ký"></i></a>
+                                        <a onclick="Delete(@item.id)" class="delete btn btn-sm" style="cursor: pointer"><i class="fa fa-trash" style="color: red" title="Hủy đăng ký"></i></a>
                                     }
                                 </td>
                             </tr>

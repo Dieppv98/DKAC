@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace DKAC.Models.InfoModel
 {
@@ -24,7 +25,7 @@ namespace DKAC.Models.InfoModel
         [StringLength(50)]
         public string RegisterCode { get; set; }
 
-        public int? EmployeeId { get; set; }
+        public int? UserId { get; set; }
 
         public string EmployeeName { get; set; }
 
@@ -41,5 +42,9 @@ namespace DKAC.Models.InfoModel
         public int? Quantity { get; set; }
 
         public DateTime RegisterDate { get; set; }
+
+        public List<SelectListItem> lstU { get; set; }
+        public List<SelectListItem> lstR { get; set; }
+        public List<SelectListItem> lstDish { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DKAC.Models.EntityModel;
+using DKAC.Models.InfoModel;
 using DKAC.Models.RequestModel;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,12 @@ namespace DKAC.Repository
 {
     public interface IEmployeeRepository
     {
-        int Add(Employee employee);
+        int Add(User employee);
         int Delete(int id);
-        Employee GetById(int? id);
-        EmployeeRequestModel GetListAllEmployee(Employee employee, User user, string KeySearch, int page, int pageSize);
-        int Update(Employee employee);
-        Employee GetByUserName(string UserName, int? id);
+        UserInfo GetById(int? id);
+        UserRequestModel GetListAllEmployee(User user, string KeySearch, int page, int pageSize);
+        int Update(UserInfo employee);
+        User GetByUserName(string UserName, int? id);
         List<Room> GetAllRoom();
 
     }

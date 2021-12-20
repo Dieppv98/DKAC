@@ -24,7 +24,7 @@ namespace DKAC.Models.EntityModel
         [StringLength(50)]
         public string RegisterCode { get; set; }
 
-        public int? EmployeeId { get; set; }
+        public int? UserId { get; set; }
 
         public int? DishId { get; set; }
 

@@ -1,5 +1,6 @@
 ﻿using DKAC.Common;
 using DKAC.Models.EntityModel;
+using DKAC.Models.Enum;
 using DKAC.Models.InfoModel;
 using DKAC.Models.RequestModel;
 using DKAC.Repository;
@@ -21,11 +22,18 @@ namespace DKAC.Controllers
         [HttpGet]
         public ActionResult RegisterByPersonal(int? dishId)
         {
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            ViewBag.hasViewPermission = CheckPermission((int)PageId.DangKyCaNhan, (int)Actions.Xem, currentUser);
+            if (!ViewBag.hasViewPermission)
+            {
+                return RedirectToAction("NotPermission", "Home");
+            }
+
             dishId = dishId == null ? 1 : dishId;
             RegisterByPersonalInfo model = new RegisterByPersonalInfo();
             model.Dish = new Dish();
             var em = (User)Session[CommonConstants.USER_SESSION];
-            model.EmployeeId = em.id;
+            model.UserId = em.id;
             model.EmployeeName = em.FullName;
             var room = _regRepo.GetRoomById(em.RoomID);
             model.RoomId = room.id;
@@ -55,6 +63,12 @@ namespace DKAC.Controllers
 
         public PartialViewResult ListRegister(string CurrentDate)
         {
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            ViewBag.hasViewPermission = CheckPermission((int)PageId.DangKyCaNhan, (int)Actions.Xem, currentUser);
+            if (!ViewBag.hasViewPermission)
+            {
+                return null;
+            }
             var em = (User)Session[CommonConstants.USER_SESSION];
             DateTime RegDate = DateTime.ParseExact(CurrentDate, "yyyy-MM-dd", null);
             var lstReg = _regRepo.GetAllRegister(em.id, RegDate);
@@ -65,8 +79,14 @@ namespace DKAC.Controllers
         [HttpPost]
         public ActionResult RegisterByPersonal(Register reg)
         {
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            ViewBag.hasViewPermission = CheckPermission((int)PageId.DangKyCaNhan, (int)Actions.Xem, currentUser);
+            if (!ViewBag.hasViewPermission)
+            {
+                return RedirectToAction("NotPermission", "Home");
+            }
             var em = (User)Session[CommonConstants.USER_SESSION];
-            reg.EmployeeId = em.id;
+            reg.UserId = em.id;
             reg.CreatedDate = DateTime.Now;
             reg.ModifyDate = DateTime.Now;
             var result = _regRepo.RegisterByPersonal(reg);
@@ -79,13 +99,20 @@ namespace DKAC.Controllers
 
         public ActionResult RegisterByGroup()
         {
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            ViewBag.hasViewPermission = CheckPermission((int)PageId.DangKyTapThe, (int)Actions.Xem, currentUser);
+            if (!ViewBag.hasViewPermission)
+            {
+                return RedirectToAction("NotPermission", "Home");
+            }
+
             var em = (User)Session[CommonConstants.USER_SESSION];
             List<RegisterByPersonalInfo> lst = new List<RegisterByPersonalInfo>();
             var lstEmInfo = _empRepo.GetEmInfo(em.RoomID);
             foreach (var item in lstEmInfo)
             {
                 RegisterByPersonalInfo reInfo = new RegisterByPersonalInfo();
-                reInfo.EmployeeId = item.id;
+                reInfo.UserId = item.id;
                 reInfo.EmployeeName = item.FullName;
                 reInfo.RoomId = item.RoomID;
                 reInfo.RoomName = item.RoomName;
@@ -112,6 +139,13 @@ namespace DKAC.Controllers
 
         public PartialViewResult ListRegisterGroup(string CurrentDate)
         {
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            ViewBag.hasViewPermission = CheckPermission((int)PageId.DangKyTapThe, (int)Actions.Xem, currentUser);
+            if (!ViewBag.hasViewPermission)
+            {
+                return null;
+            }
+
             var em = (User)Session[CommonConstants.USER_SESSION];
             DateTime RegDate = DateTime.ParseExact(CurrentDate, "yyyy-MM-dd", null);
             var lstReg = _regRepo.GetRegisterByRoomId(em.RoomID, RegDate);
@@ -122,6 +156,13 @@ namespace DKAC.Controllers
         [HttpPost]
         public ActionResult RegisterByGroup(List<Register> model)
         {
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            ViewBag.hasViewPermission = CheckPermission((int)PageId.DangKyTapThe, (int)Actions.Xem, currentUser);
+            if (!ViewBag.hasViewPermission)
+            {
+                return RedirectToAction("NotPermission", "Home");
+            }
+
             var em = (User)Session[CommonConstants.USER_SESSION];
             var result = _regRepo.RegisterByGroup(model);
             if (result == 1)
@@ -133,6 +174,13 @@ namespace DKAC.Controllers
 
         public ActionResult Delete(int? id)
         {
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            var hasDeletePermission = CheckPermission((int)PageId.DangKyTapThe, (int)Actions.Xoa, currentUser);
+            if (!hasDeletePermission)
+            {
+                return RedirectToAction("NotPermission", "Home");
+            }
+
             var result = _regRepo.DeleteReg(id);
             if (result == 1)
             {

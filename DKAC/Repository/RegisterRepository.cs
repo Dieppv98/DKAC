@@ -40,7 +40,7 @@ namespace DKAC.Repository
         {
             try
             {
-                var reg = db.Registers.FirstOrDefault(x => x.EmployeeId == model.EmployeeId && x.RegisterDate == model.RegisterDate && x.Ca == model.Ca && x.DishId == model.DishId);
+                var reg = db.Registers.FirstOrDefault(x => x.UserId == model.UserId && x.RegisterDate == model.RegisterDate && x.Ca == model.Ca && x.DishId == model.DishId);
                 if (reg != null)
                 {
                     reg.Quantity += model.Quantity;
@@ -66,7 +66,7 @@ namespace DKAC.Repository
                 {
                     if (item.DishId != null && item.Ca != null)
                     {
-                        var reg = db.Registers.FirstOrDefault(x => x.EmployeeId == item.EmployeeId && x.RegisterDate == item.RegisterDate && x.Ca == item.Ca && x.DishId == item.DishId);
+                        var reg = db.Registers.FirstOrDefault(x => x.UserId == item.UserId && x.RegisterDate == item.RegisterDate && x.Ca == item.Ca && x.DishId == item.DishId);
                         if (reg != null)
                         {
                             reg.Quantity += item.Quantity;
@@ -92,8 +92,8 @@ namespace DKAC.Repository
         public List<RegisterByPersonalInfo> GetAllRegister(int emId, DateTime regDate)
         {
             var query = from r in db.Registers
-                        where r.EmployeeId == emId && r.RegisterDate == regDate
-                        join e in db.Employees on r.EmployeeId equals e.id into le
+                        where r.UserId == emId && r.RegisterDate == regDate
+                        join e in db.Employees on r.UserId equals e.id into le
                         from lr1 in le.DefaultIfEmpty()
                         join d in db.Dishes on r.DishId equals d.id into ld
                         from lr2 in ld.DefaultIfEmpty()
@@ -104,7 +104,7 @@ namespace DKAC.Repository
                             id = r.id,
                             DishId = lr2.id,
                             Dish = lr2,
-                            EmployeeId = lr1.id,
+                            UserId = lr1.id,
                             EmployeeName = lr1.FullName,
                             RegisterCode = r.RegisterCode,
                             RoomId = lr1.RoomID,
@@ -141,7 +141,7 @@ namespace DKAC.Repository
         public List<RegisterByPersonalInfo> GetRegisterByRoomId(int? roomId, DateTime regDate)
         {
             var query = from r in db.Registers
-                        join e in db.Employees on r.EmployeeId equals e.id into le
+                        join e in db.Users on r.UserId equals e.id into le
                         from lr1 in le.DefaultIfEmpty()
                         join d in db.Dishes on r.DishId equals d.id into ld
                         from lr2 in ld.DefaultIfEmpty()
@@ -153,7 +153,7 @@ namespace DKAC.Repository
                             id = r.id,
                             DishId = lr2.id,
                             Dish = lr2,
-                            EmployeeId = lr1.id,
+                            UserId = lr1.id,
                             EmployeeName = lr1.FullName,
                             RegisterCode = r.RegisterCode,
                             RoomId = lr1.RoomID,

@@ -38,5 +38,6 @@ namespace DKAC.Models.EntityModel
 
         public int? UserGroupId { get; set; }
         public int? RoomID { get; set; }
+        public int? Role { get; set; }
     }
 }

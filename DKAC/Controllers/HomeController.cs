@@ -79,6 +79,11 @@ namespace DKAC.Controllers
             return View();
         }
 
+        public ActionResult Error()
+        {
+            return View();
+        }
+
         [HttpGet]
         public JsonResult GetQuantityNoti()
         {

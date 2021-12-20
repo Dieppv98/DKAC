@@ -19,5 +19,6 @@ namespace DKAC.Models.EntityModel
         public string Url { get; set; }
 
         public int? ModulId { get; set; }
+        public byte? IsDeleted { get; set; }
     }
 }

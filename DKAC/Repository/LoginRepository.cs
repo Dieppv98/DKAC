@@ -71,6 +71,7 @@ namespace DKAC.Repository
                 var query = from pa in db.PermissionActions.Where(x => x.RoleId == item.RoleId && x.ActionKey != 0)
                             join p in db.Pages on pa.PageId equals p.id into lp
                             from lppa in lp.DefaultIfEmpty()
+                            where lppa.IsDeleted != 1
                             select new PermissionActionInfo()
                             {
                                 id = pa.id,
