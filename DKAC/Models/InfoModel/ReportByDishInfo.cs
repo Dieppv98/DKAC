@@ -18,6 +18,7 @@ namespace DKAC.Models.InfoModel
     
     public class ListReportByDish
     {
+        public int? DishId { get; set; }
         public int? RoomId { get; set; }
         public string RoomName { get; set; }
         public int? NumberRegister { get; set; }

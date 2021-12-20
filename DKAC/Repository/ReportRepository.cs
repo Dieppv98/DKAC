@@ -135,6 +135,7 @@ namespace DKAC.Repository
 
                     var groupByRoom = lstReByDish.GroupBy(x => x.RoomId).Select(g => new ListReportByDish()
                     {
+                        DishId = g.FirstOrDefault().DishId,
                         RoomId = g.FirstOrDefault().RoomId,
                     }).ToList() ?? new List<ListReportByDish>();
 
@@ -144,8 +145,9 @@ namespace DKAC.Repository
                         var lstRegisterDishByRoom = lstReByDish.Where(x => x.RoomId == g.RoomId).ToList() ?? new List<ReportByDishInfo>();
                         if (lstRegisterDishByRoom.Count > 0)
                         {
-                            info.RoomId = lstRegisterDishByRoom.FirstOrDefault().RoomId;
-                            info.RoomName = lstRegisterDishByRoom.FirstOrDefault().RoomName;
+                            info.DishId = g.DishId;
+                            info.RoomId = g.RoomId;
+                            info.RoomName = g.RoomName;
                             info.NumberRegister = lstRegisterDishByRoom.Count;
                             listReportByDishes.Add(info);
                         }

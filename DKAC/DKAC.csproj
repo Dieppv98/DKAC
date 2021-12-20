@@ -69,6 +69,9 @@
     <Reference Include="ExcelNumberFormat, Version=1.0.10.0, Culture=neutral, PublicKeyToken=23c6f5d73be07eca, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelNumberFormat.1.0.10\lib\net20\ExcelNumberFormat.dll</HintPath>
     </Reference>
+    <Reference Include="FlexCel">
+      <HintPath>..\packages\FlexCel.dll</HintPath>
+    </Reference>
     <Reference Include="Hangfire.Core, Version=1.7.18.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hangfire.Core.1.7.18\lib\net46\Hangfire.Core.dll</HintPath>
     </Reference>
@@ -2633,6 +2636,7 @@
     <Content Include="Scripts\bootstrap-select.min.js.map" />
     <Content Include="Scripts\bootstrap-select.js.map" />
     <Content Include="Content\bootstrap-select.css.map" />
+    <Content Include="FileTemplate\RepotDish.xlsx" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\chart.js\data.js" />
     <Content Include="Scripts\chart.js\export-data.js" />
@@ -2781,6 +2785,7 @@
     <Content Include="Views\Home\ListAllDish.cshtml" />
     <Content Include="Views\Admin\ReportByDish.cshtml" />
     <Content Include="Views\Admin\ReportByDishSearch.cshtml" />
+    <Content Include="Views\Home\Error.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

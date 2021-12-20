@@ -10,6 +10,8 @@ using System.Web;
 using System.Web.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using System.IO;
+using FlexCel.Report;
 
 namespace DKAC.Controllers
 {
@@ -339,13 +341,36 @@ namespace DKAC.Controllers
             }).ToList() ?? new List<SelectListItem>();
             return View(model);
         }
-        
+
         public PartialViewResult ReportByDishSearch(DateTime? fDate, DateTime? tDate, int? roomId, int? dishId)
         {
             var data = _reportRepo.GetListRegisterByDish(fDate, tDate, roomId, dishId);
             return PartialView(data);
         }
 
+        public ActionResult ExportExcelReportByDishSearch(DateTime? fDate, DateTime? tDate, int? roomId, int? dishId)
+        {
+            var data = _reportRepo.GetListRegisterByDish(fDate, tDate, roomId, dishId);
+            var dataDetails = data.SelectMany(x => x.lstData).ToList() ?? new List<ListReportByDish>();
+            var path = Path.Combine(Server.MapPath("~/FileTemplate"), "RepotDish.xlsx");
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            var file = new FileInfo(path);
+            var excel = new ExcelPackage(file);
+            var fr = new FlexCelReport();
+            var result = CreateXlsFile(excel);
+
+            var now = DateTime.Now;
+            string rangeDate = (fDate.HasValue ? "từ " + fDate.Value.ToString("dd/MM/yyyy") : "từ trước") + (tDate.HasValue ? " đến " + tDate.Value.ToString("dd/MM/yyyy") : " đến nay");
+            fr.SetValue("time", rangeDate);
+
+            fr.AddTable("lstRegister", data);
+            fr.AddTable("lstRegisterDetails", dataDetails);
+
+            fr.Run(result);
+            fr.Dispose();
+            string tenFile = $"Báo cáo món ăn {rangeDate}_{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}";
+            return ViewReport(result, tenFile, true);
+        }
 
         public ActionResult PermissionManagerment()
         {
