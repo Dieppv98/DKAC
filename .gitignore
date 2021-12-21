@@ -403,3 +403,5 @@ __pycache__/
 .suo
 *.suo
 *.ide-shm
+*.ide-shm
+*.ide-wal
