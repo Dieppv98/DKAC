@@ -20,13 +20,14 @@ namespace DKAC.Controllers
 
         // GET: Account
         [HttpGet]
-        public ActionResult Login()
+        public ActionResult Login(string returnUrl)
         {
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
         [HttpPost]
-        public ActionResult Login(LoginModel login)
+        public ActionResult Login(LoginModel login, string returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -37,10 +38,8 @@ namespace DKAC.Controllers
                     authenSuccess = Encryption.CheckPassword(login.Password, userName.PassWord, "");
                     if (authenSuccess)
                     {
-                        var em = _loginRepo.GetEmployeeByUserName(login.UserName);
                         var user = _loginRepo.GetUserByUserName(login.UserName);
                         var pagemodul = _loginRepo.GetAccountModulPageInfo(user.id);
-                        Session.Add(CommonConstants.EMPLOYEE_SESSION, em);
                         Session.Add(CommonConstants.USER_SESSION, user);
                         Session.Add(CommonConstants.PAGE_MODUL_SESSION, pagemodul);
 
@@ -51,7 +50,7 @@ namespace DKAC.Controllers
                         {
                             Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
                             var cache = onlineUsers.Where(x => x.Key == user.id).FirstOrDefault();
-                            if(cache.Key > 0)
+                            if (cache.Key > 0)
                             {
                                 onlineUsers.Remove(cache.Key);
                             }
@@ -64,6 +63,12 @@ namespace DKAC.Controllers
                             onlineUsers.Add(user.id, DateTime.Now);
                             HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
                         }
+
+
+                        if (IsLocalUrl(returnUrl))
+                            return Redirect(returnUrl);
+
+
                         return RedirectToAction("Index", "Home");
                     }
                 }
@@ -71,7 +76,21 @@ namespace DKAC.Controllers
             }
             return View("Login");
         }
-        
+
+        /// <summary>
+        ///     Checking return url is same with the current host or not
+        /// </summary>
+        /// <param name="url">return url string</param>
+        /// <returns></returns>
+        public static bool IsLocalUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return false;
+            return url[0] == '/' && (url.Length == 1 || url[1] != '/' && url[1] != '\\') || // "/" or "/foo" but not "//" or "/\"
+                   url.Length > 1 &&
+                   url[0] == '~' && url[1] == '/'; // "~/" or "~/foo"
+        }
+
         [HttpGet]
         public ActionResult SignUp()
         {
@@ -99,14 +118,14 @@ namespace DKAC.Controllers
             {
                 Dictionary<int, DateTime> onlineUsers = (Dictionary<int, DateTime>)HttpRuntime.Cache["OnlineUsers"];
                 var cache = onlineUsers.Where(x => x.Key == user.id).FirstOrDefault();
-                if(cache.Key > 0)
+                if (cache.Key > 0)
                 {
                     onlineUsers.Remove(cache.Key);
                     HttpRuntime.Cache["OnlineUsers"] = onlineUsers;
                 }
             }
 
-            if(user.UserGroupId != (int)GroupUser.admin)
+            if (user.UserGroupId != (int)GroupUser.admin)
             {
                 if (HttpRuntime.Cache["MessageUsers"] != null)
                 {

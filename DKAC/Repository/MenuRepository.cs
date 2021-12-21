@@ -41,7 +41,7 @@ namespace DKAC.Repository
             }
         }
 
-        public int Delete(Menu menu)
+        public int Delete(MenuInfo menu)
         {
             var m = db.Menus.FirstOrDefault(x => x.IsDeleted == 0 && x.id == menu.id);
             if (m != null)
@@ -98,27 +98,62 @@ namespace DKAC.Repository
             return db.Menus.Where(x => x.IsDeleted == 0 && x.MenuCode == Code && x.id != id).FirstOrDefault();
         }
 
-        public Menu GetById(int id)
+        public MenuInfo GetById(int id)
         {
-            Menu me = db.Menus.Where(x => x.IsDeleted == 0 && x.id == id).FirstOrDefault();
-            if (me == null)
-            {
-                return new Menu();
-            }
-            return me;
+            MenuInfo menuInfo = new MenuInfo();
+            Menu me = db.Menus.Where(x => x.IsDeleted == 0 && x.id == id).FirstOrDefault() ?? new Menu();
+
+            var dataDetail = (from m in db.MenuDetails
+                              where m.MenuId == me.id
+                              join d in db.Dishes on m.DishId equals d.id into ld
+                              from ldm in ld.DefaultIfEmpty()
+                              select new MenuDetailInfo()
+                              {
+                                  id = m.id,
+                                  DishId = m.DishId,
+                                  IndexDate = m.IndexDate,
+                                  MenuId = m.MenuId,
+                                  ImageDishUrl = ldm.Image,
+                                  DishName = ldm.DishName,
+                                  DishCode = ldm.DishCode,
+                              }).ToList() ?? new List<MenuDetailInfo>();
+
+            menuInfo.DishId1 = dataDetail.FirstOrDefault(x => x.IndexDate == 1).DishId ?? 0;
+            menuInfo.DishId2 = dataDetail.FirstOrDefault(x => x.IndexDate == 2).DishId ?? 0;
+            menuInfo.DishId3 = dataDetail.FirstOrDefault(x => x.IndexDate == 3).DishId ?? 0;
+            menuInfo.DishId4 = dataDetail.FirstOrDefault(x => x.IndexDate == 4).DishId ?? 0;
+            menuInfo.DishId5 = dataDetail.FirstOrDefault(x => x.IndexDate == 5).DishId ?? 0;
+            menuInfo.DishId6 = dataDetail.FirstOrDefault(x => x.IndexDate == 6).DishId ?? 0;
+            menuInfo.DishId7 = dataDetail.FirstOrDefault(x => x.IndexDate == 7).DishId ?? 0;
+            menuInfo.MenuCode = me.MenuCode;
+            menuInfo.MenuName = me.MenuName;
+            menuInfo.Ca = me.Ca;
+            menuInfo.Date = me.Date;
+            menuInfo.ModifyDate = me.ModifyDate;
+            menuInfo.Description = me.Description;
+            menuInfo.detailInfos = dataDetail;
+            return menuInfo;
         }
 
         public int Update(MenuInfo model)
         {
             try
             {
-                Menu me = db.Menus.Where(x => x.IsDeleted == 0 && x.id == model.id).FirstOrDefault();
+                Menu me = db.Menus.Where(x => x.IsDeleted == 0 && x.id == model.id).FirstOrDefault() ?? new Menu();
                 me.MenuCode = model.MenuCode;
                 me.MenuName = model.MenuName;
-                me.Date = model.Date;
                 me.Description = model.Description;
-                me.ModifyDate = DateTime.Now;
+                me.Ca = model.Ca;
                 me.IsDeleted = 0;
+
+                if (me.id <= 0)
+                {
+                    me.CreatedBy = model.CreatedBy;
+                    me.Date = DateTime.Now;
+                    db.Menus.Add(me);
+                    db.SaveChanges();
+                }
+
                 var details = db.MenuDetails.Where(x => x.IsDeleted == 0 && x.MenuId == me.id).ToList();
                 foreach (var item in details)
                 {
@@ -129,6 +164,9 @@ namespace DKAC.Repository
                     item.MenuId = me.id;
                     db.MenuDetails.Add(item);
                 }
+
+                me.ModifyDate = DateTime.Now;
+                me.ModifyBy = model.ModifyBy;
                 db.SaveChanges();
                 return 1;
             }

@@ -13,14 +13,12 @@ namespace DKAC.Models.InfoModel
         private const string RegexCode = @"^[a-zA-Z0-9]+$";
 
         public int id { get; set; }
-
-        [StringLength(50)]
-        public string CreatedBy { get; set; }
+        
+        public int? CreatedBy { get; set; }
 
         public DateTime? CreatedDate { get; set; }
-
-        [StringLength(50)]
-        public string ModifyBy { get; set; }
+        
+        public int? ModifyBy { get; set; }
 
         public DateTime? ModifyDate { get; set; }
 
@@ -43,7 +41,13 @@ namespace DKAC.Models.InfoModel
 
         public DateTime? Date { get; set; }
         public int? Ca { get; set; }
-        public int? DishId { get; set; }
+        public int? DishId1 { get; set; }
+        public int? DishId2 { get; set; }
+        public int? DishId3 { get; set; }
+        public int? DishId4 { get; set; }
+        public int? DishId5 { get; set; }
+        public int? DishId6 { get; set; }
+        public int? DishId7 { get; set; }
 
         public List<MenuDetail> details { get; set; }
         public List<MenuDetailInfo> detailInfos { get; set; }

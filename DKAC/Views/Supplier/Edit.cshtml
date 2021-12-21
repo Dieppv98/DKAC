@@ -1,16 +1,19 @@
 ﻿@model DKAC.Models.InfoModel.SupplierInfo
 
 @{
-                /**/
-
-                ViewBag.Title = "Thêm mới nhà cung cấp";
-                if (Model.id > 0)
-                {
-                    ViewBag.Title = "Chi tiết nhà cung cấp";
-                }
-                Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<head>
+    @if (Model.id > 0)
+    {
+        <title>Chỉnh sửa nhà cung cấp</title>
+    }
+    else
+    {
+        <title>Thêm mới nhà cung cấp</title>
+    }
+</head>
 <style>
     label {
         margin-top: 8px;
@@ -134,41 +137,6 @@
     </div>
 </div>
 
-
-@*<h1 align="center" style="color:green">Bài kiểm tra 1 tiết môn Địa lý</h1>
-
-    <h3 style="color:#FF0000" align="center">
-        Thời gian còn lại của bạn: <input id="timer" class="" value="" style="width: 125px; padding: 5px;" />
-    </h3>
-
-    <script>
-
-        var c = 60 * 60;
-        var t;
-        timedCount();
-
-        function timedCount() {
-
-            var hours = parseInt(c / 3600) % 24;
-            var minutes = parseInt(c / 60) % 60;
-            var seconds = c % 60;
-
-            var result = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
-
-            $("#timer").val(result);
-            if (c == 0) {
-                window.location.reload();
-            }
-            c = c - 1;
-            t = setTimeout(function () {
-                timedCount()
-            },
-                1000);
-        }
-
-    </script>*@
-
-
 <!--Js file-->
 <script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
 
@@ -208,6 +176,8 @@
             title2 = "Bạn có đồng ý cập nhật không?";
             url = '/Supplier/Update';
         }
+
+        var myform = $("form#edit");
 
         if ($("form#edit").valid()) {
             swal({
@@ -273,4 +243,7 @@
     }
 
 </script>
+
+
+
 

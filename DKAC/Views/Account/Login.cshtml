@@ -40,6 +40,7 @@
                     <h2 class="title">Đăng nhập</h2>
                     <form action="/Account/Login" method="post">
                         @Html.ValidationSummary(true, "", new { @class = "text-danger", @style = "color: red; font-style: italic; margin-bottom: 10px;" })
+                        @Html.Hidden("ReturnUrl", ViewBag.ReturnUrl as string)
                         <fieldset>
                             <div class="input-group">
                                 <input class="input--style-2" type="text" placeholder="Tài khoản" name="UserName">
@@ -54,16 +55,16 @@
                                 @Html.ValidationMessageFor(a => a.Password)
                             </div>
                             @*<div class="row" style="padding-top:20px;">
-                                <div class="col-md-2">
-                                    <input type="checkbox" name="Remember" style=" width: 15px; height: 15px; margin-right:4px;">
-                                </div>
-                                <div class="col-md-2">
-                                    <label>Nhớ mật khẩu</label>
-                                </div>
-                                <div class="col-md-8">
-                                    <a style="padding-left: 194px;text-align: right;">Bạn chưa có tài khoản?</a><a href="/Account/SignUp" style="padding-left: 5px;">Đăng ký</a>
-                                </div>
-                            </div>*@
+                                    <div class="col-md-2">
+                                        <input type="checkbox" name="Remember" style=" width: 15px; height: 15px; margin-right:4px;">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label>Nhớ mật khẩu</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <a style="padding-left: 194px;text-align: right;">Bạn chưa có tài khoản?</a><a href="/Account/SignUp" style="padding-left: 5px;">Đăng ký</a>
+                                    </div>
+                                </div>*@
                             <div class="p-t-30 text-center">
                                 <button class="btn btn--radius btn--green" type="submit">Đăng nhập</button>
                             </div>

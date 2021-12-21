@@ -2786,6 +2786,7 @@
     <Content Include="Views\Admin\ReportByDishSearch.cshtml" />
     <Content Include="Views\Home\Error.cshtml" />
     <Content Include="Views\Menu\Edit.cshtml" />
+    <Content Include="Views\Menu\Detail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

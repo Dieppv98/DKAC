@@ -12,7 +12,7 @@ namespace DKAC.IRepository
         int Add(Room room);
         int Delete(int id);
         Room GetById(int id);
-        RoomRequestModel GetListAllRoom(Employee employee, User user, string KeySearch, int page, int pageSize);
+        RoomRequestModel GetListAllRoom(RoomRequestModel request, int pageIndex, int recordPerPage, out int totalCount);
         int Update(Room room);
         Room GetByShortName(string RoomShortName, int? id);
         Room GetByRoomName(string RoomName, int? id);

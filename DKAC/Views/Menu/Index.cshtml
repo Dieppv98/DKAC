@@ -80,8 +80,9 @@
                         <th class="text-center">STT</th>
                         <th class="text-center">Mã thực đơn</th>
                         <th class="text-center">Tên thực đơn</th>
-                        <th class="text-center">Mô tả</th>
+                        <th class="text-center">Ca</th>
                         <th class="text-center">Ngày tạo</th>
+                        <th class="text-center">Ghi chú</th>
                         <th class="text-center">Hành động</th>
                     </tr>
                 </thead>
@@ -96,8 +97,14 @@
                             <td class="text-center">@count</td>
                             <td class="text-center">@item.MenuCode</td>
                             <td class="text-center">@item.MenuName</td>
+                            <td class="text-center">@item.Ca</td>
+                            <td class="text-center">@(item.Date.HasValue ? item.Date.Value.ToString("dd/MM/yyyy") : "")</td>
                             <td class="text-center">@item.Description</td>
                             <td class="text-center">
+                                @if (ViewBag.hasViewPermission)
+                                {
+                                    <a href="/Menu/Detail/@item.id" class="details-link" style="margin-right: 5px;"><i class="fa fa-eye" title="Sửa"></i></a>
+                                }
                                 @if (ViewBag.hasUpdatePermission)
                                 {
                                     <a href="/Menu/Edit/@item.id" class="edit" style="margin-right: 5px;"><i class="fa fa-edit" title="Sửa"></i></a>

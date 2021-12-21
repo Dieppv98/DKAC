@@ -12,41 +12,33 @@ namespace DKAC.Repository
     public class RoomRepository : IRoomRepository
     {
         DKACDbContext db = new DKACDbContext();
-        public RoomRequestModel GetListAllRoom(Employee employee, User user, string KeySearch, int page, int pageSize)
+        public RoomRequestModel GetListAllRoom(RoomRequestModel request, int pageIndex, int recordPerPage, out int totalCount)
         {
-            RoomRequestModel request = new RoomRequestModel();
-            List<Room> lst = new List<Room>();
-            if (user != null)
+            pageIndex = pageIndex - 1;
+            if (!string.IsNullOrEmpty(request.Keywords))
             {
-                lst = db.Rooms.Where(x => x.IsDeleted == 0).ToList();
+                request.Keywords = request.Keywords.Trim();
             }
-            else if (employee.Role == 2)
-            {
-                lst = db.Rooms.Where(x => x.IsDeleted == 0 && x.id == employee.RoomID).ToList();
-            }
-            request.totalRecord = lst.Count;
-            request.page = page;
-            request.pageSize = pageSize;
-            int startRow = (page - 1) * pageSize;
-            if (!string.IsNullOrEmpty(KeySearch))
-            {
-                request.data = lst.Where(x => x.IsDeleted == 0 && x.RoomName.Contains(KeySearch) || x.RoomShortName.Contains(KeySearch)).OrderBy(x => x.id).Skip(startRow).Take(pageSize).ToList();
-            }
-            else
-            {
-                request.data = lst.OrderBy(x => x.RoomShortName).Skip(startRow).Take(pageSize).ToList();
-            }
-            int totalPage = 0;
-            if (request.totalRecord % pageSize == 0)
-            {
-                totalPage = request.totalRecord / pageSize;
-            }
-            else
-            {
-                totalPage = request.totalRecord / pageSize + 1;
-            }
-            request.totalPage = totalPage;
-            return request;
+
+            var query = from r in db.Rooms
+                        join u in db.Users on r.Manager equals u.id into lu
+                        from lur in lu.DefaultIfEmpty()
+                        where (string.IsNullOrEmpty(request.Keywords) || r.RoomName.Contains(request.Keywords) || r.RoomShortName.Contains(request.Keywords))
+                        select new RoomInfo()
+                        {
+                            Id = r.id,
+                            Manager = r.Manager,
+                            ManagerName = lur.FullName,
+                            RoomName = r.RoomName,
+                            RoomShortName = r.RoomShortName,
+                            Members = r.Members,
+                            DiaChi = r.DiaChi,
+                            SDT = r.SDT,
+                        };
+            totalCount = query.Count();
+            var rs = query.OrderBy(x => x.Id).Skip(pageIndex * recordPerPage).Take(recordPerPage).ToList() ?? new List<RoomInfo>();
+            request.data = rs;
+            return request ?? new RoomRequestModel();
         }
 
 
@@ -105,18 +97,19 @@ namespace DKAC.Repository
             if (data.RoomName != room.RoomName && data1 != null) return 0;
             if (room.Manager != null)
             {
-                var lstEm = db.Employees.Where(x => x.RoomID == data.id && x.IsDeleted == 0).ToList();
+                var lstEm = db.Users.Where(x => x.RoomID == data.id && x.IsDeleted == 0).ToList();
                 foreach (var item in lstEm)
                 {
                     item.Role = 1;
                 }
-                var em = db.Employees.FirstOrDefault(x => x.IsDeleted == 0 && x.id == room.Manager);
+                var em = db.Users.FirstOrDefault(x => x.IsDeleted == 0 && x.id == room.Manager);
                 em.Role = 2;
                 data.Manager = room.Manager;
             }
             data.RoomName = room.RoomName;
             data.RoomShortName = room.RoomShortName;
-            data.IsDeleted = 0;
+            data.ModifyDate = DateTime.Now;
+
             db.SaveChanges();
             return 1;
         }

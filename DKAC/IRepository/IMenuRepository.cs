@@ -12,9 +12,9 @@ namespace DKAC.IRepository
     {
         int Add(MenuInfo model);
         int Update(MenuInfo model);
-        int Delete(Menu menu);
+        int Delete(MenuInfo model);
         MenuRequestModel GetAllMenu(string KeySearch, int page, int pageSize);
-        Menu GetById(int id);
+        MenuInfo GetById(int id);
         Menu GetByCodeId(string Code, int id);
     }
 }

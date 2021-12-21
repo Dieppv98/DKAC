@@ -1,5 +1,6 @@
 ﻿using DKAC.Common;
 using DKAC.Models.EntityModel;
+using DKAC.Models.Enum;
 using DKAC.Models.InfoModel;
 using DKAC.Models.RequestModel;
 using DKAC.Repository;
@@ -14,21 +15,25 @@ namespace DKAC.Controllers
     {
         // GET: Room
         RoomRepository _roomRepo = new RoomRepository();
-        public ActionResult Index(string KeySearch, int page = 1, int pageSize = 10)
+        public ActionResult Index(RoomRequestModel model)
         {
-            Employee employee = (Employee)Session[CommonConstants.EMPLOYEE_SESSION];
+            model.page = model.page == 0 ? 1 : model.page;
+            model.pageSize = 20;
+            int totalCount = 0;
             User user = (User)Session[CommonConstants.USER_SESSION];
-            RoomRequestModel model = new RoomRequestModel();
             var currentUser = (User)Session[CommonConstants.USER_SESSION];
-            ViewBag.hasViewPermission = CheckPermission(3, 1, currentUser);
-            ViewBag.hasAddPermission = CheckPermission(3, 2, currentUser);
-            ViewBag.hasUpdatePermission = CheckPermission(3, 4, currentUser);
-            ViewBag.hasDeletePermission = CheckPermission(3, 8, currentUser);
+            ViewBag.hasViewPermission = CheckPermission((int)PageId.QuanLyPhongBan, (int)Actions.Xem, currentUser);
+            ViewBag.hasAddPermission = CheckPermission((int)PageId.QuanLyPhongBan, (int)Actions.Them, currentUser);
+            ViewBag.hasUpdatePermission = CheckPermission((int)PageId.QuanLyPhongBan, (int)Actions.Sua, currentUser);
+            ViewBag.hasDeletePermission = CheckPermission((int)PageId.QuanLyPhongBan, (int)Actions.Xoa, currentUser);
             if (!ViewBag.hasViewPermission)
             {
                 return RedirectToAction("NotPermission", "Home");
             }
-            model = _roomRepo.GetListAllRoom(employee, user, KeySearch, page, pageSize);
+
+            model = _roomRepo.GetListAllRoom(model, model.page, model.pageSize, out totalCount);
+            model.totalRecord = totalCount;
+            model.totalPage = (int)Math.Ceiling((decimal)model.totalRecord / model.pageSize);
             return View(model);
         }
 

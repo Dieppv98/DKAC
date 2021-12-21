@@ -10,14 +10,12 @@ namespace DKAC.Models.EntityModel
     public partial class Menu
     {
         public int id { get; set; }
-
-        [StringLength(50)]
-        public string CreatedBy { get; set; }
+        
+        public int? CreatedBy { get; set; }
 
         public DateTime? CreatedDate { get; set; }
-
-        [StringLength(50)]
-        public string ModifyBy { get; set; }
+        
+        public int? ModifyBy { get; set; }
 
         public DateTime? ModifyDate { get; set; }
 

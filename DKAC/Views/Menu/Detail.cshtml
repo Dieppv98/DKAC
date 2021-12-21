@@ -1,0 +1,142 @@
+﻿@model DKAC.Models.InfoModel.MenuInfo
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var count = 0;
+}
+
+<head>
+    <title>Chi tiết thực đơn</title>
+</head>
+<style>
+    label {
+        margin-top: 8px;
+        color: #435d7d;
+        font-weight: 700;
+    }
+
+    .form-group {
+        border: 2px solid #afc9e4;
+        background: #eef6ff;
+        padding: 20px;
+    }
+
+        .form-group .row {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+</style>
+
+<div class="container">
+    <div class="table-wrapper">
+        <div class="table-title">
+            <div class="row">
+                <i class="fa fa-align-left" style="font-size: 25px; margin-top: 6px;"></i>
+                <div class="col-sm-6">
+                    <h2>Chi tiết thực đơn</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <ol class="breadcrumb" style="margin-left: 15px;">
+                <li style="margin-right: 10px"><a href="/"> <i class="fa fa-home"></i>Home</a></li>
+                <li style="margin-right: 10px"><a href="/Employee"><i class="fa fa-list"></i>Danh sách</a></li>
+                <li class="active">
+                    <span>Chi tiết thực đơn: @Model.MenuName</span>
+                </li>
+            </ol>
+        </div>
+
+        <form action="" method="post" id="edit">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="form-group">
+                @Html.HiddenFor(m => m.id, new { @class = "form-control", @id = "Id" })
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Tên thực đơn:</label>
+                        <div>
+                            <input class="form-control" disabled value="@Model.MenuName" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Mã thực đơn:</label>
+                        <div>
+                            <input class="form-control" disabled value="@Model.MenuCode" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Áp dụng cho ca: </label>
+                        <div>
+                            <input class="form-control" disabled value="@Model.Ca" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Ghi chú: </label>
+                        <div>
+                            <input class="form-control" disabled value="@Model.Description" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Ngày tạo: </label>
+                        <div>
+                            <input class="form-control" disabled value="@(Model.Date.HasValue ? Model.Date.Value.ToString("dd/MM/yyyy") : "")" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Ngày chỉnh sửa: </label>
+                        <div>
+                            <input class="form-control" disabled value="@(Model.ModifyDate.HasValue ? Model.ModifyDate.Value.ToString("dd/MM/yyyy") : "")" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Chi tiết thực đơn: </label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-10">
+                        <table class="table table-bordered table-hover" style="width: 100%;text-align: center;">
+                            <tr>
+                                <th style="width: 50px">Ngày</th>
+                                <th style="width: 200px">Món ăn</th>
+                                <th style="width: 100px">Hình ảnh</th>
+                            </tr>
+                            <tbody>
+                                @foreach (var item in Model.detailInfos)
+                                {
+                                    count++;
+                                    <tr>
+                                        <td style="width: 50px">Ngày @count</td>
+                                        <td style="width: 200px">@(item.DishName + (item.DishCode.Length > 0 ? $" ({item.DishCode})" : ""))</td>
+                                        <td style="width: 100px">
+                                            <img width="100" height="100" src="~/Content/image/Dish/@item.ImageDishUrl" />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-md-12 col-md-offset-2 text-right">
+                <button onclick="AddOrUpdate()" class="btn btn-primary" id="btnLuu" style="width: 10%">Lưu</button>
+                <a type="button" class="btn btn-success" href="/Employee" style="width: 10%">Hủy</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -25,5 +25,7 @@ namespace DKAC.Models.InfoModel
 
         public byte? IsDeleted { get; set; }
         public string ImageDishUrl { get; set; }
+        public string DishName { get; set; }
+        public string DishCode { get; set; }
     }
 }

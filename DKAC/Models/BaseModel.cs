@@ -11,5 +11,6 @@ namespace DKAC.Models
         public int pageSize { get; set; }
         public int totalPage { get; set; }
         public int totalRecord { get; set; }
+        public virtual object RouteValues { get; }
     }
 }

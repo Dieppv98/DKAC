@@ -31,6 +31,7 @@ namespace DKAC.Models.InfoModel
         public int? Members { get; set; }
 
         public int? Manager { get; set; }
+        public string ManagerName { get; set; }
 
         [StringLength(100)]
         public string DiaChi { get; set; }

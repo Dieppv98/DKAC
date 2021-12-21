@@ -32,12 +32,13 @@ namespace DKAC.Controllers
         }
 
         [HttpGet]
-        public ActionResult Edit(int? id)
+        public ActionResult Edit(int id)
         {
             MenuInfo model = new MenuInfo();
             var currentUser = (User)Session[CommonConstants.USER_SESSION];
             var hasPermission = CheckPermission((int)PageId.QuanLyThucDon, (int)Actions.Them, currentUser);
-            if (!hasPermission)
+            var hasUpdatePermission = CheckPermission((int)PageId.QuanLyThucDon, (int)Actions.Sua, currentUser);
+            if (!hasPermission && !hasUpdatePermission)
             {
                 return RedirectToAction("NotPermission", "Home");
             }
@@ -50,8 +51,46 @@ namespace DKAC.Controllers
                     Value = a.id.ToString(),
                 };
             });
+            if(id > 0)
+            {
+                model = _menuRepo.GetById(id) ?? new MenuInfo();
+            }
             model.lstDish = lstAllDish;
             return View(model);
+        }
+
+        [HttpGet]
+        public ActionResult Detail(int id)
+        {
+            MenuInfo model = new MenuInfo();
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            var hasPermission = CheckPermission((int)PageId.QuanLyThucDon, (int)Actions.Xem, currentUser);
+            if (!hasPermission)
+            {
+                return RedirectToAction("NotPermission", "Home");
+            }
+            var allDish = _menuRepo.GetAllDish();
+            model = _menuRepo.GetById(id) ?? new MenuInfo();
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Update(MenuInfo info)
+        {
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            var hasPermission = CheckPermission((int)PageId.QuanLyThucDon, (int)Actions.Them, currentUser);
+            if (!hasPermission)
+            {
+                return RedirectToAction("NotPermission", "Home");
+            }
+            info.CreatedBy = currentUser.id;
+            info.ModifyBy = currentUser.id;
+            var result = _menuRepo.Update(info);
+            if (result == 1)
+            {
+                return Json(new { status = 1, message = "Thêm thành công" }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { status = 0, message = "Thêm thất bại" }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -63,6 +102,22 @@ namespace DKAC.Controllers
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
             return Json(false, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Delete(MenuInfo menu)
+        {
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            var hasPermission = CheckPermission((int)PageId.QuanLyThucDon, (int)Actions.Xoa, currentUser);
+            if (!hasPermission)
+            {
+                return RedirectToAction("NotPermission", "Home");
+            }
+            var result = _menuRepo.Delete(menu);
+            if (result == 1)
+            {
+                return Json(new { status = 1, message = "Xóa thành công" }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { status = 1, message = "Xóa thất bại" }, JsonRequestBehavior.AllowGet);
         }
 
     }

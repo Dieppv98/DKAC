@@ -4,7 +4,6 @@
 @{
     ViewBag.Title = "Quản lý phòng ban";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var em = (Employee)Session[CommonConstants.EMPLOYEE_SESSION];
     var user = (User)Session[CommonConstants.USER_SESSION];
 }
 
@@ -53,7 +52,12 @@
                         <div class="col-md-2"></div>
                         <label class="lbl">Từ khóa: </label>
                         <div class="col-md-6" style="margin-bottom: 10px;">
-                            <input type="text" name="KeySearch" placeholder="Nhập tên hoặc mã phòng" class="form-control" />
+                            @Html.TextBoxFor(m => m.Keywords, new Dictionary<string, object>
+                               {
+                                   {"class", " form-control"},
+                                     {"id", "Keywords"},
+                                     {"placeholder", "Nhập tên hoặc mã phòng"},
+                               })
                         </div>
                         <div class="col-md-2">
                             <button id="btnSearch" class="btn btn-sm btn-primary filter-submit" type="submit">
@@ -101,21 +105,21 @@
                         <tr>
                             <td class="text-center">@count</td>
                             <td class="text-center">
-                                <a href="/Room/Edit/@item.id">
+                                <a href="/Room/Edit/@item.Id">
                                     @item.RoomName
                                 </a>
                             </td>
                             <td class="text-center">@item.RoomShortName</td>
-                            <td class="text-center">@item.Members
-                            <td class="text-center">@item.Manager</td>
+                            <td class="text-center">@item.Members Người</td>
+                            <td class="text-center">@item.ManagerName</td>
                             <td class="text-center">
                                 @if (ViewBag.hasUpdatePermission)
                                 {
-                                    <a href="/Room/Edit/@item.id" class="edit" style="margin-right: 5px;"><i class="fa fa-edit" title="Sửa"></i></a>
+                                    <a href="/Room/Edit/@item.Id" class="edit" style="margin-right: 5px;"><i class="fa fa-edit" title="Sửa"></i></a>
                                 }
                                 @if (ViewBag.hasDeletePermission)
                                 {
-                                    <a onclick="Delete(@item.id)" class="delete" style="cursor: pointer"><i class="fa fa-trash" title="Xóa"></i></a>
+                                    <a onclick="Delete(@item.Id)" class="delete" style="cursor: pointer"><i class="fa fa-trash" title="Xóa"></i></a>
                                 }
                             </td>
                         </tr>
