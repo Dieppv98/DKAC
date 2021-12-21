@@ -2634,7 +2634,7 @@
     <Content Include="Scripts\bootstrap-select.min.js.map" />
     <Content Include="Scripts\bootstrap-select.js.map" />
     <Content Include="Content\bootstrap-select.css.map" />
-    <Content Include="FileTemplate\RepotDish.xlsx" />
+    <Content Include="FileTemplate\ReportDish.xlsx" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\chart.js\data.js" />
     <Content Include="Scripts\chart.js\export-data.js" />
