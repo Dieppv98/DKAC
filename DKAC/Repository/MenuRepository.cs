@@ -137,5 +137,17 @@ namespace DKAC.Repository
                 return 0;
             }
         }
+
+        public List<Dish> GetAllDish()
+        {
+            return db.Dishes.Where(x => x.IsDeleted != 1).ToList();
+        }
+
+        public Menu GetByMenuCode(string MenuCode, int? id)
+        {
+            var data = db.Menus.Where(x => x.IsDeleted == 0 && x.id != id && x.MenuCode == MenuCode).FirstOrDefault();
+            return data;
+        }
+
     }
 }

@@ -35,7 +35,17 @@ namespace DKAC.Controllers
         [HttpGet]
         public ActionResult Add()
         {
-            return View();
+            RoomInfo info = new RoomInfo();
+            var allMaster = _roomRepo.GetAllEmployeeByRoom(0);
+            info.lstUser = allMaster.ConvertAll(a =>
+            {
+                return new SelectListItem()
+                {
+                    Text = a.FullName.ToString() + "(" + a.UserName.ToString() + ")",
+                    Value = a.id.ToString()
+                };
+            });
+            return View(info);
         }
 
         [HttpGet]
@@ -50,7 +60,6 @@ namespace DKAC.Controllers
                     Value = a.id.ToString()
                 };
             });
-            ViewBag.AllEm = lstEm;
 
             Room room = _roomRepo.GetById(id);
             RoomInfo roomInfo = new RoomInfo()
@@ -62,7 +71,7 @@ namespace DKAC.Controllers
                 Members = room.Members,
                 DiaChi = room.DiaChi,
                 SDT = room.SDT,
-
+                lstUser = lstEm,
             };
             return View("Edit", roomInfo);
         }

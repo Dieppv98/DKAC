@@ -602,6 +602,7 @@
     <Compile Include="Models\InfoModel\DishInfo.cs" />
     <Compile Include="Models\InfoModel\EmployeeInfo.cs" />
     <Compile Include="Models\InfoModel\LoadNotifyInfo.cs" />
+    <Compile Include="Models\InfoModel\MenuDetailInfo.cs" />
     <Compile Include="Models\InfoModel\MenuInfo.cs" />
     <Compile Include="Models\InfoModel\NotifyInfo.cs" />
     <Compile Include="Models\InfoModel\PermissionActionInfo.cs" />
@@ -2784,6 +2785,7 @@
     <Content Include="Views\Admin\ReportByDish.cshtml" />
     <Content Include="Views\Admin\ReportByDishSearch.cshtml" />
     <Content Include="Views\Home\Error.cshtml" />
+    <Content Include="Views\Menu\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

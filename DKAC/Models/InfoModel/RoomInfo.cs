@@ -48,5 +48,6 @@ namespace DKAC.Models.InfoModel
         public DateTime? ModifyDate { get; set; }
 
         public byte IsDeleted { get; set; }
+        public List<SelectListItem> lstUser { get; set; }
     }
 }

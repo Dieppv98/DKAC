@@ -16,6 +16,6 @@ namespace DKAC.IRepository
         int Update(Room room);
         Room GetByShortName(string RoomShortName, int? id);
         Room GetByRoomName(string RoomName, int? id);
-        List<Employee> GetAllEmployeeByRoom(int roomId);
+        List<User> GetAllEmployeeByRoom(int roomId);
     }
 }

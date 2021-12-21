@@ -133,9 +133,9 @@ namespace DKAC.Repository
             return data;
         }
 
-        public List<Employee> GetAllEmployeeByRoom(int roomId)
+        public List<User> GetAllEmployeeByRoom(int roomId)
         {
-            return db.Employees.Where(x => x.IsDeleted == 0 && x.RoomID == roomId).ToList();
+            return db.Users.Where(x => x.IsDeleted == 0 && x.RoomID == roomId).ToList();
         }
 
         public string GetRoomNameByRoomId(int? id)
@@ -143,5 +143,10 @@ namespace DKAC.Repository
             var data = db.Rooms.Where(x => x.IsDeleted == 0 && x.id == id).FirstOrDefault();
             return data.RoomName;
         }
+        public List<User> GetAllMasterRoom()
+        {
+            return db.Users.Where(x => x.IsDeleted == 0 && x.Role == 2).ToList();
+        }
+
     }
 }

@@ -5,10 +5,12 @@
 @{
     ViewBag.Title = "Chỉnh sửa phòng ban";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var em = (Employee)Session[CommonConstants.EMPLOYEE_SESSION];
     var user = (User)Session[CommonConstants.USER_SESSION];
 }
 
+<head>
+    <title>Chỉnh sửa phòng ban</title>
+</head>
 <style>
     label {
         margin-top: 8px;
@@ -88,7 +90,7 @@
                             <label>Trưởng phòng: </label>
                         </div>
                         <div class="col-md-6">
-                            @Html.DropDownListFor(a => a.Manager, (List<SelectListItem>)ViewBag.AllEm, "---Chọn trưởng phòng---",
+                            @Html.DropDownListFor(a => a.Manager, Model.lstUser, "---Chọn trưởng phòng---",
                                                                    new { @class = "form-control", @id = "Manager" })
                             <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
                                 @Html.ValidationMessageFor(m => m.Manager)

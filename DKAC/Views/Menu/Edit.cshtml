@@ -1,0 +1,290 @@
+﻿@model DKAC.Models.InfoModel.MenuInfo
+
+@{
+    if (Model.id > 0)
+    {
+        ViewBag.Title = "Chỉnh sửa thực đơn";
+    }
+    else
+    {
+        ViewBag.Title = "Thêm mới thực đơn";
+    }
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    @if (Model.id > 0)
+    {
+        <title>Chỉnh sửa thực đơn</title>
+    }
+    else
+    {
+        <title>Thêm mới thực đơn</title>
+    }
+</head>
+<style>
+    label {
+        margin-top: 8px;
+        color: #435d7d;
+        font-weight: 700;
+    }
+
+    .form-group {
+        border: 2px solid #afc9e4;
+        background: #eef6ff;
+        padding: 20px;
+    }
+
+        .form-group .row {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+</style>
+
+<div class="container">
+    <div class="table-wrapper">
+        <div class="table-title">
+            <div class="row">
+                <i class="fa fa-align-left" style="font-size: 25px; margin-top: 6px;"></i>
+                <div class="col-sm-6">
+                    @if (Model.id > 0)
+                    {
+                        <h2>Chỉnh sửa thực đơn</h2>
+                    }
+                    else
+                    {
+                        <h2>Thêm mới thực đơn</h2>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <ol class="breadcrumb" style="margin-left: 15px;">
+                <li style="margin-right: 10px"><a href="/"> <i class="fa fa-home"></i>Home</a></li>
+                <li style="margin-right: 10px"><a href="/Employee"><i class="fa fa-list"></i>Danh sách</a></li>
+                <li class="active">
+                    @if (Model.id > 0)
+                    {
+                        <span>Chỉnh sửa: @Model.MenuName</span>
+                    }
+                    else
+                    {
+                        <span>Thêm mới thực đơn</span>
+                    }
+                </li>
+            </ol>
+        </div>
+
+        <form action="" method="post" id="edit">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="form-group">
+                @Html.HiddenFor(m => m.id, new { @class = "form-control", @id = "Id" })
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Tên thực đơn: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.MenuName, new { @class = "form-control", @id = "MenuName", @maxlength = "200" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.MenuName)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Mã thực đơn: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.MenuCode, new { @class = "form-control", @id = "MenuCode", @maxlength = "200" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.MenuCode)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Áp dụng cho: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.DropDownListFor(m=> m.Ca, new List<SelectListItem>
+                                              {
+                                                 new SelectListItem {Value = "1", Text = "Ca 1"},
+                                                 new SelectListItem {Value = "2", Text = "Ca 2"},
+                                                 new SelectListItem {Value = "3", Text = "Ca 3"},
+                                              }, new { @class = "form-control", @id = "Ca" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Ca)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Lên thực đơn: </label>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-bordered table-hover" style="width: 100%;text-align: center;">
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Món ăn</th>
+                            </tr>
+                            <tbody>
+                                <tr>
+                                    <td>Ngày 1</td>
+                                    <td>@Html.DropDownListFor(a => a.DishId, Model.lstDish, "---Chọn món ăn---", new { @class = "form-control", @id = "DishId1", @style = "width:100%" })</td>
+                                </tr>
+                                <tr>
+                                    <td>Ngày 2</td>
+                                    <td>@Html.DropDownListFor(a => a.DishId, Model.lstDish, "---Chọn món ăn---", new { @class = "form-control", @id = "DishId2", @style = "width:100%" })</td>
+                                </tr>
+                                <tr>
+                                    <td>Ngày 3</td>
+                                    <td>@Html.DropDownListFor(a => a.DishId, Model.lstDish, "---Chọn món ăn---", new { @class = "form-control", @id = "DishId3", @style = "width:100%" })</td>
+                                </tr>
+                                <tr>
+                                    <td>Ngày 4</td>
+                                    <td>@Html.DropDownListFor(a => a.DishId, Model.lstDish, "---Chọn món ăn---", new { @class = "form-control", @id = "DishId4", @style = "width:100%" })</td>
+                                </tr>
+                                <tr>
+                                    <td>Ngày 5</td>
+                                    <td>@Html.DropDownListFor(a => a.DishId, Model.lstDish, "---Chọn món ăn---", new { @class = "form-control", @id = "DishId5", @style = "width:100%" })</td>
+                                </tr>
+                                <tr>
+                                    <td>Ngày 6</td>
+                                    <td>@Html.DropDownListFor(a => a.DishId, Model.lstDish, "---Chọn món ăn---", new { @class = "form-control", @id = "DishId6", @style = "width:100%" })</td>
+                                </tr>
+                                <tr>
+                                    <td>Ngày 7</td>
+                                    <td>@Html.DropDownListFor(a => a.DishId, Model.lstDish, "---Chọn món ăn---", new { @class = "form-control", @id = "DishId7", @style = "width:100%" })</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2">
+                        <label>Ghi chú: </label>
+                    </div>
+                    <div class="col-md-6">
+                        @Html.TextBoxFor(m => m.Description, new { @class = "form-control", @id = "Description", @maxlength = "200" })
+                        <div style="margin-top: 10px; color: red; font-style: italic;" id="messageCode">
+                            @Html.ValidationMessageFor(m => m.Description)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            <div class="col-md-12 col-md-offset-2 text-right">
+                <button onclick="AddOrUpdate()" class="btn btn-primary" id="btnLuu" style="width: 10%">Lưu</button>
+                <a type="button" class="btn btn-success" href="/Employee" style="width: 10%">Hủy</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Js file-->
+<!-- ~/assets/login/vendor JS-->
+<script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
+<script src="~/assets/login/vendor/select2/select2.min.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#edit").submit(function () {
+            return false;
+        });
+        $("#DishId1").select2();
+        $("#DishId2").select2();
+        $("#DishId3").select2();
+        $("#DishId4").select2();
+        $("#DishId5").select2();
+        $("#DishId6").select2();
+        $("#DishId7").select2();
+    });
+
+    $("#MenuCode").on({
+        keydown: function (e) {
+            if (e.which === 32)
+                return false;
+        },
+        change: function () {
+            this.value = this.value.replace(/\s/g, "");
+        }
+    });
+
+    function AddOrUpdate() {
+        var detailArray = [];
+        for (var i = 1; i <= 7; i++) {
+            var detail = {
+                IndexDate: i,
+                DishId: $(`#DishId${i}`).val() * 1,
+            }
+            detailArray.push(detail);
+        }
+        var data = {
+            id: $('#Id').val() * 1,
+            MenuName: $('#MenuName').val().trim(),
+            MenuCode: $('#MenuCode').val().trim(),
+            Ca: $('#Ca').val() * 1,
+            Description: $('#Description').val().trim(),
+            detailInfos: detailArray,
+        };
+        if (data.MenuCode == null || data.MenuCodo == "") {
+            toastr.error('Mã không được để trống!');
+        }
+        if (data.MenuName == null || data.MenuName == "") {
+            toastr.error('Tên không được để trống!');
+        }
+        if (data.Ca <= 0) {
+            toastr.error('Ca không được để trống!');
+        }
+
+        var title = "Bạn có đồng ý cập nhật không?";
+        var url = '/Menu/Update';
+
+        if ($("form#edit").valid()) {
+            swal({
+                title: title,
+                icon: "warning",
+                buttons: {
+                    ok: "Xác nhận",
+                    cancel: "Hủy",
+                }
+            }).then((isConfirm) => {
+                if (isConfirm != 'ok') {
+
+                } else {
+                    $("#btnLuu").attr("disabled", true);
+                    $.post(url, data,
+                        function (rs) {
+                            if (rs.status > 0) {
+                                swal({
+                                    title: "Cập nhật thành công!",
+                                    text: "Dữ liệu của bạn đã được cập nhật!",
+                                    icon: "success",
+                                }).then(function (isConfirm) {
+                                    window.location.href = '/Menu';
+                                });
+                            }
+                            else {
+                                toastr.error(rs.message);
+                            }
+                        });
+                    $("#btnLuu").attr("disabled", false);
+                }
+            });
+        }
+    }
+
+
+</script>

@@ -25,10 +25,11 @@ namespace DKAC.Repository
             }
             else
             {
-                if (user.Role == 2)
-                {
-                    lst = db.Users.Where(x => x.RoomID == user.RoomID && x.IsDeleted == 0).ToList();
-                }
+                //if (user.Role == 2)
+                //{
+                //    lst = db.Users.Where(x => x.RoomID == user.RoomID && x.IsDeleted == 0).ToList();
+                //}
+                lst = db.Users.Where(x => x.RoomID == user.RoomID && x.IsDeleted == 0).ToList();
             }
             request.totalRecord = lst.Count;
             request.page = page;
