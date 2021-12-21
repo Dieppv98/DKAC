@@ -402,3 +402,4 @@ __pycache__/
 **/*.vs/
 .suo
 *.suo
+*.ide-shm

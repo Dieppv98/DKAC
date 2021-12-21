@@ -153,7 +153,6 @@ namespace DKAC.Repository
                             listReportByDishes.Add(info);
                         }
                     }
-
                     reportByDishInfo.NumberTotal = lstReByDish.Count;
                     reportByDishInfo.DishId = item.DishId;
                     reportByDishInfo.DishName = item.DishName;
