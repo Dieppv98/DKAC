@@ -1,0 +1,182 @@
+﻿@model DKAC.Models.InfoModel.RegisterByMenuInfo
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <title>Đăng ký theo thực đơn</title>
+    <style>
+        table {
+            border: 2px solid #e8e4e4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h2>Chọn thông tin</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-4">
+                        <label>Thực đơn: </label>
+                        @Html.DropDownListFor(a => a.MenuId, Model.lstMenu, "---Chọn thực đơn---", new { @class = "form-control", @id = "MenuId" })
+                    </div>
+                    <div class="col-md-4">
+                        <label>Ngày áp dụng: </label>
+                        <input class="form-control" name="RegisterDate" type="date" id="regDate" placeholder="yyyy/MM/dd" value="@DateTime.Now.ToString("yyyy-MM-dd")" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-2"></div>
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+                    <table class="table table-bordered table-striped table-hover" id="menuDetails" style="text-align:center;">
+                    </table>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="text-right" style="margin-top: 20px;">
+                    <button onclick="RegisterByGroup()" class="btn btn-primary" id="btnDangKy">Đăng ký</button>
+                    <a type="button" class="btn btn-success" href="/">Hủy</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="~/assets/vendor/jquery/1.7.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+    //var model = @Html.Raw(Json.Encode(Model));
+
+    $("#MenuId").change(function () {
+        var menuId = $(this).val() * 1;
+        if (menuId > 0) {
+            $.ajax({
+                url: "/Register/GetMenuById/" + menuId,
+                type: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (rs) {
+                    var date = new Date(rs.Date);
+                    var dateFomat = `${date.getDate()}/${(date.getMonth() + 1)}/${date.getFullYear()}`;
+                    var str = "";
+                    $('#menuDetails').empty();
+                    var detailInfos = rs.detailInfos;
+                    str += `<tr>
+                                <td>Tên: ${rs.MenuName}</td>
+                                <td>Áp dụng cho ca: ${rs.Ca}</td>
+                            </tr>
+                            <tr>
+                                <td>Ngày tạo: ${dateFomat}</td>
+                                <td>Ghi chú: ${rs.Description}</td>
+                            </tr>
+                            <tbody>
+                                ${GenHtml(detailInfos)}
+                            </tbody>`;
+                    $('#menuDetails').html(str);
+                    console.log(rs);
+                },
+                error: function (ErrorMessage) {
+                    alert(ErrorMessage.response);
+                }
+            });
+        } else {
+            $('#menuDetails').empty();
+        }
+    });
+
+    function GenHtml(elemnt) {
+        var html = "<tr>";
+        for (var i = 0; i < elemnt.length; i++) {
+            html += `<td style='width:100px;'>Ngày thứ ${elemnt[i].IndexDate}</td>`;
+        }
+        html += `</tr><tr>`;
+        for (var i = 0; i < elemnt.length; i++) {
+            html += `<td>${elemnt[i].DishName}</td>`;
+        }
+        html += `</tr><tr>`;
+        for (var i = 0; i < elemnt.length; i++) {
+            html += `<td><img width='100' height='100' src='/Content/image/Dish/${elemnt[i].ImageDishUrl}' /></td>`;
+        }
+        html += `</tr>`;
+        return html;
+    }
+
+    //function
+    function RegisterByGroup() {
+
+        var lstReg = [];
+        for (j = 0; j < model.length; j++) {
+            var reg = {
+                DishId: $('#dishId_' + j).val() * 1,
+                Ca: $("#ca_" + j).val() * 1,
+                Quantity: $("#quantity_" + j).val() * 1,
+                RegisterDate: $("#regDate").val(),
+                UserId: $("#emId_" + j).val() * 1,
+            };
+            if (reg.Ca <= 0) {
+                toastr.warning('Bạn chưa chọn ca!');
+                return;
+            }
+            if (reg.DishId <= 0) {
+                toastr.warning('Bạn chưa chọn món!');
+                return;
+            }
+            if (reg.Quantity <= 0) {
+                toastr.warning('Bạn chưa nhập số lượng!');
+                return;
+            }
+            lstReg.push(reg);
+        }
+
+        var data = {
+            model: lstReg,
+        }
+
+        var title = "Bạn có đồng ý đăng ký không?";
+        var url = '/Register/RegisterByGroup/';
+        swal({
+            title: title,
+            icon: "warning",
+            buttons: {
+                ok: "Xác nhận",
+                cancel: "Hủy",
+            }
+        }).then((isConfirm) => {
+            if (isConfirm != 'ok') {
+
+            } else {
+                $.post(url, data,
+                    function (rs) {
+                        if (rs.status > 0) {
+                            swal({
+                                title: rs.message + "!",
+                                text: "Dữ liệu của bạn đã được cập nhật!",
+                                icon: "success",
+                            }).then(function (isConfirm) {
+                                window.location.href = '/Register/RegisterByGroup';
+                            });
+                        }
+                        else {
+                            swal({
+                                title: rs.message + "!",
+                                text: "Có lỗi xảy ra!",
+                                icon: "error",
+                            })
+                        }
+                    });
+            }
+        });
+    };
+
+</script>

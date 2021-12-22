@@ -1,4 +1,5 @@
 ﻿using DKAC.Common;
+using DKAC.IRepository;
 using DKAC.Models.EntityModel;
 using DKAC.Models.Enum;
 using DKAC.Models.InfoModel;
@@ -17,6 +18,7 @@ namespace DKAC.Controllers
         RegisterRepository _regRepo = new RegisterRepository();
         RoomRepository _roomRepo = new RoomRepository();
         EmployeeRepository _empRepo = new EmployeeRepository();
+        IMenuRepository _menuRepo = new MenuRepository();
 
         // GET: Register
         [HttpGet]
@@ -106,9 +108,8 @@ namespace DKAC.Controllers
                 return RedirectToAction("NotPermission", "Home");
             }
 
-            var em = (User)Session[CommonConstants.USER_SESSION];
             List<RegisterByPersonalInfo> lst = new List<RegisterByPersonalInfo>();
-            var lstEmInfo = _empRepo.GetEmInfo(em.RoomID);
+            var lstEmInfo = _empRepo.GetEmInfo(currentUser.RoomID);
             foreach (var item in lstEmInfo)
             {
                 RegisterByPersonalInfo reInfo = new RegisterByPersonalInfo();
@@ -131,10 +132,29 @@ namespace DKAC.Controllers
             });
             ViewBag.listDish = listDish;
 
-            var lstReg = _regRepo.GetRegisterByRoomId(em.RoomID, DateTime.Now.Date);
+            var lstReg = _regRepo.GetRegisterByRoomId(currentUser.RoomID, DateTime.Now.Date);
             ViewBag.listReg = lstReg;
 
             return View(lst);
+        }
+
+        public ActionResult RegisterByMenu()
+        {
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            ViewBag.hasViewPermission = CheckPermission((int)PageId.DangKyTapThe, (int)Actions.Xem, currentUser);
+            if (!ViewBag.hasViewPermission)
+            {
+                return RedirectToAction("NotPermission", "Home");
+            }
+            RegisterByMenuInfo model = new RegisterByMenuInfo();
+            var lstMenu = _regRepo.GetMenuByUserId(currentUser.id);
+            model.lstMenu = lstMenu.ConvertAll(a => new SelectListItem()
+            {
+                Text = a.MenuName,
+                Value = a.id.ToString(),
+            }).ToList() ?? new List<SelectListItem>();
+
+            return View(model);
         }
 
         public PartialViewResult ListRegisterGroup(string CurrentDate)
@@ -199,9 +219,16 @@ namespace DKAC.Controllers
                 Image = dish.Image,
                 Cost = dish.Cost,
                 CostFormat = @String.Format("{0:N0} VNĐ", dish.Cost),
-                Jugment = dish.JugmentPoint + "(" + dish.JugmentQty + " đánh giá)", 
+                Jugment = dish.JugmentPoint + "(" + dish.JugmentQty + " đánh giá)",
             };
             return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetMenuById(int id)
+        {
+            var menu = _menuRepo.GetById(id);
+
+            return Json(menu, JsonRequestBehavior.AllowGet);
         }
     }
 }

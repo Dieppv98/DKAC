@@ -606,6 +606,7 @@
     <Compile Include="Models\InfoModel\MenuInfo.cs" />
     <Compile Include="Models\InfoModel\NotifyInfo.cs" />
     <Compile Include="Models\InfoModel\PermissionActionInfo.cs" />
+    <Compile Include="Models\InfoModel\RegisterByMenuInfo.cs" />
     <Compile Include="Models\InfoModel\RegisterByPersonalInfo.cs" />
     <Compile Include="Models\InfoModel\ReportByDishInfo.cs" />
     <Compile Include="Models\InfoModel\RoomInfo.cs" />
@@ -2787,6 +2788,7 @@
     <Content Include="Views\Home\Error.cshtml" />
     <Content Include="Views\Menu\Edit.cshtml" />
     <Content Include="Views\Menu\Detail.cshtml" />
+    <Content Include="Views\Register\RegisterByMenu.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -18,5 +18,6 @@ namespace DKAC.IRepository
         Dish GetDishById(int? id);
         List<RegisterByPersonalInfo> GetAllRegister(int emId, DateTime regDate);
         int DeleteReg(int? id);
+        List<Menu> GetMenuByUserId(int id);
     }
 }

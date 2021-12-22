@@ -129,7 +129,7 @@
                         <h2>Chọn ngày đăng ký</h2>
                     </div>
                     <div class="col-sm-6">
-                        <button id="btnSearch" style="margin-top: 3px;" class="btn btn-sm btn-warning"><i class="fa fa-clipboard-list"></i> Đăng ký theo thực đơn</button>
+                        <a  href="/Register/RegisterByMenu" id="btnSearch" style="margin-top: 3px;" class="btn btn-sm btn-warning"><i class="fa fa-clipboard-list"></i> Đăng ký theo thực đơn</a>
                     </div>
                 </div>
             </div>
@@ -459,12 +459,24 @@
         var lstReg = [];
         for (j = 0; j < model.length; j++) {
             var reg = {
-                DishId: $('#dishId_' + j).val(),
-                Ca: $("#ca_" + j).val(),
-                Quantity: $("#quantity_" + j).val(),
+                DishId: $('#dishId_' + j).val() * 1,
+                Ca: $("#ca_" + j).val() * 1,
+                Quantity: $("#quantity_" + j).val() * 1,
                 RegisterDate: $("#regDate").val(),
-                UserId: $("#emId_" + j).val(),
+                UserId: $("#emId_" + j).val() * 1,
             };
+            if (reg.Ca <= 0) {
+                toastr.warning('Bạn chưa chọn ca!');
+                return;
+            }
+            if (reg.DishId <= 0) {
+                toastr.warning('Bạn chưa chọn món!');
+                return;
+            }
+            if (reg.Quantity <= 0) {
+                toastr.warning('Bạn chưa nhập số lượng!');
+                return;
+            }
             lstReg.push(reg);
         }
 

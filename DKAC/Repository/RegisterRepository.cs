@@ -164,5 +164,11 @@ namespace DKAC.Repository
                         };
             return query.ToList();
         }
+
+        public List<Menu> GetMenuByUserId(int id)
+        {
+            var data = db.Menus.Where(x => x.IsDeleted != 1 && x.CreatedBy == id).OrderByDescending(x => x.Date).ToList() ?? new List<Menu>();
+            return data;
+        }
     }
 }
