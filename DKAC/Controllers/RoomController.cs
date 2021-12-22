@@ -20,7 +20,6 @@ namespace DKAC.Controllers
             model.page = model.page == 0 ? 1 : model.page;
             model.pageSize = 20;
             int totalCount = 0;
-            User user = (User)Session[CommonConstants.USER_SESSION];
             var currentUser = (User)Session[CommonConstants.USER_SESSION];
             ViewBag.hasViewPermission = CheckPermission((int)PageId.QuanLyPhongBan, (int)Actions.Xem, currentUser);
             ViewBag.hasAddPermission = CheckPermission((int)PageId.QuanLyPhongBan, (int)Actions.Them, currentUser);

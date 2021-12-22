@@ -1,13 +1,14 @@
 ﻿@model List<DKAC.Models.InfoModel.RegisterByPersonalInfo>
 @{
-    ViewBag.Title = "Đăng ký ăn ca cá nhân";
+    ViewBag.Title = "Đăng ký ăn ca tập thể";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <head>
+    <title>Đăng ký ăn ca tập thể</title>
     <style>
         #btnSearch {
-            padding: 7px 15px 7px 15px;
+            padding: 7px 15px 7px 15px !important;
         }
 
         .lbl {
@@ -126,6 +127,9 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <h2>Chọn ngày đăng ký</h2>
+                    </div>
+                    <div class="col-sm-6">
+                        <button id="btnSearch" style="margin-top: 3px;" class="btn btn-sm btn-warning"><i class="fa fa-clipboard-list"></i> Đăng ký theo thực đơn</button>
                     </div>
                 </div>
             </div>

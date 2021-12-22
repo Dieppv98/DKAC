@@ -1,5 +1,6 @@
 ﻿using DKAC.IRepository;
 using DKAC.Models.EntityModel;
+using DKAC.Models.Enum;
 using DKAC.Models.InfoModel;
 using DKAC.Models.RequestModel;
 using System;
@@ -60,37 +61,26 @@ namespace DKAC.Repository
             return 0;
         }
 
-        public MenuRequestModel GetAllMenu(string KeySearch, int page, int pageSize)
+        public MenuRequestModel GetAllMenu(MenuRequestModel request, int pageIndex, int recordPerPage, out int totalCount, User user)
         {
-            MenuRequestModel request = new MenuRequestModel();
-            request.page = page;
-            request.pageSize = pageSize;
-            int startRow = (page - 1) * pageSize;
-            var lst = from m in db.Menus.Where(x => x.IsDeleted == 0) select (m);
-
-            if (!string.IsNullOrEmpty(KeySearch))
+            pageIndex = pageIndex - 1;
+            if (!string.IsNullOrEmpty(request.KeyWord))
             {
-                request.totalRecord = lst.Where(x => x.MenuCode.Contains(KeySearch) || x.MenuName.Contains(KeySearch)).ToList().Count;
-                request.data = lst.Where(x => x.MenuCode.Contains(KeySearch) || x.MenuName.Contains(KeySearch)).OrderBy(x => x.ModifyDate).Skip(startRow).Take(pageSize).ToList();
+                request.KeyWord = request.KeyWord.Trim();
             }
-            else
+            int? userId = null;
+            if (user.UserGroupId != (int)GroupUser.admin)
             {
-                request.totalRecord = lst.ToList().Count;
-                request.data = lst.OrderBy(x => x.ModifyDate).Skip(startRow).Take(pageSize).ToList();
+                userId = user.id;
             }
 
-            int totalPage = 0;
-            if (request.totalRecord % pageSize == 0)
-            {
-                totalPage = request.totalRecord / pageSize;
-            }
-            else
-            {
-                totalPage = request.totalRecord / pageSize + 1;
-            }
-            request.totalPage = totalPage;
-            request.KeyWord = KeySearch;
-            return request;
+            var query = from m in db.Menus
+                        where (!userId.HasValue || m.CreatedBy == userId) && (string.IsNullOrEmpty(request.KeyWord) || m.MenuName.Contains(request.KeyWord) || m.MenuCode.Contains(request.KeyWord))
+                        select m;
+            totalCount = query.Count();
+            var rs = query.OrderByDescending(x => x.Date).Skip(pageIndex * recordPerPage).Take(recordPerPage).ToList() ?? new List<Menu>();
+            request.data = rs;
+            return request ?? new MenuRequestModel();
         }
 
         public Menu GetByCodeId(string Code, int id)
@@ -117,7 +107,7 @@ namespace DKAC.Repository
                                   DishName = ldm.DishName,
                                   DishCode = ldm.DishCode,
                               }).ToList() ?? new List<MenuDetailInfo>();
-
+            menuInfo.id = me.id;
             menuInfo.DishId1 = dataDetail.FirstOrDefault(x => x.IndexDate == 1).DishId ?? 0;
             menuInfo.DishId2 = dataDetail.FirstOrDefault(x => x.IndexDate == 2).DishId ?? 0;
             menuInfo.DishId3 = dataDetail.FirstOrDefault(x => x.IndexDate == 3).DishId ?? 0;
@@ -154,7 +144,7 @@ namespace DKAC.Repository
                     db.SaveChanges();
                 }
 
-                var details = db.MenuDetails.Where(x => x.IsDeleted == 0 && x.MenuId == me.id).ToList();
+                var details = db.MenuDetails.Where(x => x.IsDeleted != 1 && x.MenuId == me.id).ToList();
                 foreach (var item in details)
                 {
                     db.MenuDetails.Remove(item);

@@ -47,7 +47,12 @@
                     <div class="col-md-2"></div>
                     <label class="lbl">Từ khóa: </label>
                     <div class="col-md-6" style="margin-bottom: 10px;">
-                        <input type="text" name="KeySearch" placeholder="Nhập mã hoặc tên thực đơn" class="form-control" value="@Model.KeyWord" />
+                        @Html.TextBoxFor(m => m.KeyWord, new Dictionary<string, object>
+                              {
+                                  {"class", " form-control"},
+                                    {"id", "KeyWord"},
+                                    {"placeholder", "Nhập mã hoặc tên thực đơn"},
+                              })
                     </div>
                     <div class="col-md-2">
                         <button id="btnSearch" class="btn btn-sm btn-primary filter-submit">

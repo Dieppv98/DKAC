@@ -2,6 +2,7 @@
 using DKAC.Models.EntityModel;
 using DKAC.Models.Enum;
 using DKAC.Models.InfoModel;
+using DKAC.Models.RequestModel;
 using DKAC.Repository;
 using System;
 using System.Collections.Generic;
@@ -16,8 +17,11 @@ namespace DKAC.Controllers
         MenuRepository _menuRepo = new MenuRepository();
 
         // GET: Menu
-        public ActionResult Index(string KeySearch, int page = 1, int pageSize = 10)
+        public ActionResult Index(MenuRequestModel model)
         {
+            model.page = model.page == 0 ? 1 : model.page;
+            model.pageSize = 20;
+            int totalCount = 0;
             var currentUser = (User)Session[CommonConstants.USER_SESSION];
             ViewBag.hasViewPermission = CheckPermission((int)PageId.QuanLyThucDon, (int)Actions.Xem, currentUser);
             ViewBag.hasAddPermission = CheckPermission((int)PageId.QuanLyThucDon, (int)Actions.Them, currentUser);
@@ -27,7 +31,9 @@ namespace DKAC.Controllers
             {
                 return RedirectToAction("NotPermission", "Home");
             }
-            var model = _menuRepo.GetAllMenu(KeySearch, page, pageSize);
+            model = _menuRepo.GetAllMenu(model, model.page, model.pageSize, out totalCount, currentUser);
+            model.totalRecord = totalCount;
+            model.totalPage = (int)Math.Ceiling((decimal)model.totalRecord / model.pageSize);
             return View(model);
         }
 
