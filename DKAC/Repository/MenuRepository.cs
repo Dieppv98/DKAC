@@ -119,6 +119,7 @@ namespace DKAC.Repository
             menuInfo.MenuName = me.MenuName;
             menuInfo.Ca = me.Ca;
             menuInfo.Date = me.Date;
+            menuInfo.DateString = me.Date.Value.ToString("dd/MM/yyyy");
             menuInfo.ModifyDate = me.ModifyDate;
             menuInfo.Description = me.Description;
             menuInfo.detailInfos = dataDetail;

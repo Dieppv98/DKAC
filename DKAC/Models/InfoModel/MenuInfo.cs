@@ -40,6 +40,7 @@ namespace DKAC.Models.InfoModel
         public string Description { get; set; }
 
         public DateTime? Date { get; set; }
+        public string DateString { get; set; }
         public int? Ca { get; set; }
         public int? DishId1 { get; set; }
         public int? DishId2 { get; set; }

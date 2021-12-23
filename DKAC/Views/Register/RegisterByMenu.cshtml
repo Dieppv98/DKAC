@@ -38,8 +38,8 @@
                 </div>
 
                 <div class="row" style="margin-top: 20px;">
-                    <table class="table table-bordered table-striped table-hover" id="menuDetails" style="text-align:center;">
-                    </table>
+                    <table class="table table-bordered table-striped table-hover" id="menuTop" style="text-align:center;"></table>
+                    <table class="table table-bordered table-striped table-hover" id="menuDetails" style="text-align:center;"></table>
                 </div>
             </div>
 
@@ -67,20 +67,20 @@
                 contentType: "application/json;charset=UTF-8",
                 dataType: "json",
                 success: function (rs) {
-                    var date = new Date(rs.Date);
-                    var dateFomat = `${date.getDate()}/${(date.getMonth() + 1)}/${date.getFullYear()}`;
                     var str = "";
+                    $('#menuTop').empty();
+                    var munuTop = `<tr>
+                                        <td>Tên: <b>${rs.MenuName}</b></td>
+                                        <td>Áp dụng cho ca: <b>${rs.Ca}</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ngày tạo: <b>${rs.DateString}</b></td>
+                                        <td>Ghi chú: <b>${rs.Description}</b></td>
+                                    </tr>`;
+                    $('#menuTop').html(munuTop);
                     $('#menuDetails').empty();
                     var detailInfos = rs.detailInfos;
-                    str += `<tr>
-                                <td>Tên: ${rs.MenuName}</td>
-                                <td>Áp dụng cho ca: ${rs.Ca}</td>
-                            </tr>
-                            <tr>
-                                <td>Ngày tạo: ${dateFomat}</td>
-                                <td>Ghi chú: ${rs.Description}</td>
-                            </tr>
-                            <tbody>
+                    str += `<tbody>
                                 ${GenHtml(detailInfos)}
                             </tbody>`;
                     $('#menuDetails').html(str);
@@ -91,6 +91,7 @@
                 }
             });
         } else {
+            $('#menuTop').empty();
             $('#menuDetails').empty();
         }
     });
