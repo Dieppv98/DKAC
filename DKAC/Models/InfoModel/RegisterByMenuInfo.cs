@@ -13,7 +13,13 @@ namespace DKAC.Models.InfoModel
         public string UserName { get; set; }
         public int? RoomId { get; set; }
         public string RoomName { get; set; }
+        public int? Quantity { get; set; } // số lượng
         public DateTime? DateApply { get; set; }// ngày bắt đầu áp dụng
+        public DateTime? RegDate { get; set; }// ngày đăng ký
+        public string RegDateString { get; set; }// ngày đăng ký string
+        public int? Ca { get; set; } // ca đăng ký
+        public int? DishId { get; set; }
+        public string DishName { get; set; }
         public List<SelectListItem> lstMenu { get; set; }
     }
 }

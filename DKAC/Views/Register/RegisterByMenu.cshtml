@@ -10,6 +10,28 @@
         table {
             border: 2px solid #e8e4e4;
         }
+
+        .modal-header {
+            background-color: #0076d2;
+            color: white;
+        }
+
+        .modal-content {
+            border: #d0d0d0 solid 2px !important;
+            background-color: #fff6ee;
+        }
+
+        .ui-autocomplete {
+            z-index: 1000;
+        }
+
+        .modal-backdrop {
+            position: unset;
+        }
+
+        .pd-8 {
+            padding: 8px !important;
+        }
     </style>
 </head>
 <body>
@@ -60,6 +82,38 @@
                 <div class="text-right" style="margin-top: 20px;">
                     <button onclick="RegisterByGroup()" class="btn btn-primary" id="btnDangKy">Đăng ký</button>
                     <a type="button" class="btn btn-success" href="/">Hủy</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal content-->
+    <div class="modal" id="Modal-DetailSalesPerformance" style="height:auto;" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="font-size:12px !important">
+                <div class="modal-header row" style="margin-left:0px;margin-right:0px;padding:10px 0px 0px 0px;">
+                    <div class="col-md-12">
+                        <h5 class="modal-title"><b>Chi tiết hiệu quả doanh số</b></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="padding:0.5rem 1rem;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="col-md-12">
+                        <h6><b id="strTime"></b></h6>
+                    </div>
+                </div>
+                <div class="modal-body" style="max-height:400px !important;overflow-y:scroll;">
+                    <div class="row">
+                        <div class="col-md-12" style="padding-right:0px;padding-left:0px ;">
+                            <table class="table table-bordered table-hover">
+                                <tbody id="tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer" style="padding:5px 10px 5px 5px;">
+                    <button type="button" class="btn btn-secondary" style="background-color:red;margin:0;" data-dismiss="modal">Đóng</button>
                 </div>
             </div>
         </div>
@@ -151,29 +205,30 @@
                     dataType: "json",
                     data: JSON.stringify(check),
                     success: function (result) {
-                        if (true) {
+                        if (result.length == 0) {
                             //nếu thỏa mãn thì đăng ký luôn
-                            //$.post(url, data,
-                            //    function (rs) {
-                            //        if (rs.status > 0) {
-                            //            swal({
-                            //                title: rs.message + "!",
-                            //                text: "Dữ liệu của bạn đã được cập nhật!",
-                            //                icon: "success",
-                            //            }).then(function (isConfirm) {
-                            //                window.location.href = '/Register/RegisterByGroup';
-                            //            });
-                            //        }
-                            //        else {
-                            //            swal({
-                            //                title: rs.message + "!",
-                            //                text: "Có lỗi xảy ra!",
-                            //                icon: "error",
-                            //            })
-                            //        }
-                            //    });
+                            $.post(url, data,
+                                function (rs) {
+                                    if (rs.status > 0) {
+                                        swal({
+                                            title: rs.message + "!",
+                                            text: "Dữ liệu của bạn đã được cập nhật!",
+                                            icon: "success",
+                                        }).then(function (isConfirm) {
+                                            window.location.href = '/Register/RegisterByGroup';
+                                        });
+                                    }
+                                    else {
+                                        swal({
+                                            title: rs.message + "!",
+                                            text: "Có lỗi xảy ra!",
+                                            icon: "error",
+                                        })
+                                    }
+                                });
                         } else {
                             //list danh sách đang bị trùng
+
 
                         }
                     },

@@ -174,12 +174,27 @@ namespace DKAC.Repository
         public List<RegisterByMenuInfo> CheckDupplicateRegister(int MenuId, DateTime? DateApply, int userId)
         {
             var user = db.Users.FirstOrDefault(x => x.id == userId) ?? new User();
-            var room = db.Rooms.FirstOrDefault(x => x.id == user.RoomID) ?? new Room();
-            var lstUserByRoom = db.Users.Where(x => x.RoomID == room.id).ToList() ?? new List<User>();
+            var menu = db.Menus.FirstOrDefault(x => x.id == MenuId) ?? new Menu();
+            var dateEnd = DateApply.Value.AddDays(7);
+            var ca = menu.Ca;
 
+            var lstReg = (from u in db.Users where u.RoomID == user.RoomID
+                          join r in db.Registers on u.id equals r.UserId
+                          join d in db.Dishes on r.DishId equals d.id
+                          where r.Ca == ca && r.RegisterDate >= DateApply && r.RegisterDate <= dateEnd
+                          select new RegisterByMenuInfo()
+                          {
+                              Ca = r.Ca,
+                              RegDate = r.RegisterDate,
+                              RegDateString = r.RegisterDate.ToString("dd/MM/yyyyy"),
+                              DishId = r.DishId,
+                              DishName = d.DishName,
+                              Quantity = r.Quantity,
+                              UserId = u.id,
+                              UserName = u.FullName + "(" + u.UserName + ")",
+                          }).ToList() ?? new List<RegisterByMenuInfo>();
 
-
-            return new List<RegisterByMenuInfo>();
+            return lstReg;
         }
     }
 }
