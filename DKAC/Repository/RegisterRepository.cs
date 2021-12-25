@@ -170,5 +170,16 @@ namespace DKAC.Repository
             var data = db.Menus.Where(x => x.IsDeleted != 1 && x.CreatedBy == id).OrderByDescending(x => x.Date).ToList() ?? new List<Menu>();
             return data;
         }
+
+        public List<RegisterByMenuInfo> CheckDupplicateRegister(int MenuId, DateTime? DateApply, int userId)
+        {
+            var user = db.Users.FirstOrDefault(x => x.id == userId) ?? new User();
+            var room = db.Rooms.FirstOrDefault(x => x.id == user.RoomID) ?? new Room();
+            var lstUserByRoom = db.Users.Where(x => x.RoomID == room.id).ToList() ?? new List<User>();
+
+
+
+            return new List<RegisterByMenuInfo>();
+        }
     }
 }

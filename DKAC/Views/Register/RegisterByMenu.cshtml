@@ -31,8 +31,21 @@
                         @Html.DropDownListFor(a => a.MenuId, Model.lstMenu, "---Chọn thực đơn---", new { @class = "form-control", @id = "MenuId" })
                     </div>
                     <div class="col-md-4">
-                        <label>Ngày áp dụng: </label>
+                        <label>Áp dụng từ: </label>
                         <input class="form-control" name="RegisterDate" type="date" id="regDate" placeholder="yyyy/MM/dd" value="@DateTime.Now.ToString("yyyy-MM-dd")" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-2"></div>
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-4">
+                        <label>Tên bạn: </label>
+                        <input class="form-control" value="@Model.UserName" disabled />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Phòng ban: </label>
+                        <input class="form-control" value="@Model.RoomName" disabled />
                     </div>
                     <div class="col-md-2"></div>
                 </div>
@@ -56,7 +69,7 @@
 
 <script type="text/javascript">
 
-    //var model = @Html.Raw(Json.Encode(Model));
+    var model = @Html.Raw(Json.Encode(Model));
 
     $("#MenuId").change(function () {
         var menuId = $(this).val() * 1;
@@ -115,37 +128,8 @@
 
     //function
     function RegisterByGroup() {
-
-        var lstReg = [];
-        for (j = 0; j < model.length; j++) {
-            var reg = {
-                DishId: $('#dishId_' + j).val() * 1,
-                Ca: $("#ca_" + j).val() * 1,
-                Quantity: $("#quantity_" + j).val() * 1,
-                RegisterDate: $("#regDate").val(),
-                UserId: $("#emId_" + j).val() * 1,
-            };
-            if (reg.Ca <= 0) {
-                toastr.warning('Bạn chưa chọn ca!');
-                return;
-            }
-            if (reg.DishId <= 0) {
-                toastr.warning('Bạn chưa chọn món!');
-                return;
-            }
-            if (reg.Quantity <= 0) {
-                toastr.warning('Bạn chưa nhập số lượng!');
-                return;
-            }
-            lstReg.push(reg);
-        }
-
-        var data = {
-            model: lstReg,
-        }
-
-        var title = "Bạn có đồng ý đăng ký không?";
-        var url = '/Register/RegisterByGroup/';
+        var title = "Bạn có chắc chắn muốn đăng ký?";
+        var url = '/Register/RegisterByMenu/';
         swal({
             title: title,
             icon: "warning",
@@ -154,28 +138,49 @@
                 cancel: "Hủy",
             }
         }).then((isConfirm) => {
-            if (isConfirm != 'ok') {
+            if (isConfirm == 'ok') {
+                //check trùng lịch đăng ký
+                var check = {
+                    MenuId: $('#MenuId').val() * 1,
+                    DateApply: $('#regDate').val(),
+                };
+                $.ajax({
+                    url: "/Register/CheckDupplicateRegister/",
+                    type: "POST",
+                    contentType: "application/json;charset=UTF-8",
+                    dataType: "json",
+                    data: JSON.stringify(check),
+                    success: function (result) {
+                        if (true) {
+                            //nếu thỏa mãn thì đăng ký luôn
+                            //$.post(url, data,
+                            //    function (rs) {
+                            //        if (rs.status > 0) {
+                            //            swal({
+                            //                title: rs.message + "!",
+                            //                text: "Dữ liệu của bạn đã được cập nhật!",
+                            //                icon: "success",
+                            //            }).then(function (isConfirm) {
+                            //                window.location.href = '/Register/RegisterByGroup';
+                            //            });
+                            //        }
+                            //        else {
+                            //            swal({
+                            //                title: rs.message + "!",
+                            //                text: "Có lỗi xảy ra!",
+                            //                icon: "error",
+                            //            })
+                            //        }
+                            //    });
+                        } else {
+                            //list danh sách đang bị trùng
 
-            } else {
-                $.post(url, data,
-                    function (rs) {
-                        if (rs.status > 0) {
-                            swal({
-                                title: rs.message + "!",
-                                text: "Dữ liệu của bạn đã được cập nhật!",
-                                icon: "success",
-                            }).then(function (isConfirm) {
-                                window.location.href = '/Register/RegisterByGroup';
-                            });
                         }
-                        else {
-                            swal({
-                                title: rs.message + "!",
-                                text: "Có lỗi xảy ra!",
-                                icon: "error",
-                            })
-                        }
-                    });
+                    },
+                    error: function (ErrorMessage) {
+                        alert(ErrorMessage.response);
+                    }
+                });
             }
         });
     };

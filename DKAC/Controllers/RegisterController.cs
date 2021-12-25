@@ -146,6 +146,7 @@ namespace DKAC.Controllers
             {
                 return RedirectToAction("NotPermission", "Home");
             }
+            var userInfo = _empRepo.GetById(currentUser.id);
             RegisterByMenuInfo model = new RegisterByMenuInfo();
             var lstMenu = _regRepo.GetMenuByUserId(currentUser.id);
             model.lstMenu = lstMenu.ConvertAll(a => new SelectListItem()
@@ -153,8 +154,30 @@ namespace DKAC.Controllers
                 Text = a.MenuName,
                 Value = a.id.ToString(),
             }).ToList() ?? new List<SelectListItem>();
+            model.RoomId = userInfo.RoomID;
+            model.RoomName = userInfo.RoomName;
+            model.UserId = userInfo.id;
+            model.UserName = userInfo.UserName;
 
             return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult RegisterByMenu(RegisterByMenuInfo model)
+        {
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            ViewBag.hasViewPermission = CheckPermission((int)PageId.DangKyTapThe, (int)Actions.Them, currentUser);
+            if (!ViewBag.hasViewPermission)
+            {
+                return RedirectToAction("NotPermission", "Home");
+            }
+            
+            var result = 1;// _regRepo.RegisterByGroup(model);
+            if (result == 1)
+            {
+                return Json(new { status = 1, message = "Đăng ký thành công" }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { status = 0, message = "Đăng ký thất bại" }, JsonRequestBehavior.AllowGet);
         }
 
         public PartialViewResult ListRegisterGroup(string CurrentDate)
@@ -182,8 +205,7 @@ namespace DKAC.Controllers
             {
                 return RedirectToAction("NotPermission", "Home");
             }
-
-            var em = (User)Session[CommonConstants.USER_SESSION];
+            
             var result = _regRepo.RegisterByGroup(model);
             if (result == 1)
             {
@@ -229,6 +251,20 @@ namespace DKAC.Controllers
             var menu = _menuRepo.GetById(id);
 
             return Json(menu, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult CheckDupplicateRegister(int MenuId, DateTime? DateApply)
+        {
+            var currentUser = (User)Session[CommonConstants.USER_SESSION];
+            ViewBag.hasViewPermission = CheckPermission((int)PageId.DangKyTapThe, (int)Actions.Xem, currentUser);
+            if (!ViewBag.hasViewPermission)
+            {
+                return RedirectToAction("NotPermission", "Home");
+            }
+
+            var data = _regRepo.CheckDupplicateRegister(MenuId, DateApply, currentUser.id);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
     }
 }
