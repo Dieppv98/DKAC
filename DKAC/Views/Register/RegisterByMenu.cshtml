@@ -54,7 +54,7 @@
                     </div>
                     <div class="col-md-4">
                         <label>Ngày bắt đầu áp dụng: </label>
-                        <input class="form-control" name="RegisterDate" type="date" id="regDate" placeholder="yyyy/MM/dd" value="@DateTime.Now.ToString("yyyy-MM-dd")" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" />
+                        <input class="form-control" name="RegisterDate" type="date" id="regDate" onchange="CheckMenu()" placeholder="yyyy/MM/dd" value="@DateTime.Now.ToString("yyyy-MM-dd")" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" />
                     </div>
                     <div class="col-md-2"></div>
                 </div>
@@ -133,7 +133,14 @@
     var model = @Html.Raw(Json.Encode(Model));
 
     $("#MenuId").change(function () {
-        var menuId = $(this).val() * 1;
+        CheckMenu();
+    });
+
+    function CheckMenu() {
+        var menuId = $('#MenuId').val() * 1;
+        var date = $('#regDate').val();
+        var dateFormat = new Date(date);
+        var now = new Date();
         if (menuId > 0) {
             $.ajax({
                 url: "/Register/GetMenuById/" + menuId,
@@ -158,7 +165,31 @@
                                 ${GenHtml(detailInfos)}
                             </tbody>`;
                     $('#menuDetails').html(str);
-                    console.log(rs);
+
+                    if (now.getFullYear() == dateFormat.getFullYear() && now.getMonth() == dateFormat.getMonth() && dateFormat.getDate() == now.getDate()) {
+                        var hour = now.getHours();
+                        if (rs.Ca == 1) {
+                            if (hour > 9) {
+                                toastr.warning('Bạn đã quá giờ đăng ký cho ca 1!');
+                                $('#btnDangKy').attr('disabled', 'disabled');
+                                return;
+                            }
+                        }
+                        if (rs.Ca == 2) {
+                            if (hour > 15) {
+                                toastr.warning('Bạn đã quá giờ đăng ký cho ca 2!');
+                                $('#btnDangKy').attr('disabled', 'disabled');
+                                return;
+                            }
+                        }
+                        if (rs.Ca == 3) {
+                            if (hour > 22) {
+                                toastr.warning('Bạn đã quá giờ đăng ký cho ca 3!');
+                                $('#btnDangKy').attr('disabled', 'disabled');
+                                return;
+                            }
+                        }
+                    }
                 },
                 error: function (ErrorMessage) {
                     alert(ErrorMessage.response);
@@ -168,7 +199,7 @@
             $('#menuTop').empty();
             $('#menuDetails').empty();
         }
-    });
+    }
 
     function GenHtml(elemnt) {
         var html = "<tr>";
