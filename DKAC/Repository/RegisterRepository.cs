@@ -186,7 +186,7 @@ namespace DKAC.Repository
                           {
                               Ca = r.Ca,
                               RegDate = r.RegisterDate,
-                              RegDateString = r.RegisterDate.ToString("dd/MM/yyyyy"),
+                              //RegDateString = r.RegisterDate.Date + "/" + r.RegisterDate.Month + "/" + r.RegisterDate.Year,
                               DishId = r.DishId,
                               DishName = d.DishName,
                               Quantity = r.Quantity,

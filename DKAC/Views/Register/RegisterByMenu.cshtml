@@ -53,7 +53,7 @@
                         @Html.DropDownListFor(a => a.MenuId, Model.lstMenu, "---Chọn thực đơn---", new { @class = "form-control", @id = "MenuId" })
                     </div>
                     <div class="col-md-4">
-                        <label>Áp dụng từ: </label>
+                        <label>Ngày bắt đầu áp dụng: </label>
                         <input class="form-control" name="RegisterDate" type="date" id="regDate" placeholder="yyyy/MM/dd" value="@DateTime.Now.ToString("yyyy-MM-dd")" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" />
                     </div>
                     <div class="col-md-2"></div>
@@ -62,11 +62,11 @@
                 <div class="row" style="margin-top: 20px;">
                     <div class="col-md-2"></div>
                     <div class="col-md-4">
-                        <label>Tên bạn: </label>
+                        <label>Tên của bạn: </label>
                         <input class="form-control" value="@Model.UserName" disabled />
                     </div>
                     <div class="col-md-4">
-                        <label>Phòng ban: </label>
+                        <label>Phòng ban của bạn: </label>
                         <input class="form-control" value="@Model.RoomName" disabled />
                     </div>
                     <div class="col-md-2"></div>
@@ -88,25 +88,32 @@
     </div>
 
     <!-- Modal content-->
-    <div class="modal" id="Modal-DetailSalesPerformance" style="height:auto;" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content" style="font-size:12px !important">
-                <div class="modal-header row" style="margin-left:0px;margin-right:0px;padding:10px 0px 0px 0px;">
-                    <div class="col-md-12">
-                        <h5 class="modal-title"><b>Chi tiết hiệu quả doanh số</b></h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="padding:0.5rem 1rem;">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="col-md-12">
-                        <h6><b id="strTime"></b></h6>
-                    </div>
+    <div class="modal" id="Modal-CheckDupplicateRegister" style="height:auto;" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><b>Danh sách trùng lịch đăng ký</b></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <div class="modal-body" style="max-height:400px !important;overflow-y:scroll;">
+                <div class="modal-body" style="max-height:initial !important;overflow-y:scroll;">
                     <div class="row">
-                        <div class="col-md-12" style="padding-right:0px;padding-left:0px ;">
+                        <div class="col-md-12" style="padding-right:0px;padding-left:0px;">
                             <table class="table table-bordered table-hover">
-                                <tbody id="tbody"></tbody>
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Tên nhân viên</th>
+                                        <th>Ngày đăng ký</th>
+                                        <th>Tên món</th>
+                                        <th>Ca</th>
+                                        <th>Số lượng</th>
+                                        <th>Thay thế</th>
+                                        <th>Đăng ký thêm</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyCheckDupplicate"></tbody>
                             </table>
                         </div>
                     </div>
@@ -182,6 +189,18 @@
 
     //function
     function RegisterByGroup() {
+        var check = {
+            MenuId: $('#MenuId').val() * 1,
+            DateApply: $('#regDate').val(),
+        };
+        if (check.MenuId <= 0) {
+            toastr.warning('Bạn chưa chọn thực đơn!');
+            return;
+        }
+        if (check.DateApply == null || check.DateApply == undefined || check.DateApply.length <= 0) {
+            toastr.warning('Bạn chưa chọn ngày bắt đầu áp dụng!');
+            return;
+        }
         var title = "Bạn có chắc chắn muốn đăng ký?";
         var url = '/Register/RegisterByMenu/';
         swal({
@@ -194,10 +213,6 @@
         }).then((isConfirm) => {
             if (isConfirm == 'ok') {
                 //check trùng lịch đăng ký
-                var check = {
-                    MenuId: $('#MenuId').val() * 1,
-                    DateApply: $('#regDate').val(),
-                };
                 $.ajax({
                     url: "/Register/CheckDupplicateRegister/",
                     type: "POST",
@@ -228,8 +243,30 @@
                                 });
                         } else {
                             //list danh sách đang bị trùng
+                            var html = ``;
+                            var count = 0;
+                            for (var i = 0; i < result.length; i++) {
+                                var date = new Date(parseInt(result[i].RegDate.substr(6)));
+                                var formatted = date.getFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
+                                count++;
+                                html += `<tr>
+                                            <td>${count}</td>
+                                            <td>${result[i].UserName}</td>
+                                            <td>${formatted}</td>
+                                            <td>${result[i].DishName}</td>
+                                            <td>${result[i].Ca}</td>
+                                            <td>${result[i].Quantity}</td>
+                                            <td>
+                                               <input class='form-control' id='replace_${count}' type='radio' name='check_${count}' style='width:20px;margin-left:15px;' />
+                                            </td>
+                                            <td>
+                                               <input class='form-control' id='plus_${count}' type='radio' name='check_${count}' style='width:20px;margin-left:15px;' />
+                                            </td>
+                                         </tr>`;
+                            }
 
-
+                            $('#tbodyCheckDupplicate').html(html);
+                            $('#Modal-CheckDupplicateRegister').modal('show');
                         }
                     },
                     error: function (ErrorMessage) {

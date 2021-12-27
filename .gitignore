@@ -419,3 +419,6 @@ __pycache__/
 *.ide
 *.ide-shm
 *.ide-wal
+.vs/DKAC/v15/Server/sqlite3/storage.ide
+.vs/DKAC/v15/Server/sqlite3/storage.ide-shm
+.vs/DKAC/v15/Server/sqlite3/storage.ide-wal
