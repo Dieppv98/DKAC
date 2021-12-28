@@ -32,6 +32,12 @@
         .pd-8 {
             padding: 8px !important;
         }
+
+        .radio {
+            width: 20px !important;
+            margin: auto !important;
+            cursor: pointer !important;
+        }
     </style>
 </head>
 <body>
@@ -89,7 +95,7 @@
 
     <!-- Modal content-->
     <div class="modal" id="Modal-CheckDupplicateRegister" style="height:auto;" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><b>Danh sách trùng lịch đăng ký</b></h5>
@@ -102,15 +108,17 @@
                         <div class="col-md-12" style="padding-right:0px;padding-left:0px;">
                             <table class="table table-bordered table-hover">
                                 <thead>
-                                    <tr>
+                                    <tr style="text-align:center;">
                                         <th>STT</th>
                                         <th>Tên nhân viên</th>
-                                        <th>Ngày đăng ký</th>
+                                        <th style="width:120px;">Ngày đăng ký</th>
                                         <th>Tên món</th>
                                         <th>Ca</th>
-                                        <th>Số lượng</th>
-                                        <th>Thay thế</th>
-                                        <th>Đăng ký thêm</th>
+                                        <th style="width:80px;">Số lượng</th>
+                                        <th style="width:80px;">Thay thế</th>
+                                        <th style="width:80px;">Đăng ký thêm</th>
+                                        <th style="width:80px;">Bỏ qua</th>
+                                        <th style="width:80px;">Xóa đăng ký</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbodyCheckDupplicate"></tbody>
@@ -120,6 +128,7 @@
 
                 </div>
                 <div class="modal-footer" style="padding:5px 10px 5px 5px;">
+                    <button type="button" class="btn btn-success" onclick="RegisterByDupplicate()">Xác nhận</button>
                     <button type="button" class="btn btn-secondary" style="background-color:red;margin:0;" data-dismiss="modal">Đóng</button>
                 </div>
             </div>
@@ -234,26 +243,27 @@
         }
         var title = "Bạn có chắc chắn muốn đăng ký?";
         var url = '/Register/RegisterByMenu/';
-        swal({
-            title: title,
-            icon: "warning",
-            buttons: {
-                ok: "Xác nhận",
-                cancel: "Hủy",
-            }
-        }).then((isConfirm) => {
-            if (isConfirm == 'ok') {
-                //check trùng lịch đăng ký
-                $.ajax({
-                    url: "/Register/CheckDupplicateRegister/",
-                    type: "POST",
-                    contentType: "application/json;charset=UTF-8",
-                    dataType: "json",
-                    data: JSON.stringify(check),
-                    success: function (result) {
-                        if (result.length == 0) {
-                            //nếu thỏa mãn thì đăng ký luôn
-                            $.post(url, data,
+
+        //check trùng lịch đăng ký
+        $.ajax({
+            url: "/Register/CheckDupplicateRegister/",
+            type: "POST",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "json",
+            data: JSON.stringify(check),
+            success: function (result) {
+                if (result.length == 0) {
+                    //nếu thỏa mãn thì đăng ký luôn
+                    swal({
+                        title: title,
+                        icon: "warning",
+                        buttons: {
+                            ok: "Xác nhận",
+                            cancel: "Hủy",
+                        }
+                    }).then((isConfirm) => {
+                        if (isConfirm == 'ok') {
+                            $.post(url, check,
                                 function (rs) {
                                     if (rs.status > 0) {
                                         swal({
@@ -272,40 +282,103 @@
                                         })
                                     }
                                 });
-                        } else {
-                            //list danh sách đang bị trùng
-                            var html = ``;
-                            var count = 0;
-                            for (var i = 0; i < result.length; i++) {
-                                var date = new Date(parseInt(result[i].RegDate.substr(6)));
-                                var formatted = date.getFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
-                                count++;
-                                html += `<tr>
-                                            <td>${count}</td>
-                                            <td>${result[i].UserName}</td>
-                                            <td>${formatted}</td>
-                                            <td>${result[i].DishName}</td>
-                                            <td>${result[i].Ca}</td>
-                                            <td>${result[i].Quantity}</td>
-                                            <td>
-                                               <input class='form-control' id='replace_${count}' type='radio' name='check_${count}' style='width:20px;margin-left:15px;' />
-                                            </td>
-                                            <td>
-                                               <input class='form-control' id='plus_${count}' type='radio' name='check_${count}' style='width:20px;margin-left:15px;' />
-                                            </td>
-                                         </tr>`;
-                            }
-
-                            $('#tbodyCheckDupplicate').html(html);
-                            $('#Modal-CheckDupplicateRegister').modal('show');
                         }
-                    },
-                    error: function (ErrorMessage) {
-                        alert(ErrorMessage.response);
+                    });
+                } else {
+                    //list danh sách đang bị trùng
+                    var html = ``;
+                    var count = 0;
+                    for (var i = 0; i < result.length; i++) {
+                        var date = new Date(parseInt(result[i].RegDate.substr(6)));
+                        var formatted = date.getFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
+                        count++;
+                        html += `<tr style='text-align:center;' class='rowDupplicate' value='${result[i].RegisterId}'>
+                                    <td class='indexRow'>${count}</td>
+                                    <td>${result[i].UserName}</td>
+                                    <td>${formatted}</td>
+                                    <td>${result[i].DishName}</td>
+                                    <td>${result[i].Ca}</td>
+                                    <td>${result[i].Quantity}</td>
+                                    <td>
+                                       <input class='form-control radio' type='radio' name='check_${count}' value='1' title='Thay thế' />
+                                    </td>
+                                    <td>
+                                       <input class='form-control radio' type='radio' name='check_${count}' value='2' title='Đăng ký thêm' />
+                                    </td>
+                                    <td>
+                                       <input class='form-control radio' type='radio' name='check_${count}' value='3' title='Bỏ qua' />
+                                    </td>
+                                    <td>
+                                       <input class='form-control radio' type='radio' name='check_${count}' value='4' title='Xóa đăng ký này' />
+                                    </td>
+                                 </tr>`;
                     }
-                });
+                    $('#tbodyCheckDupplicate').html(html);
+                    $('#Modal-CheckDupplicateRegister').modal('show');
+                }
+            },
+            error: function (ErrorMessage) {
+                alert(ErrorMessage.response);
             }
         });
     };
+
+    function RegisterByDupplicate() {
+        var data = {
+            MenuId: $('#MenuId').val() * 1,
+            DateApply: $('#regDate').val(),
+            lstDupplicate: GetInfoRegisterDupplicate(),
+        };
+        var url = '/Register/RegisterByMenu/';
+        $.post(url, data,
+            function (rs) {
+                if (rs.status > 0) {
+                    swal({
+                        title: rs.message + "!",
+                        text: "Dữ liệu của bạn đã được cập nhật!",
+                        icon: "success",
+                    }).then(function (isConfirm) {
+                        window.location.href = '/Register/RegisterByGroup';
+                    });
+                }
+                else {
+                    swal({
+                        title: rs.message + "!",
+                        text: "Có lỗi xảy ra!",
+                        icon: "error",
+                    })
+                }
+            });
+    }
+
+    function GetInfoRegisterDupplicate() {
+        var lstInfo = [];
+        var count = 0;
+        var element = $('#tbodyCheckDupplicate .rowDupplicate');
+        $(element).each(function (index, e) {
+            count++;
+            var regId = $(e).val() * 1;
+            var data = {
+                RegisterId: regId,
+                Replace: false,
+                Plus: false,
+                Skip: false,
+                Remove: false,
+            }
+
+            var value = $(`input[name="check_${count}"]:checked`).val();
+            if (value == "1")
+                data.Replace = true;
+            if (value == "2")
+                data.Plus = true;
+            if (value == "3")
+                data.Skip = true;
+            if (value == "4")
+                data.Remove = true;
+
+            lstInfo.push(data);
+        });
+        return lstInfo;
+    }
 
 </script>

@@ -171,8 +171,29 @@ namespace DKAC.Controllers
             {
                 return RedirectToAction("NotPermission", "Home");
             }
-            
-            var result = 1;// _regRepo.RegisterByGroup(model);
+
+            var ca = model.Ca;
+            var dateApply = model.DateApply;
+            if (dateApply.Value.Date < DateTime.Now.Date || dateApply == null)
+            {
+                return Json(new { status = 0, message = "Đăng ký thất bại" }, JsonRequestBehavior.AllowGet);
+            }
+            if (dateApply.Value.Date == DateTime.Now.Date)
+            {
+                var hour = DateTime.Now.Hour;
+                if(ca == 1)
+                    if (hour > 9)
+                        return Json(new { status = 0, message = "Đăng ký thất bại" }, JsonRequestBehavior.AllowGet);
+                if (ca == 2)
+                    if (hour > 15)
+                        return Json(new { status = 0, message = "Đăng ký thất bại" }, JsonRequestBehavior.AllowGet);
+                if(ca == 3)
+                    if(hour > 22)
+                        return Json(new { status = 0, message = "Đăng ký thất bại" }, JsonRequestBehavior.AllowGet);
+            }
+
+            model.ModifyBy = currentUser.id;
+            var result = _regRepo.RegisterByMenu(model);
             if (result == 1)
             {
                 return Json(new { status = 1, message = "Đăng ký thành công" }, JsonRequestBehavior.AllowGet);

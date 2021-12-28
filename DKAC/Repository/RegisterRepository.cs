@@ -178,23 +178,169 @@ namespace DKAC.Repository
             var dateEnd = DateApply.Value.AddDays(7);
             var ca = menu.Ca;
 
-            var lstReg = (from u in db.Users where u.RoomID == user.RoomID
+            var lstReg = (from u in db.Users
+                          where u.RoomID == user.RoomID
                           join r in db.Registers on u.id equals r.UserId
                           join d in db.Dishes on r.DishId equals d.id
                           where r.Ca == ca && r.RegisterDate >= DateApply && r.RegisterDate <= dateEnd
                           select new RegisterByMenuInfo()
                           {
+                              RegisterId = r.id,
                               Ca = r.Ca,
                               RegDate = r.RegisterDate,
-                              //RegDateString = r.RegisterDate.Date + "/" + r.RegisterDate.Month + "/" + r.RegisterDate.Year,
                               DishId = r.DishId,
                               DishName = d.DishName,
                               Quantity = r.Quantity,
                               UserId = u.id,
                               UserName = u.FullName + "(" + u.UserName + ")",
-                          }).ToList() ?? new List<RegisterByMenuInfo>();
+                          }).OrderBy(x => x.UserId).ToList() ?? new List<RegisterByMenuInfo>();
 
             return lstReg;
+        }
+
+        public int RegisterByMenu(RegisterByMenuInfo model)
+        {
+            try
+            {
+
+                var user = db.Users.FirstOrDefault(x => x.id == model.UserId) ?? new User();
+                var lstUserByRoom = db.Users.Where(x => x.RoomID == user.id).ToList() ?? new List<User>();
+
+                var menu = db.Menus.FirstOrDefault(x => x.id == model.MenuId) ?? new Menu();
+                var menuDetails = db.MenuDetails.Where(x => x.MenuId == menu.id).ToList() ?? new List<MenuDetail>();
+
+                var lstDupplicate = CheckDupplicateRegister(menu.id, model.DateApply.Value.Date, user.id) ?? new List<RegisterByMenuInfo>();
+
+
+                foreach (var item in lstUserByRoom)
+                {
+                    var dateApply = model.DateApply.Value.Date;
+                    var dateEnd = dateApply.AddDays(7);
+                    var regDup = lstDupplicate.FirstOrDefault(x => x.UserId == item.id);
+                    var dateDup = regDup.RegDate;
+                    int index = 0;
+                    while (dateApply <= dateEnd)
+                    {
+                        index += 1;
+                        var detail = menuDetails.FirstOrDefault(x => x.IndexDate == index);
+                        if(detail != null)
+                        {
+                            if (regDup != null)
+                            {
+                                var r = model.lstDupplicate.FirstOrDefault(x => x.RegisterId == regDup.RegisterId);
+                            }
+                            else
+                            {
+                                var newReg = new Register()
+                                {
+                                    Ca = menu.Ca,
+                                    DishId = detail.DishId,
+                                    CreatedBy = model.ModifyBy,
+                                    CreatedDate = DateTime.Now,
+                                    Quantity = 1,
+                                    UserId = item.id,
+                                    RegisterDate = dateApply
+                                };
+                                db.Registers.Add(newReg);
+                            }
+                        }
+                        
+
+
+
+
+
+                        if (regDup != null)
+                        {
+                             
+                        }
+
+
+                        dateApply.AddDays(1);
+                    }
+
+                    if (regDup != null)
+                    {
+
+                    }
+                }
+
+
+                
+
+                var lstUId = lstUserByRoom.Select(x => x.id).ToList() ?? new List<int>();
+
+
+                
+
+
+                var lstUserId = new List<int?>();
+
+                
+                if (model.lstDupplicate != null)
+                {
+                    foreach (var item in model.lstDupplicate)
+                    {
+                        //nếu khác bỏ qua thì chạy
+                        if (item.Skip != true)
+                        {
+                            int index = 0;
+                            var reg = db.Registers.FirstOrDefault(x => x.id == item.RegisterId) ?? new Register();
+                            //while (dateApply <= dateEnd)
+                            //{
+                            //    index += 1;
+                            //    if (dateApply.Date == reg.RegisterDate.Date)
+                            //    {
+                            //        break;
+                            //    }
+                            //    dateApply.AddDays(1);
+                            //}
+                            var detail = menuDetails.FirstOrDefault(x => x.IndexDate == index) ?? new MenuDetail();
+                            // thay thế đăng ký trước đó
+                            if (item.Replace == true)
+                            {
+                                reg.DishId = detail.DishId;
+                                reg.ModifyDate = DateTime.Now;
+                                reg.ModifyBy = model.ModifyBy;
+                            }
+                            // add thêm 
+                            if (item.Plus == true)
+                            {
+                                var regNew = new Register()
+                                {
+                                    Ca = reg.Ca,
+                                    Quantity = 1,
+                                    UserId = reg.UserId,
+                                    RegisterDate = reg.RegisterDate,
+                                    CreatedDate = DateTime.Now,
+                                    ModifyDate = DateTime.Now,
+                                    CreatedBy = model.ModifyBy,
+                                    DishId = detail.DishId,
+                                };
+                                db.Registers.Add(regNew);
+                            }
+                            //xóa đăng ký trước đó
+                            if (item.Remove == true)
+                            {
+                                db.Registers.Remove(reg);
+                            }
+                        }
+                    }
+                }
+
+
+                var lstRegisDup = model.lstDupplicate.Select(x => x.RegisterId).ToList() ?? new List<int>();
+                var lstRegisModel = (from r in db.Registers
+                                     where lstRegisDup.Contains(r.id)
+                                     select r).ToList() ?? new List<Register>();
+                lstUserId = lstRegisModel.Select(x => x.UserId).Distinct().ToList();
+
+                return db.SaveChanges();
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ namespace DKAC.Models.InfoModel
     public class RegisterByMenuInfo
     {
         public int? MenuId { get; set; }
+        public int? RegisterId { get; set; }
         public int? UserId { get; set; }
         public string UserName { get; set; }
         public int? RoomId { get; set; }
@@ -19,7 +20,18 @@ namespace DKAC.Models.InfoModel
         public string RegDateString { get; set; }// ngày đăng ký string
         public int? Ca { get; set; } // ca đăng ký
         public int? DishId { get; set; }
+        public int? ModifyBy { get; set; }
         public string DishName { get; set; }
         public List<SelectListItem> lstMenu { get; set; }
+        public List<RegisterByDuplplicate> lstDupplicate { get; set; }
+    }
+
+    public class RegisterByDuplplicate
+    {
+        public int RegisterId { get; set; }
+        public bool? Replace { get; set; }
+        public bool? Plus { get; set; }
+        public bool? Skip { get; set; }
+        public bool? Remove { get; set; }
     }
 }

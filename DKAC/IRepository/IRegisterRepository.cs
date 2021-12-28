@@ -19,5 +19,6 @@ namespace DKAC.IRepository
         List<RegisterByPersonalInfo> GetAllRegister(int emId, DateTime regDate);
         int DeleteReg(int? id);
         List<Menu> GetMenuByUserId(int id);
+        int RegisterByMenu(RegisterByMenuInfo model);
     }
 }
