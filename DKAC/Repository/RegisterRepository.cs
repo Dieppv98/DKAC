@@ -171,14 +171,14 @@ namespace DKAC.Repository
             return data;
         }
 
-        public List<RegisterByMenuInfo> CheckDupplicateRegister(int MenuId, DateTime? DateApply, int userId)
+        public List<RegisterByMenuInfo> CheckDupplicateRegister(int MenuId, DateTime? DateApply, int userId, List<int> lstUserId)
         {
             var user = db.Users.FirstOrDefault(x => x.id == userId) ?? new User();
             var menu = db.Menus.FirstOrDefault(x => x.id == MenuId) ?? new Menu();
             var dateEnd = DateApply.Value.AddDays(7);
             var ca = menu.Ca;
 
-            var lstReg = (from u in db.Users
+            var lstReg = (from u in db.Users where !lstUserId.Contains(u.id)
                           where u.RoomID == user.RoomID
                           join r in db.Registers on u.id equals r.UserId
                           join d in db.Dishes on r.DishId equals d.id
@@ -202,38 +202,74 @@ namespace DKAC.Repository
         {
             try
             {
-
-                var user = db.Users.FirstOrDefault(x => x.id == model.UserId) ?? new User();
-                var lstUserByRoom = db.Users.Where(x => x.RoomID == user.id).ToList() ?? new List<User>();
-
-                var menu = db.Menus.FirstOrDefault(x => x.id == model.MenuId) ?? new Menu();
-                var menuDetails = db.MenuDetails.Where(x => x.MenuId == menu.id).ToList() ?? new List<MenuDetail>();
-
-                var lstDupplicate = CheckDupplicateRegister(menu.id, model.DateApply.Value.Date, user.id) ?? new List<RegisterByMenuInfo>();
-
+                var menuId = model.MenuId ?? 0;
+                var lstDupClinet = model.lstDupplicate ?? new List<RegisterByDuplplicate>();
+                var user = db.Users.FirstOrDefault(x => x.id == model.ModifyBy) ?? new User();
+                var lstUserByRoom = db.Users.Where(x => x.RoomID == user.RoomID && !model.lstUserId.Contains(x.id)).ToList() ?? new List<User>();
+                var menuDetails = db.MenuDetails.Where(x => x.MenuId == menuId).ToList() ?? new List<MenuDetail>();
+                var lstDupplicate = CheckDupplicateRegister(menuId, model.DateApply.Value.Date, user.id, model.lstUserId) ?? new List<RegisterByMenuInfo>();
 
                 foreach (var item in lstUserByRoom)
                 {
                     var dateApply = model.DateApply.Value.Date;
                     var dateEnd = dateApply.AddDays(7);
-                    var regDup = lstDupplicate.FirstOrDefault(x => x.UserId == item.id);
-                    var dateDup = regDup.RegDate;
+                    var regDup = lstDupplicate.Where(x => x.UserId == item.id).ToList() ?? new List<RegisterByMenuInfo>();
+                    //var dateDup = regDup.RegDate;
                     int index = 0;
                     while (dateApply <= dateEnd)
                     {
                         index += 1;
                         var detail = menuDetails.FirstOrDefault(x => x.IndexDate == index);
-                        if(detail != null)
+                        if (detail != null)
                         {
-                            if (regDup != null)
+                            var regDupByDate = regDup.Where(x => x.RegDate == dateApply && x.UserId == item.id).ToList();
+                            if (regDupByDate != null && regDupByDate.Count > 0)
                             {
-                                var r = model.lstDupplicate.FirstOrDefault(x => x.RegisterId == regDup.RegisterId);
+                                foreach (var i in regDupByDate)
+                                {
+                                    var element = lstDupClinet.FirstOrDefault(x => x.RegisterId == i.RegisterId);
+                                    if (element != null)
+                                    {
+                                        if (element.Skip != true)
+                                        {
+                                            var regUpdate = db.Registers.FirstOrDefault(x => x.id == element.RegisterId) ?? new Register();
+                                            // thay thế đăng ký trước đó
+                                            if (element.Replace == true)
+                                            {
+                                                regUpdate.DishId = detail.DishId;
+                                                regUpdate.ModifyDate = DateTime.Now;
+                                                regUpdate.ModifyBy = model.ModifyBy;
+                                            }
+                                            // add thêm 
+                                            if (element.Plus == true)
+                                            {
+                                                var regNew = new Register()
+                                                {
+                                                    Ca = regUpdate.Ca,
+                                                    Quantity = 1,
+                                                    UserId = regUpdate.UserId,
+                                                    RegisterDate = regUpdate.RegisterDate,
+                                                    CreatedDate = DateTime.Now,
+                                                    ModifyDate = DateTime.Now,
+                                                    CreatedBy = model.ModifyBy,
+                                                    DishId = detail.DishId,
+                                                };
+                                                db.Registers.Add(regNew);
+                                            }
+                                            //xóa đăng ký trước đó
+                                            if (element.Remove == true)
+                                            {
+                                                db.Registers.Remove(regUpdate);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
                                 var newReg = new Register()
                                 {
-                                    Ca = menu.Ca,
+                                    Ca = model.Ca,
                                     DishId = detail.DishId,
                                     CreatedBy = model.ModifyBy,
                                     CreatedDate = DateTime.Now,
@@ -244,100 +280,13 @@ namespace DKAC.Repository
                                 db.Registers.Add(newReg);
                             }
                         }
-                        
-
-
-
-
-
-                        if (regDup != null)
-                        {
-                             
-                        }
-
-
-                        dateApply.AddDays(1);
-                    }
-
-                    if (regDup != null)
-                    {
-
+                        dateApply = dateApply.AddDays(1);
                     }
                 }
-
-
-                
-
-                var lstUId = lstUserByRoom.Select(x => x.id).ToList() ?? new List<int>();
-
-
-                
-
-
-                var lstUserId = new List<int?>();
-
-                
-                if (model.lstDupplicate != null)
-                {
-                    foreach (var item in model.lstDupplicate)
-                    {
-                        //nếu khác bỏ qua thì chạy
-                        if (item.Skip != true)
-                        {
-                            int index = 0;
-                            var reg = db.Registers.FirstOrDefault(x => x.id == item.RegisterId) ?? new Register();
-                            //while (dateApply <= dateEnd)
-                            //{
-                            //    index += 1;
-                            //    if (dateApply.Date == reg.RegisterDate.Date)
-                            //    {
-                            //        break;
-                            //    }
-                            //    dateApply.AddDays(1);
-                            //}
-                            var detail = menuDetails.FirstOrDefault(x => x.IndexDate == index) ?? new MenuDetail();
-                            // thay thế đăng ký trước đó
-                            if (item.Replace == true)
-                            {
-                                reg.DishId = detail.DishId;
-                                reg.ModifyDate = DateTime.Now;
-                                reg.ModifyBy = model.ModifyBy;
-                            }
-                            // add thêm 
-                            if (item.Plus == true)
-                            {
-                                var regNew = new Register()
-                                {
-                                    Ca = reg.Ca,
-                                    Quantity = 1,
-                                    UserId = reg.UserId,
-                                    RegisterDate = reg.RegisterDate,
-                                    CreatedDate = DateTime.Now,
-                                    ModifyDate = DateTime.Now,
-                                    CreatedBy = model.ModifyBy,
-                                    DishId = detail.DishId,
-                                };
-                                db.Registers.Add(regNew);
-                            }
-                            //xóa đăng ký trước đó
-                            if (item.Remove == true)
-                            {
-                                db.Registers.Remove(reg);
-                            }
-                        }
-                    }
-                }
-
-
-                var lstRegisDup = model.lstDupplicate.Select(x => x.RegisterId).ToList() ?? new List<int>();
-                var lstRegisModel = (from r in db.Registers
-                                     where lstRegisDup.Contains(r.id)
-                                     select r).ToList() ?? new List<Register>();
-                lstUserId = lstRegisModel.Select(x => x.UserId).Distinct().ToList();
 
                 return db.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return 0;
             }

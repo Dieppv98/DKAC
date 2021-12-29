@@ -2,6 +2,7 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var count = 0;
 }
 
 <head>
@@ -37,6 +38,10 @@
             width: 20px !important;
             margin: auto !important;
             cursor: pointer !important;
+        }
+
+        .form-control {
+            height: auto !important
         }
     </style>
 </head>
@@ -79,6 +84,35 @@
                 </div>
 
                 <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-6">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr style="text-align:center;">
+                                    <th style="width:50px;">STT</th>
+                                    <th style="width:200px;">Tên nhân viên</th>
+                                    <th>Bỏ qua không đăng ký</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.lstUser)
+                                {
+                                    count++;
+                                    <tr style="text-align:center;">
+                                        <td>@count</td>
+                                        <td>@(item.FullName + "(" + item.UserName + ")")</td>
+                                        <td>
+                                            <input class='form-control' type='checkbox' id="checkSkip_@count" value="@item.id" title='Bỏ qua' style="width:20px;margin: auto;" />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>
+
+                <div class="row" style="margin-top: 20px;">
                     <table class="table table-bordered table-striped table-hover" id="menuTop" style="text-align:center;"></table>
                     <table class="table table-bordered table-striped table-hover" id="menuDetails" style="text-align:center;"></table>
                 </div>
@@ -103,7 +137,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body" style="max-height:initial !important;overflow-y:scroll;">
+                <div class="modal-body" style="max-height:500px !important;overflow-y:scroll;">
                     <div class="row">
                         <div class="col-md-12" style="padding-right:0px;padding-left:0px;">
                             <table class="table table-bordered table-hover">
@@ -139,7 +173,7 @@
 
 <script type="text/javascript">
 
-    var model = @Html.Raw(Json.Encode(Model));
+    var lstUserId = @Html.Raw(Json.Encode(Model.lstUser.Count));
 
     $("#MenuId").change(function () {
         CheckMenu();
@@ -232,6 +266,7 @@
         var check = {
             MenuId: $('#MenuId').val() * 1,
             DateApply: $('#regDate').val(),
+            lstUserId: GetInforUserCheck(),
         };
         if (check.MenuId <= 0) {
             toastr.warning('Bạn chưa chọn thực đơn!');
@@ -292,7 +327,7 @@
                         var date = new Date(parseInt(result[i].RegDate.substr(6)));
                         var formatted = date.getFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
                         count++;
-                        html += `<tr style='text-align:center;' class='rowDupplicate' value='${result[i].RegisterId}'>
+                        html += `<tr style='text-align:center;' class='rowDupplicate' id='${result[i].RegisterId}'>
                                     <td class='indexRow'>${count}</td>
                                     <td>${result[i].UserName}</td>
                                     <td>${formatted}</td>
@@ -323,32 +358,55 @@
         });
     };
 
+    function GetInforUserCheck() {
+        var lstId = [];
+        for (var i = 1; i <= lstUserId; i++) {
+            if ($(`#checkSkip_${i}`).is(':checked')) {
+                var check = $(`#checkSkip_${i}`).val() * 1;
+                lstId.push(check);
+            }
+        }
+        return lstId;
+    }
+
     function RegisterByDupplicate() {
         var data = {
             MenuId: $('#MenuId').val() * 1,
             DateApply: $('#regDate').val(),
             lstDupplicate: GetInfoRegisterDupplicate(),
+            lstUserId: GetInforUserCheck(),
         };
         var url = '/Register/RegisterByMenu/';
-        $.post(url, data,
-            function (rs) {
-                if (rs.status > 0) {
-                    swal({
-                        title: rs.message + "!",
-                        text: "Dữ liệu của bạn đã được cập nhật!",
-                        icon: "success",
-                    }).then(function (isConfirm) {
-                        window.location.href = '/Register/RegisterByGroup';
+        swal({
+            title: 'Bạn chắc chắn chứ?',
+            icon: "warning",
+            buttons: {
+                ok: "Xác nhận",
+                cancel: "Hủy",
+            }
+        }).then((isConfirm) => {
+            if (isConfirm == 'ok') {
+                $.post(url, data,
+                    function (rs) {
+                        if (rs.status > 0) {
+                            swal({
+                                title: rs.message + "!",
+                                text: "Dữ liệu của bạn đã được cập nhật!",
+                                icon: "success",
+                            }).then(function (isConfirm) {
+                                window.location.href = '/Register/RegisterByGroup';
+                            });
+                        }
+                        else {
+                            swal({
+                                title: rs.message + "!",
+                                text: "Có lỗi xảy ra!",
+                                icon: "error",
+                            })
+                        }
                     });
-                }
-                else {
-                    swal({
-                        title: rs.message + "!",
-                        text: "Có lỗi xảy ra!",
-                        icon: "error",
-                    })
-                }
-            });
+            }
+        });
     }
 
     function GetInfoRegisterDupplicate() {
@@ -357,7 +415,7 @@
         var element = $('#tbodyCheckDupplicate .rowDupplicate');
         $(element).each(function (index, e) {
             count++;
-            var regId = $(e).val() * 1;
+            var regId = $(e).attr("id") * 1;
             var data = {
                 RegisterId: regId,
                 Replace: false,

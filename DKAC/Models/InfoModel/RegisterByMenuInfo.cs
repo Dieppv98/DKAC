@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DKAC.Models.EntityModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -24,6 +25,8 @@ namespace DKAC.Models.InfoModel
         public string DishName { get; set; }
         public List<SelectListItem> lstMenu { get; set; }
         public List<RegisterByDuplplicate> lstDupplicate { get; set; }
+        public List<User> lstUser { get; set; }
+        public List<int> lstUserId { get; set; }
     }
 
     public class RegisterByDuplplicate

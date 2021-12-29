@@ -60,6 +60,11 @@
 </head>
 
 <body>
+    <style>
+        .setHeight {
+            margin-top: 100Px !important;
+        }
+    </style>
     <!-- ======= Header ======= -->
     <header id="header" class="fixed-top">
         <div class="container d-flex align-items-center">
@@ -186,16 +191,15 @@
 
         </div>
     </header>
-    <!-- End Header -->
 
-    <main id="main">
-        <!--Body Section-->
-        <section id="body">
-            <div class="container" data-aos="fade-up">
+    <!-- End Header -->
+    <main id="main" class="main">
+        <div class="container">
+            <div class="setHeight">
                 @RenderBody()
             </div>
-        </section>
-        <!--End Body Section-->
+
+        </div>
     </main><!-- End #main -->
     <!-- ======= Footer ======= -->
     <footer id="footer">

@@ -147,6 +147,7 @@ namespace DKAC.Controllers
                 return RedirectToAction("NotPermission", "Home");
             }
             var userInfo = _empRepo.GetById(currentUser.id);
+            var lstUserByRoomId = _empRepo.GetEmployees(userInfo.RoomID);
             RegisterByMenuInfo model = new RegisterByMenuInfo();
             var lstMenu = _regRepo.GetMenuByUserId(currentUser.id);
             model.lstMenu = lstMenu.ConvertAll(a => new SelectListItem()
@@ -158,6 +159,7 @@ namespace DKAC.Controllers
             model.RoomName = userInfo.RoomName;
             model.UserId = userInfo.id;
             model.UserName = userInfo.UserName;
+            model.lstUser = lstUserByRoomId;
 
             return View(model);
         }
@@ -171,8 +173,13 @@ namespace DKAC.Controllers
             {
                 return RedirectToAction("NotPermission", "Home");
             }
-
-            var ca = model.Ca;
+            var menuId = model.MenuId ?? 0;
+            var menu = _menuRepo.GetById(menuId);
+            if (menu.id <= 0)
+            {
+                return Json(new { status = 0, message = "Đăng ký thất bại" }, JsonRequestBehavior.AllowGet);
+            }
+            var ca = menu.Ca;
             var dateApply = model.DateApply;
             if (dateApply.Value.Date < DateTime.Now.Date || dateApply == null)
             {
@@ -181,20 +188,21 @@ namespace DKAC.Controllers
             if (dateApply.Value.Date == DateTime.Now.Date)
             {
                 var hour = DateTime.Now.Hour;
-                if(ca == 1)
+                if (ca == 1)
                     if (hour > 9)
                         return Json(new { status = 0, message = "Đăng ký thất bại" }, JsonRequestBehavior.AllowGet);
                 if (ca == 2)
                     if (hour > 15)
                         return Json(new { status = 0, message = "Đăng ký thất bại" }, JsonRequestBehavior.AllowGet);
-                if(ca == 3)
-                    if(hour > 22)
+                if (ca == 3)
+                    if (hour > 22)
                         return Json(new { status = 0, message = "Đăng ký thất bại" }, JsonRequestBehavior.AllowGet);
             }
-
+            model.MenuId = menu.id;
+            model.Ca = ca;
             model.ModifyBy = currentUser.id;
             var result = _regRepo.RegisterByMenu(model);
-            if (result == 1)
+            if (result > 0)
             {
                 return Json(new { status = 1, message = "Đăng ký thành công" }, JsonRequestBehavior.AllowGet);
             }
@@ -226,7 +234,7 @@ namespace DKAC.Controllers
             {
                 return RedirectToAction("NotPermission", "Home");
             }
-            
+
             var result = _regRepo.RegisterByGroup(model);
             if (result == 1)
             {
@@ -275,7 +283,7 @@ namespace DKAC.Controllers
         }
 
         [HttpPost]
-        public ActionResult CheckDupplicateRegister(int MenuId, DateTime? DateApply)
+        public ActionResult CheckDupplicateRegister(int MenuId, DateTime? DateApply, List<int> lstUserId)
         {
             var currentUser = (User)Session[CommonConstants.USER_SESSION];
             ViewBag.hasViewPermission = CheckPermission((int)PageId.DangKyTapThe, (int)Actions.Xem, currentUser);
@@ -284,7 +292,7 @@ namespace DKAC.Controllers
                 return RedirectToAction("NotPermission", "Home");
             }
 
-            var data = _regRepo.CheckDupplicateRegister(MenuId, DateApply, currentUser.id);
+            var data = _regRepo.CheckDupplicateRegister(MenuId, DateApply, currentUser.id, lstUserId);
             return Json(data, JsonRequestBehavior.AllowGet);
         }
     }
