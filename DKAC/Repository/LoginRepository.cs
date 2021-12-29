@@ -92,7 +92,7 @@ namespace DKAC.Repository
                 if (page != null) lstPage.Add(page);
             }
             model.ListPerAction = lstPerAction;
-            model.ListModul = lstModul.Distinct().ToList();
+            model.ListModul = lstModul.Distinct().OrderBy(x => x.id).ToList();
             model.ListPage = lstPage.Distinct().ToList();
             return model;
         }
