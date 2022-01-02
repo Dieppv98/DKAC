@@ -2398,6 +2398,9 @@
     <Content Include="Content\DKAC\index.min.css" />
     <Content Include="Content\image\Dish\favicon.png" />
     <Content Include="Content\image\Dish\notify.jpg" />
+    <Content Include="Content\image\star\halfstar.png" />
+    <Content Include="Content\image\star\whitestar.png" />
+    <Content Include="Content\image\star\yellowstar.png" />
     <Content Include="Content\share.css" />
     <Content Include="Content\soundMessage.mp3" />
     <Content Include="Content\sweet-alert.css" />

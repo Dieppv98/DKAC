@@ -22,8 +22,9 @@ namespace DKAC.Repository
                 model.IsDeleted = 0;
                 db.Jugments.Add(model);
                 var dish = db.Dishes.FirstOrDefault(x => x.IsDeleted == 0 && x.id == model.DishId);
+                int jugmentQty = dish.JugmentQty == null ? 1 : dish.JugmentQty == 0 ? 1 : dish.JugmentQty ?? 1;
                 double totalPoint = (double)(dish.JugmentPoint + model.Point);
-                dish.JugmentPoint = (float)(totalPoint / 2);
+                dish.JugmentPoint = Math.Round((totalPoint / jugmentQty), 1);
                 dish.JugmentQty++;
                 db.SaveChanges();
                 return 1;

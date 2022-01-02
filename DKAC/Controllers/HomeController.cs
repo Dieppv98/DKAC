@@ -61,9 +61,30 @@ namespace DKAC.Controllers
 
         public ActionResult ListAllDish(HomeRequestModel model, int page = 1, int pageSize = 10)
         {
-            var lstDish = _homeRepo.GetListAllDish();
+            var em = (User)Session[CommonConstants.USER_SESSION];
+            List<DishInfo> lstInfo = new List<DishInfo>();
+            var lstDish = _homeRepo.GetAllDishs(null);
+            foreach (var item in lstDish)
+            {
+                DishInfo info = new DishInfo();
+                info.id = item.id;
+                info.Image = item.Image;
+                info.JugmentPoint = item.JugmentPoint;
+                info.JugmentQty = item.JugmentQty;
+                info.RegisterQty = item.RegisterQty;
+                info.SupplierId = item.SupplierId;
+                info.DishCode = item.DishCode;
+                info.DishName = item.DishName;
+                info.DishTypeId = item.DishTypeId;
+                info.Cost = item.Cost;
+                info.Description = item.Description;
+                var jug = _homeRepo.GetJug(item.id, em.id);
+                if (jug != null) { info.JugStatus = 1; }
+                else { info.JugStatus = 0; }
+                lstInfo.Add(info);
+            }
 
-            model.lstAllDish = lstDish;
+            model.lstDish = lstInfo;
             return View(model);
         }
 

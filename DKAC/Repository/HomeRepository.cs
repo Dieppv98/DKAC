@@ -30,7 +30,7 @@ namespace DKAC.Repository
 
         public Jugment GetJug(int? dishId, int? emId)
         {
-            return db.Jugments.FirstOrDefault(x => x.IsDeleted == 0 && x.DishId == dishId && x.EmployeeId == emId);
+            return db.Jugments.AsNoTracking().FirstOrDefault(x => x.IsDeleted == 0 && x.DishId == dishId && x.EmployeeId == emId);
         }
 
         public List<Dish> GetListAllDish()

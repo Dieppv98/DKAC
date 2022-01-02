@@ -13,10 +13,19 @@ namespace DKAC.Controllers
     public class JugmentController : Controller
     {
         JugmentRepository _jugRepo = new JugmentRepository();
+        HomeRepository _homeRepo = new HomeRepository();
 
         // GET: Jugment
         public ActionResult Index(int? dishId)
         {
+            var em = (User)Session[CommonConstants.USER_SESSION];
+            var jug = _homeRepo.GetJug(dishId, em.id);
+            //nếu người dùng đã đánh giá món ăn này 1 lần r
+            if (jug != null)
+            {
+                return RedirectToAction("NotPermission", "Home");
+            }
+
             var dish = _jugRepo.GetDish(dishId);
             ViewBag.Dish = dish;
             return View();
@@ -25,6 +34,12 @@ namespace DKAC.Controllers
         public ActionResult Jugment(Jugment model)
         {
             var em = (User)Session[CommonConstants.USER_SESSION];
+            var jug = _homeRepo.GetJug(model.DishId, em.id);
+            //nếu người dùng đã đánh giá món ăn này 1 lần r
+            if (jug != null)
+            {
+                return Json(new { status = 0, message = "Đánh giá thất bại" }, JsonRequestBehavior.AllowGet);
+            }
             model.EmployeeId = em.id;
             model.JugmentDate = DateTime.Now;
             model.ModifyDate = DateTime.Now;

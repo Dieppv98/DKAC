@@ -9,25 +9,38 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<style>
-    label {
-        margin-top: 8px;
-        color: #435d7d;
-        font-weight: 700;
-        font-size: 15px;
+<head>
+    @if (Model.id > 0)
+    {
+        <title>
+            Chi tiết suất ăn
+        </title>
+    }
+    else
+    {
+        <title>Thêm mới suất ăn</title>
     }
 
-    .form-group {
-        border: 2px solid #afc9e4;
-        background: #eef6ff;
-        padding: 20px;
-    }
-
-        .form-group .row {
-            margin-top: 20px;
-            margin-bottom: 20px;
+    <style>
+        label {
+            margin-top: 8px;
+            color: #435d7d;
+            font-weight: 700;
+            font-size: 15px;
         }
-</style>
+
+        .form-group {
+            border: 2px solid #afc9e4;
+            background: #eef6ff;
+            padding: 20px;
+        }
+
+            .form-group .row {
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+    </style>
+</head>
 
 <div class="container">
     <div class="table-wrapper">
@@ -239,7 +252,7 @@
                 },
             });
         };
-        
+
     });
 
     function AddOrUpdate() {
@@ -338,6 +351,6 @@
         //}
     }
 
-    
+
 </script>
 

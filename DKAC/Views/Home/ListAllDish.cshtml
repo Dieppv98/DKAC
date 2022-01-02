@@ -5,12 +5,11 @@
     var count = 0;
 }
 
-
-
 <head>
+    <title>Tất cả món ăn</title>
     <style>
         #btnSearch {
-            padding: 7px 15px 7px 15px;
+            padding: 7px 15px 7px 15px !important;
         }
 
         .lbl {
@@ -49,8 +48,8 @@
 
     <div class="container">
         <div class="table-wrapper" style=" background-color: #88a6cb; color: white; ">
-                
-            @foreach (var item in Model.lstAllDish)
+
+            @foreach (var item in Model.lstDish)
             {
                 { count++; }
                 <div class="row" style="padding: 15px; margin-bottom: 20px;">
@@ -77,16 +76,28 @@
                                 <div class="col-md-3"><p>Đánh giá: </p></div>
                                 <div class="col-md-9">
                                     <div class="sm-rating">
-                                        <input name="sm_rating" role="button" tabindex="5" type="radio" id="sm_rating5" value="5" on="tap:sm_rating.submit">
-                                        <label for="sm_rating5" title="5 stars">☆</label>
-                                        <input name="sm_rating" role="button" tabindex="4" type="radio" id="sm_rating4" value="4" on="tap:sm_rating.submit">
-                                        <label for="sm_rating4" title="4 stars">☆</label>
-                                        <input name="sm_rating" role="button" tabindex="3" type="radio" id="sm_rating3" value="3" on="tap:sm_rating.submit">
-                                        <label for="sm_rating3" title="3 stars">☆</label>
-                                        <input name="sm_rating" role="button" tabindex="2" type="radio" id="sm_rating2" value="2" on="tap:sm_rating.submit">
-                                        <label for="sm_rating2" title="2 stars">☆</label>
-                                        <input name="sm_rating" role="button" tabindex="1" type="radio" id="sm_rating1" value="1" on="tap:sm_rating.submit">
-                                        <label for="sm_rating1" title="1 stars">☆</label>
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (item.JugmentPoint > i)
+                                            {
+                                                <img src="~/Content/image/star/yellowstar.png" style="width: 15px; height: 15px " />
+                                            }
+                                            else if (item.JugmentPoint == i)
+                                            {
+                                                <img src="~/Content/image/star/yellowstar.png" style="width: 15px; height: 15px " />
+                                            }
+                                            else
+                                            {
+                                                if (item.JugmentPoint > (i - 1))
+                                                {
+                                                    <img src="~/Content/image/star/halfstar.png" style="width: 15px; height: 15px" />
+                                                }
+                                                else
+                                                {
+                                                    <img src="~/Content/image/star/whitestar.png" style="width: 15px; height: 15px " />
+                                                }
+                                            }
+                                        }
                                         <input type="hidden" name="sm_rating_post_id" value="66449">
                                     </div>
                                 </div>
@@ -94,18 +105,27 @@
                             <div class="row">
                                 <div class="col-md-3"><p>Điểm: </p></div>
                                 <div class="col-md-9">
-                                    <p>@item.JugmentPoint (@item.JugmentQty Đánh giá)</p>
+                                    @if (item.JugStatus == 1)
+                                    {
+                                        <p>@item.JugmentPoint ☆ (@item.JugmentQty Đánh giá) - Bạn đã đánh giá &#10003;</p>
+                                    }
+                                    else
+                                    {
+                                        <p>@item.JugmentPoint ☆ (@item.JugmentQty Đánh giá)</p>
+                                    }
                                 </div>
                             </div>
                         </div>
                         <div class="dish_box">
-                            <a href="/Register/RegisterByPersonal?dishId=@item.id" class="btn btn-sm btn-success">Đăng ký</a>
-                            <a href="/Jugment/Index?dishId=@item.id" class="btn btn-sm btn-danger">Đánh giá</a>
+                            <a href="/Register/RegisterByPersonal?dishId=@item.id" class="btn btn-success">Đăng ký</a>
+                            @if (item.JugStatus != 1)
+                            {
+                                <a href="/Jugment?dishId=@item.id" class="btn btn-danger">Đánh giá</a>
+                            }
                         </div>
                     </div>
                 </div>
             }
-
         </div>
     </div>
 </body>
