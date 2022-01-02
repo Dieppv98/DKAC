@@ -20,7 +20,7 @@ namespace DKAC.Controllers
         {
             var em = (User)Session[CommonConstants.USER_SESSION];
             var jug = _homeRepo.GetJug(dishId, em.id);
-            //nếu người dùng đã đánh giá món ăn này 1 lần r
+            //nếu người dùng đã đánh giá món ăn này 1 lần rồi
             if (jug != null)
             {
                 return RedirectToAction("NotPermission", "Home");
@@ -35,7 +35,7 @@ namespace DKAC.Controllers
         {
             var em = (User)Session[CommonConstants.USER_SESSION];
             var jug = _homeRepo.GetJug(model.DishId, em.id);
-            //nếu người dùng đã đánh giá món ăn này 1 lần r
+            //nếu người dùng đã đánh giá món ăn này 1 lần rồi
             if (jug != null)
             {
                 return Json(new { status = 0, message = "Đánh giá thất bại" }, JsonRequestBehavior.AllowGet);
