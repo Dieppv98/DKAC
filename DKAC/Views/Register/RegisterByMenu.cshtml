@@ -199,7 +199,7 @@
                                     </tr>
                                     <tr>
                                         <td>Ngày tạo: <b>${rs.DateString}</b></td>
-                                        <td>Ghi chú: <b>${rs.Description}</b></td>
+                                        <td>Ghi chú: <b>${rs.Description == null ? "" : rs.Description}</b></td>
                                     </tr>`;
                     $('#menuTop').html(munuTop);
                     $('#menuDetails').empty();

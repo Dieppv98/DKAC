@@ -177,7 +177,8 @@ namespace DKAC.Repository
             var menu = db.Menus.FirstOrDefault(x => x.id == MenuId) ?? new Menu();
             var dateEnd = DateApply.Value.AddDays(7);
             var ca = menu.Ca;
-
+            if (lstUserId == null)
+                lstUserId = new List<int>();
             var lstReg = (from u in db.Users where !lstUserId.Contains(u.id)
                           where u.RoomID == user.RoomID
                           join r in db.Registers on u.id equals r.UserId
