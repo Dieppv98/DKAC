@@ -2792,6 +2792,7 @@
     <Content Include="Views\Menu\Edit.cshtml" />
     <Content Include="Views\Menu\Detail.cshtml" />
     <Content Include="Views\Register\RegisterByMenu.cshtml" />
+    <Content Include="Temp\DanhSachThongKe.xlsx" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
