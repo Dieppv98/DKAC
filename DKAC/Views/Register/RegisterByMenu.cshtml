@@ -40,8 +40,8 @@
             cursor: pointer !important;
         }
 
-        .form-control {
-            height: auto !important
+        table.table tr th, table.table tr td {
+            padding: 5px 5px !important;
         }
     </style>
 </head>
@@ -216,6 +216,8 @@
                                 toastr.warning('Bạn đã quá giờ đăng ký cho ca 1!');
                                 $('#btnDangKy').attr('disabled', 'disabled');
                                 return;
+                            } else {
+                                $('#btnDangKy').removeAttr('disabled');
                             }
                         }
                         if (rs.Ca == 2) {
@@ -223,6 +225,8 @@
                                 toastr.warning('Bạn đã quá giờ đăng ký cho ca 2!');
                                 $('#btnDangKy').attr('disabled', 'disabled');
                                 return;
+                            } else {
+                                $('#btnDangKy').removeAttr('disabled');
                             }
                         }
                         if (rs.Ca == 3) {
@@ -230,9 +234,11 @@
                                 toastr.warning('Bạn đã quá giờ đăng ký cho ca 3!');
                                 $('#btnDangKy').attr('disabled', 'disabled');
                                 return;
+                            } else {
+                                $('#btnDangKy').removeAttr('disabled');
                             }
                         }
-                    }
+                    } else { $('#btnDangKy').removeAttr('disabled');}
                 },
                 error: function (ErrorMessage) {
                     alert(ErrorMessage.response);

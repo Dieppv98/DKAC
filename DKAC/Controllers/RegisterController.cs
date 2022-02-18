@@ -201,6 +201,11 @@ namespace DKAC.Controllers
             model.MenuId = menu.id;
             model.Ca = ca;
             model.ModifyBy = currentUser.id;
+            if(model.lstUserId == null)
+            {
+                model.lstUserId = new List<int>();
+            }
+            
             var result = _regRepo.RegisterByMenu(model);
             if (result > 0)
             {
