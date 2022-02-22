@@ -30,7 +30,12 @@ namespace DKAC.Repository
 
         public Jugment GetJug(int? dishId, int? emId)
         {
-            return db.Jugments.AsNoTracking().FirstOrDefault(x => x.IsDeleted == 0 && x.DishId == dishId && x.EmployeeId == emId);
+            DateTime now = DateTime.Now.Date;
+
+            var thisWeekStart = now.AddDays(-(int)now.DayOfWeek);//ngày bắt đầu tuần(chủ nhật) theo now
+            var thisWeekEnd = thisWeekStart.AddDays(7);//ngày kết thúc tuần(thứ 7) theo now
+
+            return db.Jugments.AsNoTracking().FirstOrDefault(x => x.IsDeleted == 0 && x.DishId == dishId && x.EmployeeId == emId && x.JugmentDate >= thisWeekStart && x.JugmentDate < thisWeekEnd);
         }
 
         public List<Dish> GetListAllDish()
